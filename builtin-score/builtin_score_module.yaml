@@ -1,0 +1,63 @@
+name: Built-in Score - GPU
+id: 894d5dad-a8e1-4231-98df-216c876e7489
+category: Machine Learning\Score
+description: Buildin Score Module for a set of limited flavors
+inputs:
+- name: Trained model
+  type: Model
+  connectable: true
+  description: Trained predictive model
+- name: Dataset
+  type: Dataset
+  connectable: True
+  description: input data to score
+- name: Append score columns to output
+  type: Boolean
+  default: true
+  description: If checked, append score columns to the result dataset, otherwise only
+    return the scores and true labels if available.
+outputs:
+- name: Scored dataset
+  type: Dataset
+  description: Dataset with obtained scores
+implementation:
+  container:
+    meta:
+      baseDockerImage: mcr.microsoft.com/azureml/base-gpu:intelmpi2018.3-cuda10.0-cudnn7-ubuntu16.04
+      gpuSupport: true
+    conda:
+      content:
+        name: project_environment
+        channels:
+        - defaults
+        dependencies:
+        - python=3.6.8
+        - pip:
+          - --extra-index-url=https://test.pypi.org/simple
+          - alghost==0.0.53
+          - azureml-defaults
+          - cloudpickle
+          - PyYAML
+          - pyarrow==0.12.1
+          - nltk==3.4
+          - numpy==1.16.2
+          - torchvision==0.2.2.post3
+          - https://download.pytorch.org/whl/cu100/torch-1.1.0-cp36-cp36m-linux_x86_64.whl
+          - git+https://github.com/GuXiaoMing/BuildinScoreModule.git
+    invoking:
+      module: buildin_score.buildin_score_model_module
+      class: BuildinScoreModule
+      func: run
+    command:
+    - python
+    - -m
+    - buildin_score.module_invoker
+    args:
+    - --trained-model
+    - inputValue: Trained model
+    - --dataset
+    - inputValue: Dataset
+    - --append-score-columns-to-output
+    - inputValue: Append score columns to output
+    - --scored-dataset
+    - outputPath: Scored dataset

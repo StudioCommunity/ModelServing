@@ -43,15 +43,15 @@ implementation:
           - numpy==1.16.2
           - torchvision==0.2.2.post3
           - https://download.pytorch.org/whl/cu100/torch-1.1.0-cp36-cp36m-linux_x86_64.whl
-          - git+https://github.com/GuXiaoMing/BuildinScoreModule.git
+          - git+https://github.com/GuXiaoMing/CustomModules.git@master#subdirectory=builtin-score
     invoking:
-      module: buildin_score.buildin_score_model_module
-      class: BuildinScoreModule
+      module: builtin_score.builtin_score_module
+      class: BuiltinScoreModule
       func: run
     command:
     - python
     - -m
-    - buildin_score.module_invoker
+    - builtin_score.module_invoker
     args:
     - --trained-model
     - inputValue: Trained model

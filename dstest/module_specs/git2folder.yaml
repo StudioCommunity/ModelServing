@@ -1,0 +1,37 @@
+name: Git to Folder
+id: a58c2f70-be68-11e9-a558-d89ef34146e8
+category: Import Data
+description: Import Git data as a folder
+inputs:
+- name: Git URL
+  type: String
+  description: The Git project to be imported
+outputs:
+- name: Output Path
+  type: GenericFolder
+  port: True
+  description: The Output Folder
+implementation:
+  container:
+    conda:
+      name: project_environment
+      channels:
+      - defaults
+      dependencies:
+      - python=3.6.8
+      - pip:
+        - gitpython
+        - git+https://github.com/StudioCommunity/CustomModules.git@master#subdirectory=dstest
+    command:
+    - python
+    - -m
+    - dstest.importer.git2folder
+    args:
+    - --git_url
+    - inputValue: Git URL
+    - --out_path
+    - outputPath: Output Path
+  invoking:
+    module:
+    class:
+    func:

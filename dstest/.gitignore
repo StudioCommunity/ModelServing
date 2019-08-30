@@ -1,0 +1,12 @@
+MNIST_data
+MNIST-data
+model
+*.pkl
+*.csv
+*.parquet
+outputs
+data
+datas
+notebooks
+app
+logdir

@@ -1,0 +1,52 @@
+name: Images to DataFrame
+id: 9e19eb80-c25d-11e9-85ca-d89ef34146e8
+category: Machine Learning\Preprocess
+description: Images to DataFrame
+inputs:
+- name: Input Data
+  type: GenericFolder
+  port: True
+  description: input data frame
+outputs:
+- name: Output Data
+  type: TabularDataFolder
+  port: True
+  description: The Output
+implementation:
+  container:
+    conda:
+      name: project_environment
+      channels:
+      - defaults
+      dependencies:
+      - python=3.6.8
+      - pip:
+        - --extra-index-url=https://test.pypi.org/simple
+        - azureml-defaults
+        - alghost
+        - pandas
+        - tensorflow
+        - click
+        - PyYAML
+        - pyarrow
+        - scipy
+        - scikit-image
+        - Pillow
+        - opencv-python-headless
+        - https://download.pytorch.org/whl/cu100/torch-1.1.0-cp36-cp36m-linux_x86_64.whl
+        - https://download.pytorch.org/whl/cu100/torchvision-0.3.0-cp36-cp36m-linux_x86_64.whl
+        - git+https://github.com/StudioCommunity/CustomModules.git@master#subdirectory=builtin-score
+        - git+https://github.com/StudioCommunity/CustomModules.git@master#subdirectory=dstest
+    command:
+    - python
+    - -m
+    - dstest.preprocess.import_image
+    args:
+    - --input_path
+    - inputValue: Input Data
+    - --output_path
+    - outputPath: Output Data
+  invoking:
+    module:
+    class:
+    func:

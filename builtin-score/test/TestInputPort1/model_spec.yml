@@ -1,4 +1,9 @@
-model_file_path: ./model.pkl
+conda:
+  conda_file_path: conda.yaml
 flavor:
-  framework: Pytorch
-  env: conda.yaml
+  framework: pytorch
+pytorch:
+  model_file_path: model.pkl
+inputs:
+  - x
+  - c

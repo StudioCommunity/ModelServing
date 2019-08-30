@@ -1,0 +1,11 @@
+conda:
+  conda_file_path: conda.yaml
+flavor:
+  framework: pytorch
+pytorch:
+  model_file_path: model.pkl
+inputs:
+  - x
+  - c
+
+# Model origin github: https://modelzoo.co/model/stargan

@@ -1,0 +1,79 @@
+name: Import Model
+id: 384bf168-be54-11e9-b8bd-d89ef34146e8
+category: Machine Learning\Score
+description: Import External Model to Studio Trained Model
+inputs: 
+- name: Input Path
+  type: GenericFolder
+  port: True
+  description: Input Folder
+- name: Model Flavor
+  type: Mode
+  description: Model Flavor
+  options: 
+    - pytorch
+    - tensorflow
+    - sklearn
+    - keras
+- name: Model File
+  type: String
+  description: Model File
+- name: Serialization Mode
+  type: String 
+  description: Serialization Mode
+- name: Init Args
+  type: String
+  optional: True
+  description: Init Args
+outputs:
+- name: Output Model
+  type: ModelFolder
+  port: True
+  description: Output Model
+implementation:
+  container:
+    runConfig:
+      baseDockerImage: mcr.microsoft.com/azureml/base-gpu:intelmpi2018.3-cuda10.0-cudnn7-ubuntu16.04
+      gpuSupport: true
+    conda:
+      name: project_environment
+      channels:
+      - defaults
+      dependencies:
+      - python=3.6.8
+      - git
+      - regex
+      - pip:
+        - pandas
+        - azureml-defaults
+        - https://download.pytorch.org/whl/cu100/torch-1.1.0-cp36-cp36m-linux_x86_64.whl
+        - https://download.pytorch.org/whl/cu100/torchvision-0.3.0-cp36-cp36m-linux_x86_64.whl
+        - pillow==5.2.0
+        - tensorflow
+        - keras
+        - cloudpickle
+        - click
+        - PyYAML
+        - git+https://github.com/StudioCommunity/CustomModules.git@master#subdirectory=dstest
+        - git+https://github.com/StudioCommunity/CustomModules.git@master#subdirectory=builtin-models
+    command:
+    - python
+    - -m
+    - dstest.importer.import_model
+    args:
+    - --input_path
+    - inputValue: Input Path
+    - --flavor
+    - inputValue: Model Flavor
+    - --model_file
+    - inputValue: Model File
+    - --serialization_mode
+    - inputValue: Serialization Mode
+    - --init_args
+    - inputValue: Init Args
+    - --out_model_path
+    - outputPath: Output Model
+  invoking:
+    module:
+    class:
+    func:

@@ -1,0 +1,38 @@
+name: Dataset to Model
+id: 01d734a3-82bf-449b-85b4-5f99fdf64d43
+category: Machine Learning\Train
+description: Unzip the dataset in the input port to the output port (of Model type)
+inputs:
+- name: Zipped Model
+  type: Zip
+  port: True
+  description: Contains a zipfile in which the Model folder resides
+outputs:
+- name: Output Model
+  type: ModelFolder
+  port: True
+  description: The Output model
+implementation:
+  container:
+    conda:
+      name: project_environment
+      channels:
+      - defaults
+      dependencies:
+      - python=3.6.8
+      - pip:
+        - zipfile36
+        - git+https://github.com/StudioCommunity/CustomModules.git@master#subdirectory=dstest
+    command:
+    - python
+    - -m
+    - dstest.dataset2model
+    args:
+    - --zipped_model_path
+    - inputValue: Zipped Model
+    - --unzipped_model_path
+    - outputPath: Output Model
+  invoking:
+    module:
+    class:
+    func:

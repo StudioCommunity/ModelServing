@@ -1,0 +1,8 @@
+flavor:
+  framework: pytorch
+pytorch:
+  model_class_init_args: model.init
+  model_class_name: MnistNet
+  model_class_package: MnistModel
+  model_file_path: model.states
+  serialization_format: statedict

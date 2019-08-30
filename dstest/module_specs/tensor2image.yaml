@@ -1,0 +1,59 @@
+name: Tensor to Image
+id: 3a5b1335-5958-4c15-b598-9e92cb59b4b2
+category: Machine Learning\Postprocess
+description: Convert tensor to image
+inputs:
+- name: Input Data
+  type: TabularDataFolder
+  port: True
+  description: input data frame
+- name: Tensor Column
+  type: String
+  default: Score_0
+  description: Tensor Column
+outputs:
+- name: Output Data
+  type: TabularDataFolder
+  port: True
+  description: The Output
+implementation:
+  container:
+    conda:
+      name: project_environment
+      channels:
+      - defaults
+      dependencies:
+      - python=3.6.2
+      - pip:
+        - --extra-index-url=https://test.pypi.org/simple
+        - numpy
+        - pandas
+        - alghost==0.0.70
+        - azureml-defaults
+        - click
+        - PyYAML
+        - pyarrow
+        - torchvision
+        - tensorflow
+        - scipy
+        - scikit-image
+        - opencv-python-headless
+        - Pillow
+        - https://download.pytorch.org/whl/cu100/torch-1.1.0-cp36-cp36m-linux_x86_64.whl
+        - git+https://github.com/StudioCommunity/CustomModules.git@master#subdirectory=builtin-score
+        - git+https://github.com/StudioCommunity/CustomModules.git@master#subdirectory=dstest
+    command:
+    - python
+    - -m
+    - dstest.postprocess.tensor_to_image
+    args:
+    - --tensor_column
+    - inputValue: Tensor Column
+    - --input_path
+    - inputValue: Input Data
+    - --output_path
+    - outputPath: Output Data
+  invoking:
+    module: dstest.postprocess.tensor_to_image
+    class: Process
+    func: run

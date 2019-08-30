@@ -1,0 +1,53 @@
+name: Remove Columns
+id: 339e583b-6c79-4e04-9df8-e1248eb32612
+category: Machine Learning\Postprocess
+description: Remove Columns
+inputs:
+- name: Input Data
+  type: TabularDataFolder
+  port: True
+  description: input data frame
+- name: Remove Columns
+  type: String
+  default: 
+  description: Columns to remove
+outputs:
+- name: Output Data
+  type: TabularDataFolder
+  port: True
+  description: The Output
+implementation:
+  container:
+    conda:
+      name: project_environment
+      channels:
+      - defaults
+      dependencies:
+      - python=3.6.2
+      - pip:
+        - --extra-index-url=https://test.pypi.org/simple
+        - alghost==0.0.70
+        - pandas
+        - tensorflow
+        - click
+        - PyYAML
+        - pyarrow
+        - scipy 
+        - opencv-python-headless
+        - git+https://github.com/StudioCommunity/CustomModules.git@master#subdirectory=builtin-score
+        - git+https://github.com/StudioCommunity/CustomModules.git@master#subdirectory=dstest
+    command:
+    - python
+    - -m
+    - dstest.postprocess.remove_column
+    args:
+    - --remvoe_columns
+    - inputValue: Remove Columns
+    - --input_path
+    - inputValue: Input Data
+    - --output_path
+    - outputPath: Output Data
+  invoking:
+    module: dstest.postprocess.remove_column
+    class: Process
+    func: run

@@ -1,0 +1,36 @@
+name: Sklearn Train - Xin builtin-model test
+id: 8ad10e1b-ac2d-47f8-aa96-78597f26ca48
+category: Machine Learning\Train
+description: DS Sklearn train which outputs a Sklearn model with spec
+inputs:
+outputs:
+- name: Output Model
+  type: ModelFolder
+  port: True
+  description: The Output model
+implementation:
+  container:
+    conda:
+      name: project_environment
+      channels:
+      - defaults
+      dependencies:
+      - python=3.6.2
+      - pip:
+        - pandas
+        - scikit-learn
+        - click
+        - PyYAML
+        - git+https://github.com/StudioCommunity/CustomModules.git@master#subdirectory=dstest
+        - git+https://github.com/StudioCommunity/CustomModules.git@master#subdirectory=builtin-models
+    command:
+    - python
+    - -m
+    - dstest.sklearn.trainer
+    args:
+    - --model_path
+    - outputPath: Output Model
+  invoking:
+    module:
+    class:
+    func:

@@ -1,15 +1,15 @@
 name: Built-in Score - GPU
-id: 894d5dad-a8e1-4231-98df-216c876e7489
+id: 412abbd1-794f-4888-a72f-a16220b9a521
 category: Machine Learning\Score
 description: Buildin Score Module for a set of limited flavors
 inputs:
 - name: Trained model
-  type: Model
-  connectable: true
+  type: ModelFolder
+  port: true
   description: Trained predictive model
 - name: Dataset
-  type: Dataset
-  connectable: True
+  type: TabularDataFolder
+  port: True
   description: input data to score
 - name: Append score columns to output
   type: Boolean
@@ -18,36 +18,43 @@ inputs:
     return the scores and true labels if available.
 outputs:
 - name: Scored dataset
-  type: Dataset
+  type: TabularDataFolder
   description: Dataset with obtained scores
 implementation:
   container:
-    meta:
+    runConfig:
       baseDockerImage: mcr.microsoft.com/azureml/base-gpu:intelmpi2018.3-cuda10.0-cudnn7-ubuntu16.04
       gpuSupport: true
     conda:
-      content:
-        name: project_environment
-        channels:
-        - defaults
-        dependencies:
-        - python=3.6.8
-        - pip:
-          - --extra-index-url=https://test.pypi.org/simple
-          - alghost==0.0.53
-          - azureml-defaults
-          - cloudpickle
-          - PyYAML
-          - pyarrow==0.12.1
-          - nltk==3.4
-          - numpy==1.16.2
-          - torchvision==0.2.2.post3
-          - https://download.pytorch.org/whl/cu100/torch-1.1.0-cp36-cp36m-linux_x86_64.whl
-          - git+https://github.com/GuXiaoMing/CustomModules.git@master#subdirectory=builtin-score
-    invoking:
-      module: builtin_score.builtin_score_module
-      class: BuiltinScoreModule
-      func: run
+      name: project_environment
+      channels:
+      - defaults
+      - pytorch
+      - conda-forge # for tacotron2
+      dependencies:
+      - python=3.6.8
+      - pytorch
+      - torchvision
+      - cudatoolkit=10.0
+      - libsndfile # for tacotron2
+      - pip:
+        - --extra-index-url=https://test.pypi.org/simple
+        - alghost==0.0.70
+        - azureml-defaults
+        - cloudpickle
+        - PyYAML
+        - pyarrow==0.12.1
+        - nltk==3.4
+        - numpy==1.16.2
+        - tensorflow
+        - scikit-learn
+        - keras
+        - git+https://github.com/StudioCommunity/CustomModules.git@master#subdirectory=builtin-score
+        - git+https://github.com/StudioCommunity/CustomModules.git@master#subdirectory=builtin-models
+        - scipy # for tacotron2
+        - librosa
+        - unidecode 
+        - inflect
     command:
     - python
     - -m
@@ -61,3 +68,7 @@ implementation:
     - inputValue: Append score columns to output
     - --scored-dataset
     - outputPath: Scored dataset
+  invoking:
+    module: builtin_score.builtin_score_module
+    class: BuiltinScoreModule
+    func: run

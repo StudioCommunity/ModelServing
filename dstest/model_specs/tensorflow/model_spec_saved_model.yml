@@ -1,0 +1,8 @@
+flavor:
+  framework: tensorflow
+tensorflow:
+  serialization_format: saved_model
+  model_file_path: mnist
+  meta_graph_tags:
+  - serve
+  signature_def_key: predict_images

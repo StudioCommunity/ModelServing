@@ -1,0 +1,4 @@
+flavor:
+  framework: keras
+keras:
+  model_file_path: model.h5

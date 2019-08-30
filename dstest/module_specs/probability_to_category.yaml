@@ -1,0 +1,72 @@
+name: Probability to Category
+id: c459b343-3ec8-48d3-b699-d8b36502c6a8
+category: Machine Learning\Postprocess
+description: Probability to Category
+inputs:
+- name: Meta Data
+  type: GenericFolder
+  port: True
+  description: Meta Data, GenericFolder
+- name: Input Data
+  type: TabularDataFolder
+  port: True
+  description: input data frame
+- name: Category File Name
+  type: String
+  default: 
+  description: Category File Name
+- name: Probability Column Name
+  type: String
+  default: 
+  description: Probability Column Name
+- name: Append category column to output
+  type: Boolean
+  default: true
+  description: If checked, append category column to the result dataset, otherwise only
+    return the category column.
+outputs:
+- name: Output Data
+  type: TabularDataFolder
+  port: True
+  description: The Output
+implementation:
+  container:
+    conda:
+      name: project_environment
+      channels:
+      - defaults
+      dependencies:
+      - python=3.6.2
+      - pip:
+        - --extra-index-url=https://test.pypi.org/simple
+        - alghost==0.0.70
+        - pandas
+        - tensorflow
+        - click
+        - PyYAML
+        - pyarrow
+        - scipy 
+        - opencv-python-headless
+        - git+https://github.com/StudioCommunity/CustomModules.git@master#subdirectory=builtin-score
+        - git+https://github.com/StudioCommunity/CustomModules.git@master#subdirectory=dstest
+    command:
+    - python
+    - -m
+    - dstest.postprocess.prob_to_category
+    args:
+    - --prob_col
+    - inputValue: Probability Column Name
+    - --file_name
+    - inputValue: Category File Name
+    - --append_category_column_to_output
+    - inputValue: Append category column to output
+    - --input_path
+    - inputValue: Input Data
+    - --meta_path
+    - inputValue: Meta Data
+    - --output_path
+    - outputPath: Output Data
+  invoking:
+    module: dstest.postprocess.prob_to_category
+    class: Process
+    func: run

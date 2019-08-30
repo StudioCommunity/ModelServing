@@ -1,0 +1,93 @@
+name: Image Preprocess V2
+id: 6c060cba-d9d4-4874-b6b6-f2826d178535
+category: Machine Learning\Preprocess
+description: Image Preprocess V2
+inputs:
+- name: Input Data
+  type: TabularDataFolder
+  port: True
+  description: input data frame
+- name: Image Column
+  type: String
+  default: image
+  description: Image Column
+- name: Target Column
+  type: String
+  default: 
+  description: Target Column
+- name: Target DataURI Column
+  type: String
+  default: 
+  description: Target DataURI Column which can be displayed in browser
+- name: Resize Size
+  type: String
+  default: 
+  description: Resize Image to size, the smaller edge of the image will be matched to this number maintaing the aspect ratio.
+- name: Target Image Size
+  type: String
+  default: (256 256)
+  description: Target Image Size, eg, (256, 256)
+- name: Normalization Mean
+  type: String
+  default: (0 0 0)
+  description: Normalization Mean, eg, (0, 0, 0)
+- name: Normalization Std
+  type: String
+  default: (0.5 0.5 0.5)
+  description: Normalization Std, eg, (0.5, 0.5, 0.5)
+- name: Convert to Grayscale
+  type: Boolean
+  default: false
+  description: If checked, the image will be converted to grayscale of one channel
+outputs:
+- name: Output Data
+  type: TabularDataFolder
+  port: True
+  description: The Output
+implementation:
+  container:
+    conda:
+      name: project_environment
+      channels:
+      - defaults
+      dependencies:
+      - python=3.6.8
+      - pip:
+        - pandas
+        - click
+        - PyYAML
+        - pyarrow
+        - Pillow
+        - torchvision
+        - opencv-python-headless
+        - https://download.pytorch.org/whl/cu100/torch-1.1.0-cp36-cp36m-linux_x86_64.whl
+        - git+https://github.com/StudioCommunity/CustomModules.git@master#subdirectory=dstest
+    command:
+    - python
+    - -m
+    - dstest.preprocess.image_preprocess
+    args:
+    - --image_column
+    - inputValue: Image Column
+    - --target_column
+    - inputValue: Target Column
+    - --target_datauri_column
+    - inputValue: Target DataURI Column
+    - --resize_size
+    - inputValue: Resize Size
+    - --target_image_size
+    - inputValue: Target Image Size
+    - --normalization_mean
+    - inputValue: Normalization Mean
+    - --normalization_std
+    - inputValue: Normalization Std
+    - --convert_to_grayscale
+    - inputValue: Convert to Grayscale
+    - --input_path
+    - inputValue: Input Data
+    - --output_path
+    - outputPath: Output Data
+  invoking:
+    module: dstest.preprocess.image_preprocess
+    class: ImagePreprocess
+    func: run

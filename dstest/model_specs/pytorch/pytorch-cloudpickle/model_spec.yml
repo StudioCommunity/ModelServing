@@ -1,0 +1,5 @@
+flavor:
+  framework: pytorch
+pytorch:
+  model_file_path: model.pkl
+  serialization_format: cloudpickle

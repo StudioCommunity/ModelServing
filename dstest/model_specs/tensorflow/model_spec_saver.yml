@@ -1,0 +1,9 @@
+flavor:
+  framework: tensorflow
+tensorflow:
+  serialization_format: saver
+  model_file_path: deep_mnist_model.meta
+  inputs:
+  - name: x
+  outputs:
+  - name: y

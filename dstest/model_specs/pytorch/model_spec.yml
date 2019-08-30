@@ -1,0 +1,6 @@
+flavor:
+  framework: pytorch
+pytorch:
+  model_class_package: MnistModel
+  model_file_path: model.pt
+  serialization_format: savedmodel

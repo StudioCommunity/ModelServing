@@ -1,0 +1,5 @@
+flavor:
+  framework: sklearn
+sklearn:
+  serialization_format: pickle
+  model_file_path: model.pkl

@@ -1,0 +1,37 @@
+name: Keras Train - MNIST Saved Model
+id: 8ad10e1b-ac2d-47f8-aa96-78597f26ca38
+category: Machine Learning\Train
+description: DS keras train which outputs a keras model with spec
+inputs:
+outputs:
+- name: Output Model
+  type: ModelFolder
+  port: True
+  description: The Output model
+implementation:
+  container:
+    conda:
+      name: project_environment
+      channels:
+      - defaults
+      dependencies:
+      - python=3.6.2
+      - pip:
+        - pandas
+        - tensorflow
+        - keras
+        - click
+        - PyYAML
+        - git+https://github.com/StudioCommunity/CustomModules.git@master#subdirectory=dstest
+        - git+https://github.com/StudioCommunity/CustomModules.git@master#subdirectory=builtin-models
+    command:
+    - python
+    - -m
+    - dstest.keras.trainer_and_save_model_h5
+    args:
+    - --model_path
+    - outputPath: Output Model
+  invoking:
+    module:
+    class:
+    func:

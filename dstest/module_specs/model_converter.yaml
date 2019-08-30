@@ -1,0 +1,85 @@
+name: Ex Model Converter
+id: 26f3ddf0-ba85-11e9-951c-d89ef34146e8
+category: Machine Learning\Score
+description: Convert external model to Studio Trained Model
+inputs: 
+- name: Model Flavor
+  type: Mode
+  description: Model Flavor
+  options: 
+    - pytorch
+    - tensorflow
+    - sklearn
+    - keras
+- name: Model URL
+  type: String
+  description: Model URL
+- name: Serialization Mode
+  type: String 
+  description: Serialization Mode
+- name: Model Class URL
+  type: String
+  optional: True
+  description: Model Class URL
+- name: Init Args
+  type: String
+  optional: True
+  description: Init Args
+- name: Input Args
+  type: String
+  optional: True
+  description: Input Args
+outputs:
+- name: Output Model
+  type: ModelFolder
+  port: True
+  description: The Output model
+implementation:
+  container:
+    runConfig:
+      baseDockerImage: mcr.microsoft.com/azureml/base-gpu:intelmpi2018.3-cuda10.0-cudnn7-ubuntu16.04
+      gpuSupport: true
+    conda:
+      name: project_environment
+      channels:
+      - defaults
+      dependencies:
+      - python=3.6.8
+      - git
+      - regex
+      - pip:
+        - pandas
+        - azureml-defaults
+        - https://download.pytorch.org/whl/cu100/torch-1.1.0-cp36-cp36m-linux_x86_64.whl
+        - https://download.pytorch.org/whl/cu100/torchvision-0.3.0-cp36-cp36m-linux_x86_64.whl
+        - pillow==5.2.0
+        - tensorflow
+        - keras
+        - cloudpickle
+        - click
+        - PyYAML
+        - git+https://github.com/StudioCommunity/CustomModules.git@master#subdirectory=dstest
+        - git+https://github.com/StudioCommunity/CustomModules.git@master#subdirectory=builtin-models
+    command:
+    - python
+    - -m
+    - dstest.modelconverter.converter 
+    args:
+    - --flavor
+    - inputValue: Model Flavor
+    - --model_url
+    - inputValue: Model URL
+    - --serialization
+    - inputValue: Serialization Mode
+    - --model_class_url
+    - inputValue: Model Class URL
+    - --init_args
+    - inputValue: Init Args
+    - --input_args
+    - inputValue: Input Args
+    - --out_model_path
+    - outputPath: Output Model
+  invoking:
+    module:
+    class:
+    func:

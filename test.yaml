@@ -37,7 +37,7 @@ implementation:
       dependencies:
       - python=3.6.2
       - pip:
-        - --index-url --https://msdata.visualstudio.com/DefaultCollection/AzureML/_git/CustomModules
+        - --index-url --https://SQL_Toolset:idilya5vfpnuhikhpyrs33imzk7i4cbtvj2frivbyki7nvoo74oq@msdata.pkgs.visualstudio.com/_packaging/SQL_Toolset/pypi/simple/
         - pandas
         - tensorflow
         - click

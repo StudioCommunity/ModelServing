@@ -10,26 +10,27 @@ steps:
   inputs:
     versionSpec: '3.6'
 
+# Install python distributions like wheel, twine etc
+- script: |
+    pip install wheel
+    pip install twine
+
 - script: |
     cd src/azureml-studio-modelspec
-    pip install wheel
     python setup.py bdist_wheel
   displayName: 'Create model spec whl file'
 
-- task: PublishBuildArtifacts@1
-  displayName: 'Publish model spec whl file to artifacts'
-  inputs:
-    pathtoPublish: src/azureml-studio-modelspec/dist
-    artifactName: whl
-
 - script: |
     cd src/azureml-studio-score
-    pip install wheel
     python setup.py bdist_wheel
   displayName: 'Create score whl file'
 
-- task: PublishBuildArtifacts@1
-  displayName: 'Publish score whl file to artifacts'
+- task: TwineAuthenticate@1
+  displayName: 'Publish model spec whl file to artifacts'
   inputs:
-    pathtoPublish: src/azureml-studio-score/dist
-    artifactName: whl
+    artifactFeed: CustomModules
+
+# Use command line script to 'twine upload', use -r to pass the repository name and --config-file to pass the environment variable set by the authenticate task.
+- script: |
+    python -m twine upload -r "CustomModules" --config-file $(PYPIRC_PATH) src/azureml-studio-modelspec/dist/*.whl
+    python -m twine upload -r "CustomModules" --config-file $(PYPIRC_PATH) src/azureml-studio-score/dist/*.whl

@@ -12,6 +12,7 @@ steps:
 
 - script: |
     cd src/azureml-studio-modelspec
+    pip install wheel
     python setup.py bdist_wheel
   displayName: 'Create model spec whl file'
 
@@ -23,6 +24,7 @@ steps:
 
 - script: |
     cd src/azureml-studio-score
+    pip install wheel
     python setup.py bdist_wheel
   displayName: 'Create score whl file'
 

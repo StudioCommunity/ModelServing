@@ -9,22 +9,19 @@ import sys
 import shutil
 import re
 
-BUILD_FILE = '../../BUILD_NUMBER'
-VERSION_FILE = '_version.py'
+BUILD_NUMBER_FILE = '../build.version'
+VERSION_FILE = '../major.version'
 
 
-def generate_version_number():
-    version = {}
-    version_key = '__version__'
-    with open(VERSION_FILE) as fp:
-        exec(fp.read(), version)
-    assert version_key in version, 'Version file is empty.'
+def get_package_version():
+    with open(VERSION_FILE) as version_file:
+        version = version_file.read().strip()
     version_pattern = r'^\d+.\d$'
-    assert re.match(version_pattern, version[version_key]), f'Invalid version number: {version[version_key]}'
-    with open(BUILD_FILE) as fp:
-        build_number = fp.read()
+    assert re.match(version_pattern, version), f'Invalid version number: {version}'
+    with open(BUILD_NUMBER_FILE) as build_number_file:
+        build_number = build_number_file.read()
     assert re.match(version_pattern, build_number), f'Invalid build number: {build_number}'
-    return '.'.join([version[version_key], build_number])
+    return '.'.join([version, build_number])
 
 
 with io.open('../.inlinelicense', 'r', encoding='utf-8') as f:
@@ -38,7 +35,7 @@ print("installing... ", packages)
 # python setup.py install
 setup(
     name="azureml-studio-score",
-    version=generate_version_number(),
+    version=get_package_version(),
     description="",
     packages=packages,
     install_requires=[

@@ -13,7 +13,7 @@ steps:
 # Save build number to file
 - script: |
     echo $(Build.BuildNumber)
-    echo $(Build.BuildNumber) > BUILD_NUMBER
+    echo $(Build.BuildNumber) > src/build.version
 
 # Install python distributions like wheel, twine etc
 - script: |

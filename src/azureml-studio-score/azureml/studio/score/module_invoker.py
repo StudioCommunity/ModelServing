@@ -8,9 +8,9 @@ from . import constants
 from .builtin_score_module import BuiltinScoreModule
 from . import ioutil
 
-# python -m azureml.studio.score.module_invoker --trained-model ../dstest/model/tensorflow-minist/ --dataset ../dstest/outputs/mnist/ --scored-dataset ../dstest/outputs/mnist/ouput --append-score-columns-to-output true
-# python -m azureml.studio.score.module_invoker --trained-model ../dstest/model/vgg/ --dataset ../dstest/outputs/imagenet/ --scored-dataset ../dstest/outputs/imagenet/ouput --append-score-columns-to-output true
-# python -m azureml.studio.score.module_invoker --trained-model test/TestInputPort1 --dataset test/TestInputPort2 --scored-dataset test/TestOutputFolder --append-score-columns-to-output true
+# python -m azureml.studio.score.module_invoker --trained-model ../dstest/model/tensorflow-minist/ --dataset ../dstest/outputs/mnist/ --scored-dataset ../dstest/outputs/mnist/ouput --append-score-columns-to-output True
+# python -m azureml.studio.score.module_invoker --trained-model ../dstest/model/vgg/ --dataset ../dstest/outputs/imagenet/ --scored-dataset ../dstest/outputs/imagenet/ouput --append-score-columns-to-output True
+# python -m azureml.studio.score.module_invoker --trained-model test/TestInputPort1 --dataset test/TestInputPort2 --scored-dataset test/TestOutputFolder --append-score-columns-to-output True
 
 INPUT_FILE_NAME = "data.dataset.parquet" # hard coded, to be replaced, and we presume the data is DataFrame inside parquet
 OUTPUT_FILE_NAME = "output.csv"

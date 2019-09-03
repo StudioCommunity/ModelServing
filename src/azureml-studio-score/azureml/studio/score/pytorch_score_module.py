@@ -43,6 +43,9 @@ class PytorchScoreModule(object):
         return self.wrapper.predict(df)
 
     def load_scripts(self, model_path):
+        # This is a ugly workaround for densenet case, need to be substituded by merging conda.yaml in model folder.
+        from pip._internal import main as pipmain
+        pipmain(["install", "git+https://github.com/StudioCommunity/CustomModules-1.git@master#subdirectory=azureml-custom-module-examples/densenet-img-cls-v2", "fire", "scipy"])
         modules = {}
         with os.scandir(model_path) as files_and_dirs:
             for entry in files_and_dirs:

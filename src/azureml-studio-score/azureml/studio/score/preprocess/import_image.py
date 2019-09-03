@@ -7,7 +7,7 @@ import pandas as pd
 from os import walk
 import base64
 import pyarrow.parquet as pq
-from .. import ioutil
+from ..utils import ioutils
 from ..utils import datauri_utils
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
@@ -26,7 +26,7 @@ def run(input_path, output_path):
   """
   import glob
   print(f'INPUT_PATH({input_path}) : {os.listdir(input_path)}')
-  types = ('**.jpg', '**.png') # the tuple of file types
+  types = ('**.jpg', '**.png', '**.jfif') # the tuple of file types
   files_grabbed = []
   for files in types:
     pattern = os.path.join(input_path,files)
@@ -41,7 +41,7 @@ def run(input_path, output_path):
     image_64_encode = datauri_utils.imgfile_to_datauri(filename)
     df.loc[i] = image_64_encode
 
-  ioutil.save_parquet(df, output_path)
+  ioutils.save_dataframe(df, output_path, True)
   print(f"df =\n{df}")
   print(f'OUTPUT_PATH({output_path}) : {os.listdir(output_path)}')
 

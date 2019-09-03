@@ -1,0 +1,41 @@
+
+trigger:
+- master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: '3.6'
+
+# Save build number to file
+- script: |
+    echo $(Build.BuildNumber)
+    echo $(Build.BuildNumber) > src/build.version
+
+# Install python distributions like wheel, twine etc
+- script: |
+    pip install wheel
+    pip install twine
+
+- script: |
+    cd src/azureml-studio-modelspec
+    python setup.py bdist_wheel
+  displayName: 'Create model spec whl file'
+
+- script: |
+    cd src/azureml-studio-score
+    python setup.py bdist_wheel
+  displayName: 'Create score whl file'
+
+- task: TwineAuthenticate@1
+  displayName: 'Publish model spec whl file to artifacts'
+  inputs:
+    artifactFeed: CustomModules
+
+# Use command line script to 'twine upload', use -r to pass the repository name and --config-file to pass the environment variable set by the authenticate task.
+- script: |
+    python -m twine upload -r "CustomModules" --config-file $(PYPIRC_PATH) src/azureml-studio-modelspec/dist/*.whl
+    python -m twine upload -r "CustomModules" --config-file $(PYPIRC_PATH) src/azureml-studio-score/dist/*.whl

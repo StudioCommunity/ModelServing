@@ -29,36 +29,24 @@ implementation:
       name: project_environment
       channels:
       - defaults
-      - pytorch
       - conda-forge # for tacotron2
       dependencies:
       - python=3.6.8
       - cudatoolkit=10.0
       - libsndfile # for tacotron2
       - pip:
-        - --extra-index-url=https://test.pypi.org/simple
-        - alghost==0.0.70
-        - azureml-defaults
         - cloudpickle
         - PyYAML
         - pyarrow==0.12.1
-        - nltk==3.4
-        - numpy==1.16.2
-        - tensorflow
-        - scikit-learn
-        - keras
         - git+https://github.com/StudioCommunity/CustomModules.git@master#subdirectory=builtin-score
         - git+https://github.com/StudioCommunity/CustomModules.git@master#subdirectory=builtin-models
-        - scipy # for tacotron2
         - librosa
         - unidecode 
         - inflect
-        - https://download.pytorch.org/whl/cu100/torch-1.1.0-cp36-cp36m-linux_x86_64.whl # torch and torchvision is hard-coded for Densenet case(other wise their would be compatibility issue), should be read from model folder
-        - https://download.pytorch.org/whl/cu100/torchvision-0.3.0-cp36-cp36m-linux_x86_64.whl
     command:
     - python
     - -m
-    - azureml.studio.score.module_invoker
+    - azureml.studio.score.score.module_invoker
     args:
     - --trained-model
     - inputValue: Trained model
@@ -69,6 +57,6 @@ implementation:
     - --scored-dataset
     - outputPath: Scored dataset
   invoking:
-    module: azureml.studio.score.builtin_score_module
+    module: azureml.studio.score.score.builtin_score_module
     class: BuiltinScoreModule
     func: run

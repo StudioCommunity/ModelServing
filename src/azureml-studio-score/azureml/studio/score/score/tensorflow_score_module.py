@@ -3,7 +3,7 @@ import numpy as np
 import os
 import pandas as pd
 from . import constants
-from .utils import ioutils
+from ..utils import ioutils
 
 def rename_col(df, col_name):
     col_pattern = col_name +"."

@@ -6,7 +6,7 @@ import pandas as pd
 
 from . import constants
 from .builtin_score_module import BuiltinScoreModule
-from .utils import ioutils
+from ..utils import ioutils
 
 # python -m azureml.studio.score.module_invoker --trained-model ../dstest/model/tensorflow-minist/ --dataset ../dstest/outputs/mnist/ --scored-dataset ../dstest/outputs/mnist/ouput --append-score-columns-to-output True
 # python -m azureml.studio.score.module_invoker --trained-model ../dstest/model/vgg/ --dataset ../dstest/outputs/imagenet/ --scored-dataset ../dstest/outputs/imagenet/ouput --append-score-columns-to-output True

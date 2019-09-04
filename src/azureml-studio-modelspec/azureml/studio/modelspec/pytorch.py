@@ -5,7 +5,7 @@ import cloudpickle
 import inspect
 import torch
 import torchvision
-import azureml.studio.modelspec.utils as utils
+from . import utils
 
 FLAVOR_NAME = "pytorch"
 MODEL_FILE_NAME = "model.pkl"
@@ -58,6 +58,3 @@ def save_model(pytorch_model, path='./model/', conda_env=None, dependencies=[]):
 
     utils.save_model_spec(path, FLAVOR_NAME, MODEL_FILE_NAME, input_args = args)
     utils.generate_ilearner_files(path) # temp solution, to remove later
-
-
-    

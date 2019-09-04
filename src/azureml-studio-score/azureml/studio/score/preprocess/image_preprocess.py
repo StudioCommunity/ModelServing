@@ -2,9 +2,7 @@ import logging
 import click
 import pandas as pd
 from torchvision import transforms as T
-from .. import ioutil
-from ..utils import datauri_utils
-from ..utils import dfutils
+from ..utils import ioutils, datauri_utils, dfutils
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
                     datefmt='%m/%d/%Y %H:%M:%S',
@@ -129,9 +127,9 @@ def run(input_path, output_path, image_column, target_column, target_datauri_col
     }
     proccesor = ImagePreprocess(params)
 
-    df = ioutil.read_parquet(input_path)
+    df = ioutils.read_parquet(input_path)
     result = proccesor.run(df)
-    ioutil.save_parquet(result, output_path)
+    ioutils.save_parquet(result, output_path)
 
 # mnist: python -m dstest.preprocess.preprocess  --input_path datas/mnist --output_path outputs/mnist --image_column=image --target_column=x --target_datauri_column=x.data --target_image_size=28x28
 # imagenet: python -m dstest.preprocess.preprocess  --input_path datas/imagenet --output_path outputs/imagenet --image_column=image --target_column=import/images --target_datauri_column=import/images.data --target_image_size=224x224

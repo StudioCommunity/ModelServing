@@ -6,7 +6,7 @@ import pandas as pd
 
 from . import constants
 from .builtin_score_module import BuiltinScoreModule
-from . import ioutil
+from .utils import ioutils
 
 # python -m azureml.studio.score.module_invoker --trained-model ../dstest/model/tensorflow-minist/ --dataset ../dstest/outputs/mnist/ --scored-dataset ../dstest/outputs/mnist/ouput --append-score-columns-to-output True
 # python -m azureml.studio.score.module_invoker --trained-model ../dstest/model/vgg/ --dataset ../dstest/outputs/imagenet/ --scored-dataset ../dstest/outputs/imagenet/ouput --append-score-columns-to-output True
@@ -32,5 +32,5 @@ output_df = score_module.run(input_df)
 print(f"input_df =\n{input_df}")
 print(f"output_df =\n{output_df}")
 print(f"trying to save_parquet1(output_df, {args.scored_dataset})")
-# ioutil.save_parquet(output_df, args.scored_dataset)
-ioutil.save_parquet1(output_df, args.scored_dataset)
+# ioutils.save_parquet(output_df, args.scored_dataset)
+ioutils.save_parquet1(output_df, args.scored_dataset)

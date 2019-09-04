@@ -3,7 +3,7 @@ import logging
 import click
 import pandas as pd
 import json
-from azureml.studio.score import ioutil
+from ..utils import ioutils
 import numpy as np
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
@@ -88,10 +88,10 @@ def run(input_path, meta_path, output_path, file_name, prob_col, append_category
   }
 
   proccesor = Process(meta_path, meta)
-  df = ioutil.read_parquet(input_path)
+  df = ioutils.read_parquet(input_path)
   result = proccesor.run(df)
   print(result)
-  ioutil.save_parquet(result, output_path, True)
+  ioutils.save_parquet(result, output_path, True)
 
 # python -m dstest.postprocess.prob_to_category  --input_path outputs/imagenet/ouput --meta_path model/vgg --output_path outputs/imagenet/categories --file_name=synset.json --prob_col=import/prob --append_category_column_to_output True
 if __name__ == '__main__':

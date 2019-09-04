@@ -3,9 +3,7 @@ import click
 import pandas as pd
 import torch
 from torchvision import transforms as T
-from azureml.studio.score import ioutil
-from dstest.preprocess.datauri_util import tensor_to_datauri
-from dstest.preprocess.preprocess import add_data_to_dataframe
+from ..utils import ioutils, datauri_utils, dfutils
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
                     datefmt='%m/%d/%Y %H:%M:%S',
@@ -31,9 +29,9 @@ class Process:
       logger.info(f"tensor.size() = {tensor.size()}")
       tensor.squeeze_(0)
       tensor = self._denorm(tensor)
-      output.append(tensor_to_datauri(tensor.cpu()))
+      output.append(datauri_utils.tensor_to_datauri(tensor.cpu()))
 
-    add_data_to_dataframe(input_df, output, "Result")
+    dfutils.add_column_to_dataframe(input_df, output, "Result")
     return input_df
 
   def _denorm(self, x):
@@ -53,11 +51,11 @@ def run(input_path, output_path, tensor_column):
     "Tensor Column": tensor_column
   }
   proccesor = Process(meta)
-  df = ioutil.read_parquet(input_path)
+  df = ioutils.read_parquet(input_path)
   result = proccesor.run(df)
   #result = result[['image','Result']]
   # ioutil.save_parquet(result, output_path, True)
-  ioutil.save_parquet1(result, output_path, True)
+  ioutils.save_parquet1(result, output_path, True)
 
 # python -m dstest.postprocess.tensor_to_image --input_path inputs/tensor_to_image --output_path outputs/tensor_to_image --tensor_column=0
 if __name__ == '__main__':

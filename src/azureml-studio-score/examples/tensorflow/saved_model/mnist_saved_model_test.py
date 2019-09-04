@@ -10,7 +10,7 @@ import json
 import tensorflow as tf
 from azureml.studio.score.builtin_score_module import *
 from azureml.studio.score.tensorflow_score_module import _TFSavedModelWrapper, TensorflowScoreModule
-from azureml.studio.score import ioutil
+from azureml.studio.score.utils import ioutils
 
 def test_TFSavedWrapper():
   export_dir = 'model/tensorflow-minist-saved-model/mnist'
@@ -29,7 +29,7 @@ def test_TFSavedWrapper():
 
 # python -m examples.tensorflow.saved_model.mnist_saved_model_test
 if __name__ == '__main__':
-  df = ioutil.read_parquet("../dstest/outputs/mnist/")
+  df = ioutils.read_parquet("../dstest/outputs/mnist/")
   #df = df.rename(columns={"x": "images"})
   df = df.rename(columns={"x": "x:0"})
 

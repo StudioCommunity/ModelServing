@@ -3,7 +3,7 @@ import numpy as np
 import os
 import pandas as pd
 from . import constants
-from . import ioutil
+from .utils import ioutils
 
 def rename_col(df, col_name):
     col_pattern = col_name +"."
@@ -32,7 +32,7 @@ def load_graph(model_file_path, sess):
 #df[name]
 #shape = self.x_shape[name]
 def array_from_df_col(col, shape):
-    values = ioutil.from_df_column_to_array(col)
+    values = ioutils.from_df_column_to_array(col)
     if shape != None :
         target_shape = (len(values), *shape)
         # reshape if target_shape doesn't contain None
@@ -224,7 +224,7 @@ def _test_tensor(df, model_path):
 
 # python -m azureml.studio.score.tensorflow_score_module
 if __name__ == '__main__':
-    df = ioutil.read_parquet("../dstest/outputs/mnist/")
+    df = ioutils.read_parquet("../dstest/outputs/mnist/")
     print(df.columns)
     _test_tensor(df, "../dstest/model/tensorflow-minist/")
 
@@ -232,7 +232,7 @@ if __name__ == '__main__':
     # print(df.columns)
     # _test_tensor(df,"../dstest/model/tensorflow-minist-saved-model/")
 
-    # df = ioutil.read_parquet("../dstest/outputs/mnist/")
+    # df = ioutils.read_parquet("../dstest/outputs/mnist/")
     # df = df.rename(columns={"x": "image", "image": "image1"})
     # print(df.columns)
     # _test_tensor(df,"../dstest/model/tensorflow-mnist-cnn-estimator/")

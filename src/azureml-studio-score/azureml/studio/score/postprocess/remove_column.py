@@ -1,7 +1,7 @@
 import logging
 import click
 import pandas as pd
-from azureml.studio.score import ioutil
+from ..utils import ioutils
 import math
 import numpy as np
 import base64
@@ -44,9 +44,9 @@ def run(input_path, output_path, remvoe_columns):
     "Remove Columns": remvoe_columns
   }
   proccesor = Process(meta)
-  df = ioutil.read_parquet(input_path)
+  df = ioutils.read_parquet(input_path)
   result = proccesor.run(df)
-  ioutil.save_parquet(result, output_path)
+  ioutils.save_parquet(result, output_path)
 
 # python -m dstest.postprocess.remove_column  --input_path datas/mnist --output_path outputs/mnist --remvoe_columns=x
 if __name__ == '__main__':

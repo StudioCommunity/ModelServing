@@ -6,7 +6,7 @@ import pandas as pd
 import numpy as np
 
 from azureml.studio.score.builtin_score_module import BuiltinScoreModule
-import azureml.studio.score.ioutil as ioutil
+from azureml.studio.score.utils import ioutils
 
 def load_model_then_predict(model_path = "./model/pytorch-mnist/"):
     batch_size = 64
@@ -31,7 +31,7 @@ def load_model_then_predict(model_path = "./model/pytorch-mnist/"):
     print('=====buildinScoreModule=======')
     print(result)
     #result.columns = result.columns.astype(str)
-    ioutil.save_parquet(result, './testOutputParquet/')
+    ioutils.save_parquet(result, './testOutputParquet/')
 
 # python -m dstest.pytorch.saved_model_predict_test
 if __name__ == '__main__':

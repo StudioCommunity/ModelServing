@@ -1,0 +1,53 @@
+name: Byte Pair Encoding
+id: 3c7cbf1c-c24c-11e9-863b-6c2b59f8af4d
+category: Machine Learning\Preprocess
+description: Use Byte Pair Encoding to encode text
+inputs:
+- name: Dictionary Path
+  type: String
+  description: The dictionary used to encode the text
+- name: Vocabulary Path
+  type: String
+  description: The vacabulary used to encode the text
+- name: Input Text Path
+  type: TabularDataFolder
+  port: True
+  description: The input text
+outputs:
+- name: Output Path
+  type: TabularDataFolder
+  port: True
+  description: Encoded tokens
+implementation:
+  container:
+    conda:
+      name: project_environment
+      channels:
+      - defaults
+      dependencies:
+      - python=3.6.8
+      - regex
+      - pip:
+        - pandas
+        - click
+        - pyarrow==0.12.1
+        - --extra-index-url=https://CustomModules:ptnvejiiz3hnah5eoiv4dooigkksysjme6tqwrfjlvw4ekchejqq@msdata.pkgs.visualstudio.com/_packaging/CustomModules/pypi/simple/
+        - azureml-studio-modelspec
+        - azureml-studio-score
+    command:
+    - python
+    - -m
+    - dstest.nlp.next_word.encode
+    args:
+    - --dict_path
+    - inputPath: Dictionary Path
+    - --vocab_path
+    - inputPath: Vocabulary Path
+    - --input_text_path
+    - inputPath: Input Text Path
+    - --output_path
+    - outputPath: Output Path
+  invoking:
+    module: dstest.nlp.next_word.encode
+    class: BPEEncoder
+    func: encode

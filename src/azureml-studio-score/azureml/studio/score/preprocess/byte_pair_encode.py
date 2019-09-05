@@ -138,7 +138,10 @@ class BPEEncoder(object):
         return output
 
 
-@click.command()
+@click.command(context_settings=dict(
+    ignore_unknown_options=True,
+    allow_extra_args=True,
+))
 @click.option('--dict_path')
 @click.option('--vocab_path')
 @click.option('--input_text_path', default="examples/inputs/gpt2")

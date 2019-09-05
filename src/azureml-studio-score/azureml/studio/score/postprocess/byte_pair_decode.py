@@ -17,7 +17,10 @@ DICT_PATH_KEY = "Dictionary Path"
 VOCAB_PATH_KEY = "Vocabulary Path"
 
 
-@click.command()
+@click.command(context_settings=dict(
+    ignore_unknown_options=True,
+    allow_extra_args=True,
+))
 @click.option('--dict_path')
 @click.option('--vocab_path')
 @click.option('--encoded_token_path', default="examples/outputs/gpt2/generated_token")

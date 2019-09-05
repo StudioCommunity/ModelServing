@@ -141,8 +141,8 @@ class BPEEncoder(object):
 @click.command()
 @click.option('--dict_path')
 @click.option('--vocab_path')
-@click.option('--input_text_path', default="inputs/gpt2")
-@click.option('--output_path', default="outputs/gpt2/encoded_text")
+@click.option('--input_text_path', default="examples/inputs/gpt2")
+@click.option('--output_path', default="examples/outputs/gpt2/encoded_text")
 def run_pipeline(dict_path, vocab_path, input_text_path, output_path):
     input_df = pd.read_parquet(os.path.join(input_text_path, INPUT_FILE_NAME), engine="pyarrow")
     meta = {
@@ -156,6 +156,6 @@ def run_pipeline(dict_path, vocab_path, input_text_path, output_path):
 
 
 # TODO(wanhan): use a better way to store dict and vocabulary
-# python -m examples.tensorflow.gpt2.encode ...
+# python -m azureml.studio.score.preprocess.byte_pair_encode...
 if __name__ == '__main__':
     run_pipeline()

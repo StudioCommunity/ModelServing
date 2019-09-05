@@ -1,4 +1,4 @@
-from examples.tensorflow.gpt2.encode import BPEEncoder
+from azureml.studio.score.preprocess.byte_pair_encode import BPEEncoder
 from azureml.studio.score import ioutil
 import os
 
@@ -20,8 +20,8 @@ VOCAB_PATH_KEY = "Vocabulary Path"
 @click.command()
 @click.option('--dict_path')
 @click.option('--vocab_path')
-@click.option('--encoded_token_path', default="outputs/gpt2/generated_token")
-@click.option('--decoded_text_path', default="outputs/gpt2/generated_text")
+@click.option('--encoded_token_path', default="examples/outputs/gpt2/generated_token")
+@click.option('--decoded_text_path', default="examples/outputs/gpt2/generated_text")
 def run_pipeline(dict_path, vocab_path, encoded_token_path, decoded_text_path):
     print(f'ENCODED_TOKENS_PATH: {os.listdir(encoded_token_path)}')
     df = ioutil.read_parquet(encoded_token_path)
@@ -34,6 +34,6 @@ def run_pipeline(dict_path, vocab_path, encoded_token_path, decoded_text_path):
     ioutil.save_parquet(result, decoded_text_path)
 
 # TODO(wanhan): use a better way to store dict and vocabulary
-# python -m examples.tensorflow.gpt2.decode ...
+# python -m azureml.studio.score.postprocess.byte_pair_decode...
 if __name__ == '__main__':
     run_pipeline()

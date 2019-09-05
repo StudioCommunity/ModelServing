@@ -37,7 +37,7 @@ implementation:
     command:
     - python
     - -m
-    - dstest.nlp.next_word.encode
+    - azureml.studio.score.preprocess.byte_pair_encode
     args:
     - --dict_path
     - inputPath: Dictionary Path
@@ -48,6 +48,6 @@ implementation:
     - --output_path
     - outputPath: Output Path
   invoking:
-    module: dstest.nlp.next_word.encode
+    module: azureml.studio.score.preprocess.byte_pair_encode
     class: BPEEncoder
     func: encode

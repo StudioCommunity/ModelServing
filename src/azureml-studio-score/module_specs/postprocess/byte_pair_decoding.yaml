@@ -36,7 +36,7 @@ implementation:
     command:
     - python
     - -m
-    - dstest.nlp.next_word.decode
+    - azureml.studio.score.postprocess.byte_pair_decode
     args:
     - --dict_path
     - inputPath: Dictionary Path
@@ -47,6 +47,6 @@ implementation:
     - --decoded_text_path
     - outputPath: Decoded text
   invoking:
-    module: dstest.nlp.next_word.encode
+    module: azureml.studio.score.preprocess.byte_pair_encode
     class: BPEEncoder
     func: decode

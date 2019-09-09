@@ -2,8 +2,7 @@ import os
 import yaml
 import json
 import tensorflow as tf
-import azureml.studio.modelspec.constants as constants
-import azureml.studio.modelspec.utils as utils
+from . import constants, utils
 
 FLAVOR_NAME = "tensorflow"
 

@@ -1,29 +1,31 @@
 import os
 import yaml
-import pickle
-import sklearn
-import azureml.studio.modelspec.utils as utils
+import keras
+from . import utils
 
-FLAVOR_NAME = "sklearn"
-model_file_name = "model.pkl"
+FLAVOR_NAME = "keras"
+MODEL_FILE_NAME = "model.h5"
+
 
 def _get_default_conda_env():
+    import tensorflow as tf
     return utils.generate_conda_env(
         additional_pip_deps=[
-            "scikit-learn=={}".format(sklearn.__version__)
+            "keras=={}".format(keras.__version__),
+            "tensorflow=={}".format(tf.__version__),
         ])
 
 
-def _save_model(sklearn_model, path):
-    with open(os.path.join(path, model_file_name), "wb") as fb:
-        pickle.dump(sklearn_model, fb)
+def load_model_from_local_file(path):
+    from keras.models import load_model
+    return load_model(path)
 
 
-def save_model(sklearn_model, path='./model/', conda_env=None):
+def save_model(keras_model, path='./model/', conda_env=None):
     """
-    Save a Sklearn model to a path on the local file system.
+    Save a Keras model to a path on the local file system.
 
-    :param sklearn_model: Sklearn model to be saved. 
+    :param keras_model: Keras model to be saved. 
 
     :param path: Path to a directory containing model data.
     
@@ -34,13 +36,13 @@ def save_model(sklearn_model, path='./model/', conda_env=None):
     if not os.path.exists(path):
         os.makedirs(path)
 
-    _save_model(sklearn_model, path)
+    keras_model.save(os.path.join(path, MODEL_FILE_NAME)) 
 
     if conda_env is None:
         conda_env = _get_default_conda_env()
     utils.save_conda_env(path, conda_env)
 
-    utils.save_model_spec(path, FLAVOR_NAME, model_file_name)
+    utils.save_model_spec(path, FLAVOR_NAME, MODEL_FILE_NAME)
     utils.generate_ilearner_files(path) # temp solution, to remove later
 
     

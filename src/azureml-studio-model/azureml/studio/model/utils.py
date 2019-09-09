@@ -1,8 +1,9 @@
 import os
 import yaml
 import json
-import azureml.studio.modelspec.constants as constants
 from sys import version_info
+
+from . import constants
 
 PYTHON_VERSION = "{major}.{minor}.{micro}".format(major=version_info.major,
                                                   minor=version_info.minor,

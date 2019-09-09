@@ -1,15 +1,17 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import cloudpickle
-import inspect
 import os
+import sys
 import re
 import shutil
-import sys
+import inspect
 import zipfile
 import importlib
+
+import cloudpickle
 from urllib.request import urlopen
-import azureml.studio.modelspec.utils as utils
+
+from . import utils
 
 FLAVOR_NAME = "python"
 MODEL_FILE_NAME = "model.pkl"  # we cloud pickle the model to load/save the model by default

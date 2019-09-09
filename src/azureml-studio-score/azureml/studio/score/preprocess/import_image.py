@@ -41,7 +41,7 @@ def run(input_path, output_path):
     image_64_encode = datauri_utils.imgfile_to_datauri(filename)
     df.loc[i] = image_64_encode
 
-  ioutils.save_dataframe(df, output_path, True)
+  ioutils.save_as_datatable(df, output_path)
   print(f"df =\n{df}")
   print(f'OUTPUT_PATH({output_path}) : {os.listdir(output_path)}')
 

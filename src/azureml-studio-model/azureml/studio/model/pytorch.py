@@ -1,11 +1,15 @@
+import inspect
+import logging 
 import os
 import shutil
-import yaml
+
 import cloudpickle
-import inspect
 import torch
 import torchvision
+import yaml
+
 from . import utils
+
 
 FLAVOR_NAME = "pytorch"
 MODEL_FILE_NAME = "model.pkl"

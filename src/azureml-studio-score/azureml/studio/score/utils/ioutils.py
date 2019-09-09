@@ -17,16 +17,11 @@ def read_parquet(data_path):
     logger.info("parquet read completed.")
     return df
 
-def ensure_folder_exists(output_path):
-    if not os.path.exists(output_path):
-        os.makedirs(output_path)
-        logger.info(f"{output_path} not exists, created")
-
 def save_parquet1(df, output_path, writeCsv= False):
   from azureml.studio.modulehost.handler.port_io_handler import OutputHandler
   from azureml.studio.common.datatypes import DataTypes
   from azureml.studio.common.datatable.data_table import DataTable
-  ensure_folder_exists(output_path)
+  os.makedirs(output_path, exist_ok=True)
   #requires alghost 70
   OutputHandler.handle_output(DataTable(df), output_path, 'data.dataset.parquet', DataTypes.DATASET)
   save_datatype(output_path)
@@ -49,25 +44,19 @@ def transform_ndarraycol_to_list(df):
                 logger.info(f"transformed ndarray column '{col}' to list")
     return df
    
-def save_dataframe(df, output_path, writeCsv=False):
+def save_as_datatable(df, output_path):
     from azureml.studio.common.datatypes import DataTypes
     from azureml.studio.common.datatable.data_table import DataTable
-    from azureml.studio.common.io.data_frame_directory import save_data_frame_to_directory
-    from azureml.studio.common.io.visualizer import JsonVisualizer
-    from azureml.studio.modulehost.handler.sidecar_files import DataTableVisualizer
-
-    ensure_folder_exists(output_path)
+    from azureml.studio.modulehost.handler.port_io_handler import OutputHandler
+    
+    os.makedirs(output_path, exist_ok=True)
     df = transform_ndarraycol_to_list(df)
-    if(writeCsv):
-        df.to_csv(os.path.join(output_path, "data.csv"))
-    # Use datatable saver to get visualization data
-    datatable = DataTable(df)
-    visualizer = DataTableVisualizer(datatable)
-    visualization_data = visualizer.dump_to_dict()
-    save_data_frame_to_directory(output_path, data=df, visualization=[JsonVisualizer("Visualization", visualization_data)])
-    # save_data_frame_to_directory save df to _data.parquet instead of conventional data.dataset.parquet, manually save duplication to workaround
-    df.to_parquet(os.path.join(output_path, "data.dataset.parquet"), engine="pyarrow")
-    logger.info(f"saved an additional copy to data.dataset.parquet")
+    OutputHandler.handle_output(
+        data=DataTable(df),
+        file_path=output_path,
+        file_name='data.dataset.parquet',
+        data_type=DataTypes.DATASET,
+    )
     logger.info(f"saved data to {output_path}, columns {df.columns}")
 
 def save_datatype(output_path):
@@ -91,7 +80,7 @@ def save_datatype(output_path):
 
   
 def save_parquet(df, output_path, writeCsv= False):
-    ensure_folder_exists(output_path)
+    os.makedirs(output_path, exist_ok=True)
     if(writeCsv):
         df.to_csv(os.path.join(output_path, "data.csv"))
     df = transform_ndarraycol_to_list(df)

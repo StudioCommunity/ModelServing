@@ -13,8 +13,8 @@ logging.basicConfig(format='%(asctime)s - %(levelname)s - %(name)s -   %(message
 logging.info(f"Decode text with BPE")
 logger = logging.getLogger(__name__)
 
-DICT_PATH_KEY = "Dictionary Path"
-VOCAB_PATH_KEY = "Vocabulary Path"
+DICT_PATH_KEY = "DictionaryPath"
+VOCAB_PATH_KEY = "VocabularyPath"
 
 
 @click.command(context_settings=dict(

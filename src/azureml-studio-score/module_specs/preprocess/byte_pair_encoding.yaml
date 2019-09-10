@@ -3,10 +3,10 @@ id: 3c7cbf1c-c24c-11e9-863b-6c2b59f8af4d
 category: Machine Learning\Preprocess
 description: Use Byte Pair Encoding to encode text
 inputs:
-- name: Dictionary Path
+- name: DictionaryPath
   type: String
   description: The dictionary used to encode the text
-- name: Vocabulary Path
+- name: VocabularyPath
   type: String
   description: The vacabulary used to encode the text
 - name: Input Text Path
@@ -28,21 +28,21 @@ implementation:
       - python=3.6.8
       - regex
       - pip:
+        - --extra-index-url=https://CustomModules:ptnvejiiz3hnah5eoiv4dooigkksysjme6tqwrfjlvw4ekchejqq@msdata.pkgs.visualstudio.com/_packaging/CustomModules/pypi/simple/
+        - azureml-studio-modelspec
+        - azureml-studio-score
         - pandas
         - click
         - pyarrow==0.12.1
-        - --extra-index-url=https://CustomModules:ptnvejiiz3hnah5eoiv4dooigkksysjme6tqwrfjlvw4ekchejqq@msdata.pkgs.visualstudio.com/_packaging/CustomModules/pypi/simple/
-        - azureml-studio-modelspec==0.1.20190904.5
-        - azureml-studio-score==0.1.20190904.5
     command:
     - python
     - -m
     - azureml.studio.score.preprocess.byte_pair_encode
     args:
     - --dict_path
-    - inputPath: Dictionary Path
+    - inputPath: DictionaryPath
     - --vocab_path
-    - inputPath: Vocabulary Path
+    - inputPath: VocabularyPath
     - --input_text_path
     - inputPath: Input Text Path
     - --output_path

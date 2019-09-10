@@ -18,8 +18,8 @@ logging.info(f"Encode text with BPE")
 logger = logging.getLogger(__name__)
 
 INPUT_FILE_NAME = "data.dataset.parquet" # hard coded, to be replaced, and we presume the data is DataFrame inside parquet
-DICT_PATH_KEY = "Dictionary Path"
-VOCAB_PATH_KEY = "Vocabulary Path"
+DICT_PATH_KEY = "DictionaryPath"
+VOCAB_PATH_KEY = "VocabularyPath"
 
 @lru_cache()
 def bytes_to_unicode():

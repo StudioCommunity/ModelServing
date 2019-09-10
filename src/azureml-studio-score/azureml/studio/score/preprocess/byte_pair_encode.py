@@ -129,8 +129,12 @@ class BPEEncoder(object):
         return word
 
     def decode(self, input_df):
-        # Change shape for built-in score
-        context_tokens = input_df.values.flatten()[0]
+        # Change shape for built-in score, fit in append score column in built-in score
+        input = input_df.values.flatten()
+        if len(input) > 1:
+            context_tokens = input[1]
+        else:
+            context_tokens = input[0]
         text = ''.join([self.decoder[token] for token in context_tokens])
         text = bytearray([self.byte_decoder[c] for c in text]).decode('utf-8', errors=self.errors)
         print(f'RESULT: {text}')

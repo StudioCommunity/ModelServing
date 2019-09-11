@@ -1,0 +1,67 @@
+name: Dummy Module
+id: 25a65f00-d43f-11e9-b433-6c2b59f8af4d
+category: Score
+description: Sleep for a while
+inputs:
+- name: Input Port One
+  type: AnyFile
+  port: True
+  description: Input port one
+- name: Input Port Two
+  type: AnyFile
+  port: True
+  description: Input port two
+- name: Input Port Three
+  type: AnyFile
+  port: True
+  description: Input port three
+- name: SleepTime
+  type: int
+  description: Sleep time
+outputs:
+- name: Output Port One
+  type: AnyFile
+  port: True
+  description: Output port one
+- name: Output Port Two
+  type: AnyFile
+  port: True
+  description: Output port two
+- name: Output Port Three
+  type: AnyFile
+  port: True
+  description: Output port three
+implementation:
+  container:
+    conda:
+      name: project_environment
+      channels:
+      - defaults
+      dependencies:
+      - python=3.6.8
+      - pip:
+          - --extra-index-url=https://CustomModules:ptnvejiiz3hnah5eoiv4dooigkksysjme6tqwrfjlvw4ekchejqq@msdata.pkgs.visualstudio.com/_packaging/CustomModules/pypi/simple/
+          - azureml-studio-score
+    command:
+    - python
+    - -m
+    - azureml.studio.score.dummy_module
+    args:
+    - --sleep_time
+    - inputValue: SleepTime
+    - --input_one
+    - inputValue: Input Port One
+    - --input_two
+    - inputValue: Input Port Two
+    - --input_three
+    - inputValue: Input Port Three
+    - --output_one
+    - outputPath: Output Port One
+    - --output_two
+    - outputPath: Output Port Two
+    - --output_three
+    - outputPath: Output Port Three
+  invoking:
+    module:
+    class:
+    func:

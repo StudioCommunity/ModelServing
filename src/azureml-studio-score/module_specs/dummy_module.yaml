@@ -15,7 +15,7 @@ inputs:
   type: AnyFile
   port: True
   description: Input port three
-- name: SleepTime
+- name: SleepTimeInSeconds
   type: int
   description: Sleep time
 outputs:

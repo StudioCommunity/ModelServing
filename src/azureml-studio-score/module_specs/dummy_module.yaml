@@ -18,7 +18,7 @@ inputs:
   port: True
   optional: True
   description: Input port three
-- name: SleepTimeInSeconds
+- name: SleepTimeMilliSeconds
   type: int
   optional: True
   description: Sleep time(in seconds)
@@ -51,8 +51,8 @@ implementation:
     - -m
     - azureml.studio.score.dummy_module
     args:
-    - --sleep_time_in_seconds
-    - inputValue: SleepTimeInSeconds
+    - --sleep_time_milli_seconds
+    - inputValue: SleepTimeMilliSeconds
     - --input_one
     - inputValue: Input Port One
     - --input_two

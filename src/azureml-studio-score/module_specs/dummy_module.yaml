@@ -4,31 +4,35 @@ category: Score
 description: Sleep for a while
 inputs:
 - name: Input Port One
-  type: AnyFile
+  type: TabularDataFolder
   port: True
+  optional: True
   description: Input port one
 - name: Input Port Two
-  type: AnyFile
+  type: TabularDataFolder
   port: True
+  optional: True
   description: Input port two
 - name: Input Port Three
-  type: AnyFile
+  type: TabularDataFolder
   port: True
+  optional: True
   description: Input port three
 - name: SleepTimeInSeconds
   type: int
-  description: Sleep time
+  optional: True
+  description: Sleep time(in seconds)
 outputs:
 - name: Output Port One
-  type: AnyFile
+  type: TabularDataFolder
   port: True
   description: Output port one
 - name: Output Port Two
-  type: AnyFile
+  type: TabularDataFolder
   port: True
   description: Output port two
 - name: Output Port Three
-  type: AnyFile
+  type: TabularDataFolder
   port: True
   description: Output port three
 implementation:
@@ -47,8 +51,8 @@ implementation:
     - -m
     - azureml.studio.score.dummy_module
     args:
-    - --sleep_time
-    - inputValue: SleepTime
+    - --sleep_time_in_seconds
+    - inputValue: SleepTimeInSeconds
     - --input_one
     - inputValue: Input Port One
     - --input_two

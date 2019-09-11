@@ -1,14 +1,12 @@
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 
 
-class Model(nn.Module):
-    def __init__(self):
-        super(Model, self).__init__()
-        self.conv1 = nn.Conv2d(1, 20, 5)
-        self.conv2 = nn.Conv2d(20, 20, 5)
+class LinearRegression(torch.nn.Module):
+    def __init__(self, inputSize, outputSize):
+        super(LinearRegression, self).__init__()
+        self.linear = torch.nn.Linear(inputSize, outputSize)
 
     def forward(self, x):
-        x = F.relu(self.conv1(x))
-        return F.relu(self.conv2(x))
+        out = self.linear(x)
+        return out

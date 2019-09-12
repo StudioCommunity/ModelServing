@@ -42,6 +42,7 @@ implementation:
       - pip:
           - --extra-index-url=https://CustomModules:ptnvejiiz3hnah5eoiv4dooigkksysjme6tqwrfjlvw4ekchejqq@msdata.pkgs.visualstudio.com/_packaging/CustomModules/pypi/simple/
           - azureml-studio-score
+          - click
     command:
     - python
     - -m

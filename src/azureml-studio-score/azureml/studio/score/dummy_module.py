@@ -1,11 +1,8 @@
-from datetime import datetime
 import time
-
-from pip._internal import main as pipmain
-pipmain(["install", "click"])
 import click
 
 import logging
+
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
                     datefmt='%m/%d/%Y %H:%M:%S',
                     level=logging.INFO)
@@ -20,11 +17,15 @@ logger = logging.getLogger(__name__)
 ))
 @click.option('--sleep_time_milli_seconds', default=1000)
 def run_pipeline(sleep_time_milli_seconds):
-    print(f'Sleep time in seconds: {sleep_time_milli_seconds}')
+    print(f'Sleep time in milliseconds: {sleep_time_milli_seconds}')
     current_milli_time = lambda: int(round(time.time() * 1000))
-    print('Slept at: %s' % current_milli_time())
+    start_time = current_milli_time()
+    print('Slept at: %s' % start_time)
     time.sleep(sleep_time_milli_seconds / 1000)
-    print('Woke up at: %s' % current_milli_time())
+    end_time = current_milli_time()
+    print('Woke up at: %s' % end_time)
+    print(f'Sleep duration: {end_time - start_time}')
+
 
 # python -m azureml.studio.score.dummy_module --sleep_time_milli_seconds 1000
 if __name__ == '__main__':

@@ -18,23 +18,19 @@ inputs:
   port: True
   optional: True
   description: Input port three
+- name: Input Port Four
+  type: TabularDataFolder
+  port: True
+  optional: True
+  description: Input port four
 - name: SleepTimeMilliSeconds
   type: int
   optional: True
   description: Sleep time(in seconds)
 outputs:
-- name: Output Port One
+- name: Output Port
   type: TabularDataFolder
   port: True
-  description: Output port one
-- name: Output Port Two
-  type: TabularDataFolder
-  port: True
-  description: Output port two
-- name: Output Port Three
-  type: TabularDataFolder
-  port: True
-  description: Output port three
 implementation:
   container:
     conda:
@@ -59,12 +55,10 @@ implementation:
     - inputValue: Input Port Two
     - --input_three
     - inputValue: Input Port Three
-    - --output_one
-    - outputPath: Output Port One
-    - --output_two
-    - outputPath: Output Port Two
-    - --output_three
-    - outputPath: Output Port Three
+    - --input_four
+    - inputValue: Input Port Four
+    - --output
+    - outputPath: Output Port
   invoking:
     module:
     class:

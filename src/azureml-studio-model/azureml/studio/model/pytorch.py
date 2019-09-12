@@ -26,9 +26,15 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 def _get_default_conda_env():
     return utils.generate_conda_env(
+        additional_conda_deps=[
+            "pytorch={}".format(torch.__version__),
+            "torchvision={}".format(torchvision.__version__),
+        ],
         additional_pip_deps=[
-            "torch=={}".format(torch.__version__),
-            "torchvision=={}".format(torchvision.__version__),
+            "cloudpickle=={}".format(cloudpickle.__version__)
+        ],
+        additional_conda_channels=[
+            "pytorch"
         ])
 
 

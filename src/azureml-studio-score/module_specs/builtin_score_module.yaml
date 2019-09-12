@@ -34,10 +34,12 @@ implementation:
       - python=3.6.8
       - cudatoolkit=10.0
       - libsndfile # for tacotron2
+      - conda
       - pip:
         - cloudpickle
         - PyYAML
         - pyarrow==0.12.1
+        # TODO: change the following lines
         - git+https://github.com/StudioCommunity/CustomModules.git@master#subdirectory=builtin-score
         - git+https://github.com/StudioCommunity/CustomModules.git@master#subdirectory=builtin-models
         - librosa

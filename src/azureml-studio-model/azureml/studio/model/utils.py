@@ -20,16 +20,14 @@ def generate_conda_env(path=None, additional_conda_deps=None, additional_pip_dep
                       additional_conda_channels=None, install_azureml=True):
     env = {
         'name' : 'project_environment',
-        'channels': 'defaults',
+        'channels': ['defaults'],
         'dependencies': [
             "python={}".format(PYTHON_VERSION),
             "git",
             "regex"
         ]
     }
-    pip_dependencies = ["--extra-index-url=https://test.pypi.org/simple", "alghost"]
-    if install_azureml:
-        pip_dependencies.append("azureml-defaults")
+    pip_dependencies = []
     if additional_pip_deps is not None:
         pip_dependencies.extend(additional_pip_deps)
     env["dependencies"].append({"pip": pip_dependencies})
@@ -87,9 +85,9 @@ def generate_default_model_spec(flavor_name, model_file_name, conda_file_name=co
     }
     if input_args:
         spec['inputs'] = input_args
-    print(f'SPEC={spec}')
     if code_path:
         spec["code_path"] = code_path
+    logger.info(f'SPEC={spec}')
     return spec
 
 
@@ -116,7 +114,7 @@ def save_model_spec(path, flavor_name, model_file_name, conda_file_name=constant
 
     :input_args (optional)
     """
-    spec = generate_default_model_spec(flavor_name, model_file_name, conda_file_name, input_args)
+    spec = generate_default_model_spec(flavor_name, model_file_name, conda_file_name, input_args, code_path)
     _save_model_spec(path, spec)
 
 

@@ -29,19 +29,21 @@ with io.open('../.inlinelicense', 'r', encoding='utf-8') as f:
 
 exclude_list = ["*.tests", "azureml/studio/tests", "tests"]
 packages = find_packages(exclude=exclude_list)
+print(f"packages = {packages}")
 
 print("installing... ", packages)
 print("installing... ", inline_license)
 
 # python setup.py install
 setup(
-    name="azureml-studio-modelspec",
+    name="azureml-studio-model",
     version=get_package_version(),
     description="",
     packages=packages,
     install_requires=[
           "cloudpickle",
-          "PyYAML"
+          "PyYAML",
+          "pandas"
       ],
     author='Microsoft Corp',
     license=inline_license,

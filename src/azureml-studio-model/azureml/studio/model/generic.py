@@ -45,6 +45,8 @@ def load(artifact_path="./AzureMLModel", config={}, install_dependencies=False) 
         pass
     elif framework.lower() == "python":
         pass
+    elif framework.lower() == "onnx":
+        pass
     else:
         msg = f"Not Implemented: framework {framework} not supported"
         logger.info(msg)

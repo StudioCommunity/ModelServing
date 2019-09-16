@@ -161,12 +161,12 @@ def _copytree_include(src_dir, dst_dir, include_extensions: tuple = (), exist_ok
             if name.endswith(include_extensions):
                 file_list.append(os.path.join(root[src_dir_len:].strip('/').strip('\\'), name))
     
+    logger.info(f"file_list = {file_list}")
     for file_path in file_list:
         src_file_path = os.path.join(src_dir, file_path)
         dst_file_path = os.path.join(dst_dir, file_path)
         os.makedirs(os.path.dirname(dst_file_path), exist_ok=True)
         shutil.copy(src_file_path, dst_file_path)
-
 
 
 def add_code_path_to_syspath(artifact_path, model_conf):

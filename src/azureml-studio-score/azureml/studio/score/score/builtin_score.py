@@ -1,7 +1,6 @@
 import os
 import logging
 
-import yaml
 import pandas as pd
 
 from . import constants
@@ -25,7 +24,7 @@ class BuiltinScoreModule(object):
 
 
     def run(self, df, global_param=None):
-        output_label = self.module.predict(df)
+        output_label = self.model.predict(df)
         logger.info(f"output_label = {output_label}")
         if self.append_score_column_to_output:
             if isinstance(output_label, pd.DataFrame):

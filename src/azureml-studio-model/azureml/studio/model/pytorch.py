@@ -24,15 +24,14 @@ CODE_FOLDER_NAME = "code"
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
-def _get_default_conda_env():
+def _get_default_conda_env(additional_pip_deps=[]):
     return utils.generate_conda_env(
         additional_conda_deps=[
             "pytorch={}".format(torch.__version__),
             "torchvision={}".format(torchvision.__version__),
         ],
-        additional_pip_deps=[
-            "cloudpickle=={}".format(cloudpickle.__version__)
-        ],
+        additional_pip_deps=additional_pip_deps +
+            ["cloudpickle=={}".format(cloudpickle.__version__)],
         additional_conda_channels=[
             "pytorch"
         ])
@@ -44,12 +43,12 @@ def _save(pytorch_model, path):
         cloudpickle.dump(pytorch_model, fp)
 
 
-def save(pytorch_model, path="./AzureMLModel", conda_env=None, code_path=None, exist_ok=False):
+def save(pytorch_model, path="./AzureMLModel", conda_env=None, additional_pip_deps: list=[], code_path=None, exist_ok=False):
     os.makedirs(path, exist_ok=exist_ok)
     _save(pytorch_model, os.path.join(path, MODEL_FILE_NAME))
 
     if conda_env is None:
-        conda_env = _get_default_conda_env()
+        conda_env = _get_default_conda_env(additional_pip_deps=additional_pip_deps)
     utils.save_conda_env(path, conda_env)
 
     if code_path is not None:

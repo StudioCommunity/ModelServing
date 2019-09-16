@@ -86,10 +86,7 @@ def save_model(sess, input_tensor_list, output_tensor_list, graph_tags=None, sig
 
     :param path: Path to a directory containing model, spec, conda yaml data (optional).
     """
-    if(not path.endswith('/')):
-        path += '/'
-    if not os.path.exists(path):
-        os.makedirs(path)
+    utils.ensure_dir_exists(path)
 
     if graph_tags == None or len(graph_tags) == 0:
         graph_tags = [tf.saved_model.tag_constants.SERVING]
@@ -99,6 +96,29 @@ def save_model(sess, input_tensor_list, output_tensor_list, graph_tags=None, sig
 
     model_file_path = 'model' # sub-directory containing the tensorflow model
     _save_model(os.path.join(path, model_file_path), sess, input_tensor_list, output_tensor_list, graph_tags, signature_name)
+
+    if conda_env is None:
+        conda_env = _get_default_conda_env()
+    utils.save_conda_env(path, conda_env)
+
+    _save_model_spec(path, model_file_path, graph_tags, signature_name)
+    utils.generate_ilearner_files(path) # temp solution, to remove later
+
+
+def save_estimator_model(estimator, input_fn, conda_env=None, path='./model/'):
+    utils.ensure_dir_exists(path)
+    model_file_path = estimator.export_saved_model(path, input_fn)
+    print(model_file_path)
+
+    graph_tags = [tf.saved_model.tag_constants.SERVING]
+    signature_name = tf.saved_model.signature_constants.DEFAULT_SERVING_SIGNATURE_DEF_KEY
+
+    # TODO remove
+    graph = tf.Graph()
+    sess = tf.Session(graph=graph)
+    meta_graph_def = tf.saved_model.loader.load(sess, graph_tags, model_file_path)
+    signature_def = meta_graph_def.signature_def
+    print(signature_def)
 
     if conda_env is None:
         conda_env = _get_default_conda_env()

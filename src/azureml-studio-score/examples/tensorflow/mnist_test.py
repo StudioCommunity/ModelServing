@@ -80,12 +80,12 @@ def _evaluate(df, col1, col2):
 
 # python -m examples.tensorflow.mnist_test
 if __name__ == '__main__':
-    model_path = "model/tensorflow-minist/"
-    test(model_path, "x") # ,"label", "y_label"
+    # model_path = "model/tensorflow-minist/"
+    # test(model_path, "x") # ,"label", "y_label"
     
     # model_path = "model/tensorflow-minist-saved-model/"
     # test(model_path, "x")
 
     # #saved_model_cli show --dir model/tensorflow-mnist-cnn-estimator/1565246816 --all
-    # model_path = "model/tensorflow-mnist-cnn-estimator/"
-    # test(model_path, "image", "label", "classes")
+    model_path = "model/tensorflow-minist-cnn/model/1567565080"
+    test(model_path, "image", "label", "classes")

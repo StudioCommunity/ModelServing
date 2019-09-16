@@ -131,3 +131,15 @@ def generate_ilearner_files(path):
     # Dump data.ilearner as a work around until data type design
     with open(os.path.join(path, constants.DATA_ILEARNER_FILE_NAME), 'w') as fp:
         fp.writelines('{}')
+
+def ensure_dir_exists(path):
+    if(not path.endswith('/')):
+        path += '/'
+    if not os.path.exists(path):
+        os.makedirs(path)
+
+def find_latest_subdir(path):
+    all_subdirs = [d for d in os.listdir(path) if os.path.isdir(d)]
+    latest_subdir = max(all_subdirs, key=os.path.getmtime)
+    print(latest_subdir)
+    return latest_subdir

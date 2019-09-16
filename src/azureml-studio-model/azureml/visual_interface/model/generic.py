@@ -56,9 +56,10 @@ def load(artifact_path="./AzureMLModel", install_dependencies=False) -> GenericM
     if framework == "pytorch":
         from .pytorch import _load_generic_model
         return _load_generic_model(artifact_path)
-    elif framework == "tensorflow":
-        pass
-    elif framework == "sklearn":
+    elif framework.lower() == "tensorflow":
+        from .tensorflow import _load_generic_model
+        return _load_generic_model(artifact_path)
+    elif framework.lower() == "sklearn":
         pass
     elif framework == "keras":
         pass

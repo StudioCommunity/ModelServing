@@ -21,7 +21,7 @@ steps:
     pip install twine
 
 - script: |
-    cd src/azureml-studio-modelspec
+    cd src/azureml-studio-model
     python setup.py bdist_wheel
   displayName: 'Create model spec whl file'
 

@@ -1,0 +1,66 @@
+name: Dummy Module
+id: 25a65f00-d43f-11e9-b433-6c2b59f8af4d
+category: Score
+description: Sleep for a while
+inputs:
+- name: Input Port One
+  type: TabularDataFolder
+  port: True
+  optional: True
+  description: Input port one
+- name: Input Port Two
+  type: TabularDataFolder
+  port: True
+  optional: True
+  description: Input port two
+- name: Input Port Three
+  type: TabularDataFolder
+  port: True
+  optional: True
+  description: Input port three
+- name: Input Port Four
+  type: TabularDataFolder
+  port: True
+  optional: True
+  description: Input port four
+- name: SleepTimeMilliSeconds
+  type: int
+  optional: True
+  description: Sleep time(in seconds)
+outputs:
+- name: Output Port
+  type: TabularDataFolder
+  port: True
+implementation:
+  container:
+    conda:
+      name: project_environment
+      channels:
+      - defaults
+      dependencies:
+      - python=3.6.8
+      - pip:
+          - --extra-index-url=https://CustomModules:ptnvejiiz3hnah5eoiv4dooigkksysjme6tqwrfjlvw4ekchejqq@msdata.pkgs.visualstudio.com/_packaging/CustomModules/pypi/simple/
+          - azureml-studio-score
+          - click
+    command:
+    - python
+    - -m
+    - azureml.studio.score.dummy_module
+    args:
+    - --sleep_time_milli_seconds
+    - inputValue: SleepTimeMilliSeconds
+    - --input_one
+    - inputValue: Input Port One
+    - --input_two
+    - inputValue: Input Port Two
+    - --input_three
+    - inputValue: Input Port Three
+    - --input_four
+    - inputValue: Input Port Four
+    - --output
+    - outputPath: Output Port
+  invoking:
+    module:
+    class:
+    func:

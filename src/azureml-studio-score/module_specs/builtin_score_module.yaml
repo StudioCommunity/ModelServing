@@ -1,4 +1,4 @@
-name: Built-in Score - GPU
+name: Built-in Score
 id: 412abbd1-794f-4888-a72f-a16220b9a521
 category: Machine Learning\Score
 description: Buildin Score Module for a set of limited flavors
@@ -29,20 +29,16 @@ implementation:
       name: project_environment
       channels:
       - defaults
-      - conda-forge # for tacotron2
       dependencies:
       - python=3.6.8
-      - cudatoolkit=10.0
-      - libsndfile # for tacotron2
       - conda
       - pip:
+        - --extra-index-url=https://test.pypi.org/simple
+        - --extra-index-url=https://CustomModules:ua7fuhttm64csuuwl2cdy5zqq4ptw3otufevwselh23nse2xrtpq@msdata.pkgs.visualstudio.com/_packaging/CustomModules/pypi/simple/
+        - alghost==0.0.83
         - cloudpickle
         - PyYAML
         - pyarrow==0.12.1
-        # TODO: change the following lines
-        - git+https://github.com/StudioCommunity/CustomModules.git@master#subdirectory=builtin-score
-        - git+https://github.com/StudioCommunity/CustomModules.git@master#subdirectory=builtin-models
-        - librosa
         - unidecode 
         - inflect
     command:

@@ -1,3 +1,8 @@
+# --------------------------------------------------------------------------
+# TODO: Move the loading logit to azureml-studio-model and remove this file.
+# --------------------------------------------------------------------------
+
+
 import os
 import numpy as np
 import pandas as pd

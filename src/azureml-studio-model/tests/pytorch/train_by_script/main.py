@@ -3,8 +3,9 @@ import pandas as pd
 import torch
 from torch.autograd import Variable
 
-import azureml.studio.model.pytorch
-import azureml.studio.model.generic
+# TODO: Substitude visual_interface when Module solves conflict issue in azureml.studio.__init__.py
+import azureml.visual_interface.model.pytorch
+import azureml.visual_interface.model.generic
 
 from model import LinearRegression
 

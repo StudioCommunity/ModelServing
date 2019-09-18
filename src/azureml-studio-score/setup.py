@@ -40,7 +40,9 @@ setup(
     packages=packages,
     install_requires=[
           "cloudpickle",
-          "PyYAML"
+          "PyYAML",
+          "pandas",
+          "pyarrow"
       ],
     author='Microsoft Corp',
     license=inline_license,

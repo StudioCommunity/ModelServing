@@ -2,9 +2,9 @@ import os
 import logging
 
 import pandas as pd
+import azureml.studio.model.generic
 
 from . import constants
-import azureml.studio.model.generic
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +19,7 @@ class BuiltinScoreModule(object):
             append_score_column_to_output_value_str.lower() == "true"
         logger.info(f"self.append_score_column_to_output = {self.append_score_column_to_output}")
 
-        self.model = azureml.studio.model.generic.load(model_path)
+        self.model = azureml.studio.model.generic.load(model_path, install_dependencies=True)
         logger.info("Generic model loaded")
 
 
@@ -37,7 +37,7 @@ class BuiltinScoreModule(object):
             else:
                 df = pd.DataFrame({constants.SCORED_LABEL_COL_NAME: output_label})
         logger.info(f"df =\n{df}")
-        logger.info(df.columns)
+        logger.info(f"df.columns = {df.columns}")
         if df.shape[0] > 0:
             for col in df.columns:
                 logger.info(f"{col}: {type(df.loc[0][col])}")

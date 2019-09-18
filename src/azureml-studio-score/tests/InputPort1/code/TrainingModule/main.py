@@ -4,9 +4,8 @@ import numpy as np
 import pandas as pd
 import torch
 from torch.autograd import Variable
-# TODO: Substitude visual_interface when Module solves conflict issue in azureml.studio.__init__.py
-import azureml.visual_interface.model.pytorch
-import azureml.visual_interface.model.generic
+import azureml.studio.model.pytorch
+import azureml.studio.model.generic
 
 from .model import LinearRegression
 
@@ -20,7 +19,6 @@ y_train = np.array(y_values, dtype=np.float32)
 y_train = y_train.reshape(-1, 1)
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
-
 
 if __name__ == "__main__":
     model = LinearRegression(1, 1).to(device)

@@ -1,3 +1,8 @@
+# --------------------------------------------------------------------------
+# TODO: Move the loading logit to azureml-studio-model and remove this file.
+# --------------------------------------------------------------------------
+
+
 import torch
 from torch.autograd import Variable
 import importlib

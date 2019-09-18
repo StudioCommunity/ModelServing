@@ -1,0 +1,183 @@
+{
+  "visualizationType": "default",
+  "data": {
+    "records": [
+      [
+        21.206640243530273
+      ],
+      [
+        23.39060401916504
+      ],
+      [
+        25.574569702148438
+      ]
+    ],
+    "features": [
+      {
+        "name": "Score_0",
+        "index": 0,
+        "elementType": "float64",
+        "featureType": "Numeric Feature"
+      }
+    ],
+    "name": null,
+    "numberOfRows": 3,
+    "numberOfColumns": 1
+  },
+  "statistics": {
+    "records": [
+      [
+        23.390604654947918,
+        23.39060401916504,
+        21.206640243530273,
+        25.574569702148438,
+        2.1839647293091518,
+        3.0,
+        0.0
+      ]
+    ],
+    "features": [
+      {
+        "name": "Mean",
+        "index": 0,
+        "elementType": "float64",
+        "featureType": "Numeric Feature"
+      },
+      {
+        "name": "Median",
+        "index": 1,
+        "elementType": "float64",
+        "featureType": "Numeric Feature"
+      },
+      {
+        "name": "Min",
+        "index": 2,
+        "elementType": "float64",
+        "featureType": "Numeric Feature"
+      },
+      {
+        "name": "Max",
+        "index": 3,
+        "elementType": "float64",
+        "featureType": "Numeric Feature"
+      },
+      {
+        "name": "Standard Deviation",
+        "index": 4,
+        "elementType": "float64",
+        "featureType": "Numeric Feature"
+      },
+      {
+        "name": "Unique Values",
+        "index": 5,
+        "elementType": "float64",
+        "featureType": "Numeric Feature"
+      },
+      {
+        "name": "Missing Values",
+        "index": 6,
+        "elementType": "float64",
+        "featureType": "Numeric Feature"
+      }
+    ],
+    "name": null,
+    "numberOfRows": 1,
+    "numberOfColumns": 7
+  },
+  "layout": {
+    "records": [
+      [
+        {
+          "Bins": [
+            {
+              "x": 21.206640243530273,
+              "dx": 0.4367929458618178,
+              "y": 1,
+              "numElements": 0
+            },
+            {
+              "x": 21.64343318939209,
+              "dx": 0.4367929458618143,
+              "y": 0,
+              "numElements": 0
+            },
+            {
+              "x": 22.080226135253906,
+              "dx": 0.4367929458618178,
+              "y": 0,
+              "numElements": 0
+            },
+            {
+              "x": 22.517019081115723,
+              "dx": 0.4367929458618143,
+              "y": 0,
+              "numElements": 0
+            },
+            {
+              "x": 22.953812026977538,
+              "dx": 0.4367929458618178,
+              "y": 1,
+              "numElements": 0
+            },
+            {
+              "x": 23.390604972839355,
+              "dx": 0.4367929458618178,
+              "y": 0,
+              "numElements": 0
+            },
+            {
+              "x": 23.827397918701173,
+              "dx": 0.4367929458618143,
+              "y": 0,
+              "numElements": 0
+            },
+            {
+              "x": 24.264190864562988,
+              "dx": 0.4367929458618178,
+              "y": 0,
+              "numElements": 0
+            },
+            {
+              "x": 24.700983810424805,
+              "dx": 0.4367929458618143,
+              "y": 0,
+              "numElements": 0
+            },
+            {
+              "x": 25.13777675628662,
+              "dx": 0.4367929458618178,
+              "y": 1,
+              "numElements": 0
+            }
+          ],
+          "NumberOfRecords": 3
+        },
+        {
+          "median": 23.39060401916504,
+          "boxBottom": 22.298622131347656,
+          "boxTop": 24.48258686065674,
+          "whiskerBottom": 21.206640243530273,
+          "whiskerTop": 25.574569702148438,
+          "outliers": []
+        }
+      ]
+    ],
+    "features": [
+      {
+        "name": "Histogram",
+        "index": 0,
+        "elementType": "object",
+        "featureType": "Object Feature"
+      },
+      {
+        "name": "Boxplot",
+        "index": 1,
+        "elementType": "object",
+        "featureType": "Object Feature"
+      }
+    ],
+    "name": null,
+    "numberOfRows": 1,
+    "numberOfColumns": 2
+  }
+}

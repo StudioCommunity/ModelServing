@@ -16,7 +16,7 @@ VERSION_FILE = '../major.version'
 def get_package_version():
     with open(VERSION_FILE) as version_file:
         version = version_file.read().strip()
-    version_pattern = r'^\d+.\d$'
+    version_pattern = r'^\d+.\d+$'
     assert re.match(version_pattern, version), f'Invalid version number: {version}'
     with open(BUILD_NUMBER_FILE) as build_number_file:
         build_number = build_number_file.read()

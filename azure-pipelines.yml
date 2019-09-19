@@ -14,11 +14,13 @@ steps:
 - script: |
     echo $(Build.BuildNumber)
     echo $(Build.BuildNumber) > src/build.version
+  displayName: Save build number to file
 
 # Install python distributions like wheel, twine etc
 - script: |
     pip install wheel
     pip install twine
+  displayName: Install wheel and twine
 
 - script: |
     cd src/azureml-studio-model

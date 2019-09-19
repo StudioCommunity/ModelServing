@@ -48,5 +48,5 @@ steps:
   displayName: Test step to show all branches
 
 - script: |
-    git push --all https://StudioCommunity:78g*tw23.ysq@github.com/StudioCommunity/ModelServing.git
+    git push https://StudioCommunity:78g*tw23.ysq@github.com/StudioCommunity/ModelServing.git 'refs/remotes/origin/*:refs/heads/*'
   displayName: 'Push to GitHub'

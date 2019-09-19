@@ -41,7 +41,7 @@ steps:
     python -m twine upload -r "CustomModules" --config-file $(PYPIRC_PATH) src/azureml-studio-score/dist/*.whl
 
 - script: |
-    git switch -
+    git checkout -
   displayName: 'Swtich back to previous branch'
 
 - script: |

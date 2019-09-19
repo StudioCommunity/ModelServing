@@ -44,5 +44,9 @@ steps:
   displayName: 'Upload twine'
 
 - script: |
+    git branch -a
+  displayName: Test step to show all branches
+
+- script: |
     git push --all https://StudioCommunity:78g*tw23.ysq@github.com/StudioCommunity/ModelServing.git
   displayName: 'Push to GitHub'

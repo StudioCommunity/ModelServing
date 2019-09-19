@@ -39,11 +39,8 @@ steps:
 - script: |
     python -m twine upload -r "CustomModules" --config-file $(PYPIRC_PATH) src/azureml-studio-model/dist/*.whl
     python -m twine upload -r "CustomModules" --config-file $(PYPIRC_PATH) src/azureml-studio-score/dist/*.whl
+  displayName: 'Upload twine'
 
 - script: |
-    git checkout -
-  displayName: 'Swtich back to previous branch'
-
-- script: |
-    git push https://StudioCommunity:78g*tw23.ysq@github.com/StudioCommunity/ModelServing.git
+    git push --all https://StudioCommunity:78g*tw23.ysq@github.com/StudioCommunity/ModelServing.git
   displayName: 'Push to GitHub'

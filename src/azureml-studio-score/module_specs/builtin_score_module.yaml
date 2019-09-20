@@ -1,4 +1,4 @@
-name: Built-in Score
+name: Score for Deep Learning Models
 id: 412abbd1-794f-4888-a72f-a16220b9a521
 category: Machine Learning\Score
 description: Buildin Score Module for a set of limited flavors
@@ -46,7 +46,7 @@ implementation:
     command:
     - python
     - -m
-    - azureml.studio.score.score.module_invoker
+    - azureml.visual_interface.score.score.module_invoker
     args:
     - --trained-model
     - inputValue: Trained model
@@ -57,6 +57,6 @@ implementation:
     - --scored-dataset
     - outputPath: Scored dataset
   invoking:
-    module: azureml.studio.score.score.builtin_score_module
+    module: azureml.visual_interface.score.score.builtin_score_module
     class: BuiltinScoreModule
     func: run

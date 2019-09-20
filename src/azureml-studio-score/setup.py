@@ -39,10 +39,10 @@ setup(
     description="",
     packages=packages,
     install_requires=[
-          "cloudpickle",
           "PyYAML",
           "pandas",
-          "pyarrow"
+          "pyarrow",
+          "fire"
       ],
     author='Microsoft Corp',
     license=inline_license,

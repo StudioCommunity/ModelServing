@@ -1,5 +1,6 @@
 import os
 import logging
+from abc import ABC, abstractmethod
 
 import yaml
 
@@ -9,18 +10,36 @@ from .utils import _get_configuration
 
 logger = logging.getLogger(__name__)
 
-class GenericModel(object):
+class GenericModel(ABC):
+    """Interface class to be inherited by wrapper of different flavors, and expose unifed init and predict function
     
+    Arguments:
+        ABC {[type]} -- [description]
+    """
+    
+    @abstractmethod
     def __init__(self):
         pass
     
+    @abstractmethod
     def predict(self, df):
         pass
 
-def save(model_path):
-    pass
 
-def load(artifact_path="./AzureMLModel", config={}, install_dependencies=False) -> GenericModel:
+def load(artifact_path="./AzureMLModel", install_dependencies=False) -> GenericModel:
+    """Load model as GenericModel
+    
+    Keyword Arguments:
+        artifact_path {str} -- path to the ModelDirectory (default: {"./AzureMLModel"})
+        install_dependencies {bool} -- if true, this function will try to install the dependencies
+            specified by conda.yaml in the artifact_path (default: {False})
+    
+    Raises:
+        ValueError: [description]
+    
+    Returns:
+        GenericModel -- [description]
+    """
     model_spec_path = os.path.join(artifact_path, constants.MODEL_SPEC_FILE_NAME)
     logger.info(f'MODEL_FOLDER: {os.listdir(artifact_path)}')
     with open(model_spec_path) as fp:

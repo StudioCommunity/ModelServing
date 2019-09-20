@@ -2,7 +2,7 @@ import os
 import logging
 
 import pandas as pd
-import azureml.studio.model.generic
+import azureml.visual_interface.model.generic
 
 from . import constants
 
@@ -19,7 +19,7 @@ class BuiltinScoreModule(object):
             append_score_column_to_output_value_str.lower() == "true"
         logger.info(f"self.append_score_column_to_output = {self.append_score_column_to_output}")
 
-        self.model = azureml.studio.model.generic.load(model_path, install_dependencies=True)
+        self.model = azureml.visual_interface.model.generic.load(model_path, install_dependencies=True)
         logger.info("Generic model loaded")
 
 

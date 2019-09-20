@@ -3,7 +3,6 @@ import logging
 import os
 import shutil
 import ast
-import imp
 import sys
 import importlib
 
@@ -55,10 +54,14 @@ def save(pytorch_model, path="./AzureMLModel", conda_env=None, additional_pip_de
         dst_code_path = os.path.join(path, CODE_FOLDER_NAME)
         utils._copytree_include(code_path, dst_code_path, include_extensions=(".py"))
 
-    forward_func = getattr(pytorch_model, 'forward')
-    args = inspect.getargspec(forward_func).args
-    if 'self' in args:
-        args.remove('self')
+    try:
+        forward_func = getattr(pytorch_model, 'forward')
+        args = inspect.getfullargspec(forward_func).args
+        if 'self' in args:
+            args.remove('self')
+    except AttributeError as e:
+        logger.warning("Model without 'forward' function cannot be used to predict", exc_info=True)
+        args = []
 
     utils.save_model_spec(path, FLAVOR_NAME, MODEL_FILE_NAME, input_args=args, code_path=CODE_FOLDER_NAME)
     utils.generate_ilearner_files(path) # temp solution, to remove later

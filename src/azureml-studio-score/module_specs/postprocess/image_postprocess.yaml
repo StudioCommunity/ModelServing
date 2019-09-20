@@ -37,12 +37,12 @@ implementation:
         - opencv-python-headless
         - Pillow
         - https://download.pytorch.org/whl/cu100/torch-1.1.0-cp36-cp36m-linux_x86_64.whl
-        - git+https://github.com/StudioCommunity/CustomModules.git@master#subdirectory=builtin-score
-        - git+https://github.com/StudioCommunity/CustomModules.git@master#subdirectory=dstest
+        - --extra-index-url=https://CustomModules:ua7fuhttm64csuuwl2cdy5zqq4ptw3otufevwselh23nse2xrtpq@msdata.pkgs.visualstudio.com/_packaging/CustomModules/pypi/simple/
+        - azureml-studio-score
     command:
     - python
     - -m
-    - dstest.postprocess.tensor_to_image
+    - azureml.visual_interface.score.postprocess.tensor_to_image
     args:
     - --tensor_column
     - inputValue: Tensor Column
@@ -51,6 +51,6 @@ implementation:
     - --output_path
     - outputPath: Output Data
   invoking:
-    module: dstest.postprocess.tensor_to_image
+    module: azureml.visual_interface.score.postprocess.tensor_to_image
     class: Process
     func: run

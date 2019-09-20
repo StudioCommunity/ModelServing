@@ -48,12 +48,13 @@ implementation:
         - Pillow
         - torchvision==0.2.2.post3
         - https://download.pytorch.org/whl/cu100/torch-1.1.0-cp36-cp36m-linux_x86_64.whl
-        - git+https://github.com/StudioCommunity/CustomModules.git@master#subdirectory=builtin-score
-        - git+https://github.com/StudioCommunity/CustomModules.git@master#subdirectory=dstest
+        - --extra-index-url=https://CustomModules:ua7fuhttm64csuuwl2cdy5zqq4ptw3otufevwselh23nse2xrtpq@msdata.pkgs.visualstudio.com/_packaging/CustomModules/pypi/simple/
+        - azureml-studio-model
+        - azureml-studio-score
     command:
     - python
     - -m
-    - dstest.preprocess.preprocess
+    - azureml.visual_interface.score.preprocess.preprocess
     args:
     - --image_column
     - inputValue: Image Column
@@ -68,6 +69,6 @@ implementation:
     - --output_path
     - outputPath: Output Data
   invoking:
-    module: dstest.preprocess.preprocess
+    module: azureml.visual_interface.score.preprocess.preprocess
     class: PreProcess
     func: run

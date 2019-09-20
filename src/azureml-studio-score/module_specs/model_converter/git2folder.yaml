@@ -21,11 +21,12 @@ implementation:
       - python=3.6.8
       - pip:
         - gitpython
-        - git+https://github.com/StudioCommunity/CustomModules.git@master#subdirectory=dstest
+        - --extra-index-url=https://CustomModules:ua7fuhttm64csuuwl2cdy5zqq4ptw3otufevwselh23nse2xrtpq@msdata.pkgs.visualstudio.com/_packaging/CustomModules/pypi/simple/
+        - azureml-studio-score
     command:
     - python
     - -m
-    - dstest.importer.git2folder
+    - azureml.visual_interface.score.modelconverter.git2folder
     args:
     - --git_url
     - inputValue: Git URL

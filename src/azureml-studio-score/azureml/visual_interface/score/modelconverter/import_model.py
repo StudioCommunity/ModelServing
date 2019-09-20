@@ -79,7 +79,7 @@ class Importer(object):
         
     def load_pytorch(self, model_file, serialization_mode, init_args):
         import torch
-        from azureml.studio.modelspec.pytorch import save_model
+        from azureml.visual_interface.model.pytorch import save_model
         dependencies = []
         model = None
         device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -100,11 +100,11 @@ class Importer(object):
                         sys.modules[ex.name] = modules[name]
                         retry = True
                     else:
-                        raise ex      
+                        raise ex
         elif serialization_mode == 'savedmodel':
             print(f'SAVEDMODEL: {model_file} to {self.out_model_path}')
             retry = True
-            while retry:   
+            while retry:
                 try:
                     with open(model_file, 'rb') as fp:
                         model = torch.load(model_file, map_location=device)
@@ -147,8 +147,8 @@ class Importer(object):
     def load_keras(self, model_file, serialization_mode):
         import keras
         from keras.models import load_model
-        from azureml.studio.modelspec.keras import save_model
-        
+        from azureml.visual_interface.model.keras import save_model
+
         model = load_model(model_file)
         save_model(model, self.out_model_path)
 
@@ -156,8 +156,8 @@ class Importer(object):
         import tensorflow as tf
         import numpy as np
         import pandas as pd
-        from azureml.studio.modelspec.tensorflow import save_model
-        
+        from azureml.visual_interface.model.tensorflow import save_model
+
         model_folder = os.path.dirname(os.path.abspath(model_file)) if os.path.isfile(model_file) else model_file
         print(f'IN_MODEL_PATH = {model_folder}')
         print(f'IN_MODLE_FILES = {os.listdir(model_folder)}')
@@ -175,7 +175,7 @@ class Importer(object):
     def load_sklearn(self, model_file, serialization_mode):
         import pickle
         import joblib
-        from azureml.studio.modelspec.sklearn import save_model
+        from azureml.visual_interface.model.sklearn import save_model
         model = None
         try:
             model = joblib.load(model_file)

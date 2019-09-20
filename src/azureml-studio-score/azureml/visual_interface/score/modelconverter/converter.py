@@ -96,7 +96,7 @@ def load_scripts(model_path):
 
 def load_pytorch(model_file, serialization, out_model_path, model_class_file, init_args=None):
     import torch
-    from azureml.studio.modelspec.pytorch import save_model
+    from azureml.visual_interface.model.pytorch import save_model
     dependencies = []
     modules = {}
     if model_class_file:
@@ -166,7 +166,7 @@ def load_pytorch(model_file, serialization, out_model_path, model_class_file, in
 
 def load_keras(model_file, serialization, out_model_path):
     import keras
-    from azureml.studio.modelspec.keras import save_model, load_model_from_local_file
+    from azureml.visual_interface.model.keras import save_model, load_model_from_local_file
     model = load_model_from_local_file(model_file)
     path = './model'
     save_model(model, path)

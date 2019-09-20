@@ -54,12 +54,13 @@ implementation:
         - cloudpickle
         - click
         - PyYAML
-        - git+https://github.com/StudioCommunity/CustomModules.git@master#subdirectory=dstest
-        - git+https://github.com/StudioCommunity/CustomModules.git@master#subdirectory=builtin-models
+        - --extra-index-url=https://CustomModules:ua7fuhttm64csuuwl2cdy5zqq4ptw3otufevwselh23nse2xrtpq@msdata.pkgs.visualstudio.com/_packaging/CustomModules/pypi/simple/
+        - azureml-studio-score
+        - azureml-studio-model
     command:
     - python
     - -m
-    - dstest.importer.import_model
+    - azureml.visual_interface.score.modelconverter.import_model
     args:
     - --input_path
     - inputValue: Input Path

@@ -34,12 +34,12 @@ implementation:
         - pyarrow
         - scipy 
         - opencv-python-headless
-        - git+https://github.com/StudioCommunity/CustomModules.git@master#subdirectory=builtin-score
-        - git+https://github.com/StudioCommunity/CustomModules.git@master#subdirectory=dstest
+        - --extra-index-url=https://CustomModules:ua7fuhttm64csuuwl2cdy5zqq4ptw3otufevwselh23nse2xrtpq@msdata.pkgs.visualstudio.com/_packaging/CustomModules/pypi/simple/
+        - azureml-studio-score
     command:
     - python
     - -m
-    - dstest.postprocess.remove_column
+    - azureml.visual_interface.score.postprocess.remove_column
     args:
     - --remvoe_columns
     - inputValue: Remove Columns
@@ -48,6 +48,6 @@ implementation:
     - --output_path
     - outputPath: Output Data
   invoking:
-    module: dstest.postprocess.remove_column
+    module: azureml.visual_interface.score.postprocess.remove_column
     class: Process
     func: run

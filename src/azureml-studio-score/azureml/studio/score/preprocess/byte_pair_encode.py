@@ -79,6 +79,14 @@ class BPEEncoder(object):
         self.errors = 'replace'  # how to handle errors in decoding
 
     def encode(self, input_df):
+        """
+        Encode raw text with Byte pair encoding(BPE) algorithm.
+        This algorithm replaces the most common pair of consecutive bytes of data with a byte that does not occur,
+        then uses dictionary and vocabulary to map the bytes into numbers.
+        :param input_df: input data frame, the only column is a list of string
+        :return: list of encoded tokens data frame with column name "input:0"(for built-in score load)
+        eg: ["this is a test"] -> "input:0": [5661, 318, 257, 1332]
+        """
         print(f"BPE encoder input({input_df})")
         raw_text = ''.join(input_df.values.flatten())
         bpe_tokens = []
@@ -129,6 +137,14 @@ class BPEEncoder(object):
         return word
 
     def decode(self, input_df):
+        """
+        Decode Byte pair encoding(BPE) algorithm encoded tokens to raw text.
+        :param input_df: input data frame.
+        If there are only one column in input_df, the value of that column is the list of BPE encoded tokens.
+        If there are more than one columns in input_df, the value of the second column is the list of BPE encoded tokens.
+        :return: list of decoded texts data frame
+        eg: "input:0": [5661, 318, 257, 1332] -> ["this is a test"]
+        """
         # Change shape for built-in score, fit in append score column in built-in score
         input = input_df.values.flatten()
         if len(input) > 1:

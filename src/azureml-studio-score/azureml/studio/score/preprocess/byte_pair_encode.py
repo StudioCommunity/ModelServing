@@ -6,10 +6,6 @@ import os
 from functools import lru_cache
 from azureml.studio.score import ioutil
 
-from pip._internal import main as pipmain
-pipmain(["install", "click"])
-import click
-
 import logging
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
                     datefmt='%m/%d/%Y %H:%M:%S',

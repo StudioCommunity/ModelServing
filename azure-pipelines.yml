@@ -10,6 +10,17 @@ steps:
   inputs:
     versionSpec: '3.6'
 
+- script: |
+    cd src/azureml-studio-model
+    python -m pip install --upgrade pip
+    pip install -r requirements.txt
+  displayName: 'Install dependencies'
+
+- script: |
+    cd src/azureml-studio-model
+    python -m pytest
+  displayName: 'PyTest'
+
 # Save build number to file
 - script: |
     echo $(Build.BuildNumber)

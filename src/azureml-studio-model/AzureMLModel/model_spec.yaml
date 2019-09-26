@@ -1,9 +1,0 @@
-code_path: code
-conda:
-  conda_file_path: conda.yaml
-flavor:
-  framework: pytorch
-inputs:
-- x
-pytorch:
-  model_file_path: model.pkl

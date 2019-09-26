@@ -50,7 +50,7 @@ def save(pytorch_model, path="./AzureMLModel", conda_env=None, additional_pip_de
         conda_env = _get_default_conda_env(additional_pip_deps=additional_pip_deps)
     utils.save_conda_env(path, conda_env)
 
-    if code_path is not None:
+    if code_path:
         dst_code_path = os.path.join(path, CODE_FOLDER_NAME)
         utils._copytree_include(code_path, dst_code_path, include_extensions=(".py"))
 
@@ -120,7 +120,7 @@ class _PytorchWrapper(GenericModel):
         self.input_args = input_args
 
     def _to_tensor(self, entry):
-        if type(entry) == str:
+        if isinstance(entry, str):
             entry = ast.literal_eval(entry)
         return torch.Tensor(list(entry)).to(self.device)
     
@@ -132,7 +132,6 @@ class _PytorchWrapper(GenericModel):
             logger.info(f"input_df =\n {df}")
             # TODO: Consolidate serveral rows together for efficiency
             for _, row in df.iterrows():
-                input_params = []
                 input_params = list(map(self._to_tensor, row[self.input_args]))
                 predicted = self.model(*input_params)
                 output.append(predicted.tolist())

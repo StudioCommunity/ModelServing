@@ -15,7 +15,7 @@ from . import utils
 
 FLAVOR_NAME = "python"
 MODEL_FILE_NAME = "model.pkl"  # we cloud pickle the model to load/save the model by default
-
+logger = logging.getLogger(__name__)
 
 class PythonModel(object):
     """
@@ -55,9 +55,7 @@ class DummyPythonModel(PythonModel):
             self.b = m.b
 
     def predict(self, x, y):
-        print("input:")
-        print(x)
-        print(y)
+        logger.info(f"Input:\n{x}\n{y}")
         result = self.a *x + self.b * y 
         return result
     
@@ -127,11 +125,11 @@ def _remove_if_exists(path):
 
 
 def _git_archive_link(repo_owner, repo_name, branch):
-    return 'https://github.com/{}/{}/archive/{}.zip'.format(repo_owner, repo_name, branch)
+    return f"https://github.com/{repo_owner}/{repo_name}/archive/{branch}.zip"
 
 
 def _download_archive_zip(url, filename):
-    sys.stderr.write('Downloading: \"{}\" to {}\n'.format(url, filename))
+    sys.stderr.write(f'Downloading: \"{url}\" to {filename}\n')
     response = urlopen(url)
     with open(filename, 'wb') as f:
         while True:
@@ -249,9 +247,9 @@ def save_model(python_model, path='./model/', conda_env=None, dependencies=[], g
 
     spec = utils.generate_default_model_spec(FLAVOR_NAME, MODEL_FILE_NAME, input_args=args)
     pySpec = spec[FLAVOR_NAME]
-    if github is not None: pySpec["github"] = github
-    if module_path is not None: pySpec["module_path"] = module_path
-    if model_class is not None: pySpec["model_class"] = model_class
+    if github: pySpec["github"] = github
+    if module_path: pySpec["module_path"] = module_path
+    if model_class: pySpec["model_class"] = model_class
     utils._save_model_spec(path, spec)
     utils.generate_ilearner_files(path)  # temp solution, to remove later
 
@@ -273,10 +271,10 @@ def load_model(model_path, github = None, module_path = None, model_class = None
     Example:
         model = azureml.studio.modelspec.load('StudioCommunity/CustomModules:master', 'dstest/dstest/python/dummy.py', 'DummyPythonModel', pretrained=True)
     """
-    if(model_path is None):
+    if model_path:
         raise RuntimeError("Invalid model_path")
 
-    if github is not None:
+    if github:
         # Setup cache_dir to save downloaded files
         _setup_cache_dir()
 
@@ -288,7 +286,7 @@ def load_model(model_path, github = None, module_path = None, model_class = None
         print(f'adding {repo_dir} to sys path')
         sys.path.insert(0, repo_dir)
 
-        print(f'try load model from {repo_dir}, {module_path}, {model_class}')
+        print(f'try loading model from {repo_dir}, {module_path}, {model_class}')
         module = import_module(module_path, repo_dir + '/' + module_path)
         entry = _load_entry_from_module(module, model_class)
         print(f'initialize entry with: {args}, {kwargs}')

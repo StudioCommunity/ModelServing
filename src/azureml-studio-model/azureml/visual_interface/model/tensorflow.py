@@ -90,7 +90,7 @@ def save_model(sess, input_tensor_list, output_tensor_list, graph_tags=None, sig
     if not os.path.exists(path):
         os.makedirs(path)
 
-    if graph_tags == None or len(graph_tags) == 0:
+    if not graph_tags:
         graph_tags = [tf.saved_model.tag_constants.SERVING]
 
     if signature_name is None or signature_name == '':

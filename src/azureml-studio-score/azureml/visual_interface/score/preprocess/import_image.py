@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 @click.option('--output_path', default="datas/mnist")
 def run(input_path, output_path):
   """
-  This functions read images in an folder and encode it ans base64. Then save it as csv in output_path.
+  This function reads images in an folder and encode it ans base64. Then save it as csv in output_path.
   """
   import glob
   print(f'INPUT_PATH({input_path}) : {os.listdir(input_path)}')

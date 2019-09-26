@@ -12,7 +12,7 @@ class DependencyManager(object):
     
     def __init__(self):
         self.conda_channels = []
-        self.conda_dendencies = []
+        self.conda_dependencies = []
         self.pip_dependencies = []
     
     def load(self, conda_yaml_path):
@@ -32,27 +32,27 @@ class DependencyManager(object):
             elif entry.startswith(("python=", "python>", "python<")):
                 pass
             else:
-                self.conda_dendencies.append(entry)
+                self.conda_dependencies.append(entry)
         logger.info(f"conda_channels = {', '.join(self.conda_channels)}")
-        logger.info(f"conda_dependencies = {', '.join(self.conda_dendencies)}")
+        logger.info(f"conda_dependencies = {', '.join(self.conda_dependencies)}")
         logger.info(f"pip_dependencies = {', '.join(self.pip_dependencies)}")
 
     def install(self):
         import conda.cli.python_api as Conda
 
-        if len(self.conda_dendencies) == 0:
+        if len(self.conda_dependencies) == 0:
             logger.info("No conda denpendencies to install")
         else:
             conda_cmds = [Conda.Commands.INSTALL]
             for channel in self.conda_channels:
                 conda_cmds += ["-c", channel]
-            conda_cmds += self.conda_dendencies
+            conda_cmds += self.conda_dependencies
             (stdout_str, sterr_str, return_code_int) = Conda.run_command(
                 *conda_cmds, use_exception_handler=True, stdout=sys.stdout, stderr=sys.stderr)
             logger.info("Finished install conda dependencies")
             logger.warn(f"sterr: {sterr_str}")
 
-        if len(self.pip_dependencies) == 0:
+        if not self.pip_dependencies:
             logger.info("No pip dependencies to install")
         else:
             pipmain(["install"] + self.pip_dependencies)

@@ -52,19 +52,19 @@ def load(artifact_path="./AzureMLModel", install_dependencies=False) -> GenericM
         dependency_manager.install()
     
     model_conf = _get_configuration(artifact_path)
-    framework = model_conf["flavor"]["framework"]
-    if framework.lower() == "pytorch":
+    framework = model_conf["flavor"]["framework"].lower()
+    if framework == "pytorch":
         from .pytorch import _load_generic_model
         return _load_generic_model(artifact_path)
-    elif framework.lower() == "tensorflow":
+    elif framework == "tensorflow":
         pass
-    elif framework.lower() == "sklearn":
+    elif framework == "sklearn":
         pass
-    elif framework.lower() == "keras":
+    elif framework == "keras":
         pass
-    elif framework.lower() == "python":
+    elif framework == "python":
         pass
-    elif framework.lower() == "onnx":
+    elif framework == "onnx":
         pass
     else:
         msg = f"Not Implemented: framework {framework} not supported"

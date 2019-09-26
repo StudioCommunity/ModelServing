@@ -29,7 +29,7 @@ def save_model(sklearn_model, path='./model/', conda_env=None):
     
     :param conda_env: Either a dictionary representation of a Conda environment or the path to a conda environment yaml file. 
     """
-    if(not path.endswith('/')):
+    if not path.endswith('/'):
         path += '/'
     if not os.path.exists(path):
         os.makedirs(path)

@@ -28,11 +28,10 @@ def save_parquet1(df, output_path, writeCsv= False):
   logger.info(f"saved parquet to {output_path}, columns {df.columns}")
 
 def transform_to_list(root):
-    if type(root) == np.ndarray:
+    if isinstance(root, np.ndarray):
         root = root.tolist()
-    if type(root) == list:
-        for i, child in enumerate(root):
-            root[i] = transform_to_list(child)
+    if isinstance(root, list):
+        root = [transform_to_list(child) for child in root]
     return root
 
 def transform_ndarraycol_to_list(df):

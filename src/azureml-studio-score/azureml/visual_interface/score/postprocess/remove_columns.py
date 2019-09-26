@@ -38,7 +38,7 @@ class Process:
 @click.option('--remvoe_columns', default="")
 def run(input_path, output_path, remvoe_columns):
   """
-  This functions removes specified column from input
+  This function removes specified columns from input dataframe
   """
   meta = {
     "Remove Columns": remvoe_columns

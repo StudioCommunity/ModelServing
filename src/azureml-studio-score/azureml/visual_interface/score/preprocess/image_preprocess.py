@@ -113,7 +113,7 @@ class ImagePreprocess:
 def run(input_path, output_path, image_column, target_column, target_datauri_column, resize_size, target_image_size,
         normalization_mean, normalization_std, convert_to_grayscale):
     """
-    This functions read base64 encoded images from df. Transform to format required by model input.
+    This function reads base64 encoded images from df. Transform to format required by model input.
     """
     params = {
         "Image Column": image_column,

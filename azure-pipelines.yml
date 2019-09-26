@@ -10,6 +10,9 @@ steps:
   inputs:
     versionSpec: '3.6'
 
+- bash: echo "##vso[task.prependpath]$CONDA/bin"
+  displayName: Add conda to PATH
+
 - script: |
     cd src/azureml-studio-model
     python -m pip install --upgrade pip

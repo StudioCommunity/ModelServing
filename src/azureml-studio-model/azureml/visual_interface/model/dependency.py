@@ -3,7 +3,6 @@ import logging
 
 import yaml
 from pip._internal import main as pipmain
-import conda.cli.python_api as Conda
 
 logger = logging.getLogger(__name__)
 
@@ -39,6 +38,8 @@ class DependencyManager(object):
         logger.info(f"pip_dependencies = {', '.join(self.pip_dependencies)}")
 
     def install(self):
+        import conda.cli.python_api as Conda
+
         if len(self.conda_dendencies) == 0:
             logger.info("No conda denpendencies to install")
         else:

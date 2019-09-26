@@ -107,8 +107,8 @@ class ImagePreprocess:
 @click.option('--target_datauri_column', default="")
 @click.option('--resize_size', default="")
 @click.option('--target_image_size', default="")
-@click.option('--normalization_mean', default="(0, 0, 0)")
-@click.option('--normalization_std', default="(0.5, 0.5, 0.5)")
+@click.option('--normalization_mean', default="(0 0 0)")
+@click.option('--normalization_std', default="(0.5 0.5 0.5)")
 @click.option('--convert_to_grayscale', default="False")
 def run(input_path, output_path, image_column, target_column, target_datauri_column, resize_size, target_image_size,
         normalization_mean, normalization_std, convert_to_grayscale):
@@ -131,8 +131,6 @@ def run(input_path, output_path, image_column, target_column, target_datauri_col
     result = proccesor.run(df)
     ioutils.save_parquet(result, output_path)
 
-# mnist: python -m dstest.preprocess.preprocess  --input_path datas/mnist --output_path outputs/mnist --image_column=image --target_column=x --target_datauri_column=x.data --target_image_size=28x28
-# imagenet: python -m dstest.preprocess.preprocess  --input_path datas/imagenet --output_path outputs/imagenet --image_column=image --target_column=import/images --target_datauri_column=import/images.data --target_image_size=224x224
-# stargan: python -m dstest.preprocess.preprocess  --input_path inputs/stargan --output_path outputs/stargan --image_column=image --target_column=import/images --target_datauri_column=import/images.data --resize_size=300 --target_image_size=(256, 256) --normalization_mean=(0, 0, 0) --normalization_std=(0.5, 0.5, 0.5)
+# python -m azureml.visual_interface.score.preprocess.image_preprocess  --input_path data/Output_Data --output_path outputs/stargan --image_column=image --target_column=input --target_datauri_column=input.url --resize_size=256 --target_image_size="(224 224)" --normalization_mean="(0.485 0.456 0.406)" --normalization_std="(0.229 0.224 0.225)"
 if __name__ == '__main__':
     run()

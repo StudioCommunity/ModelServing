@@ -93,7 +93,7 @@ def run(input_path, meta_path, output_path, file_name, prob_col, append_category
   print(result)
   ioutils.save_parquet(result, output_path, True)
 
-# python -m dstest.postprocess.prob_to_category  --input_path outputs/imagenet/ouput --meta_path model/vgg --output_path outputs/imagenet/categories --file_name=synset.json --prob_col=import/prob --append_category_column_to_output True
+# python -m azureml.visual_interface.score.postprocess.prob_to_category --meta_path outputs/densenet/Label_Map_Path --input_path outputs/densenet/Scored_dataset --output_path outputs/densenet/output --file_name=index_to_label.json --prob_col=Score_0 --append_category_column_to_output True
 if __name__ == '__main__':
   #categories = read_categories_from_file("model/vgg/synset.txt")
   #save_categories_to_file(categories, "model/vgg/synset.json")

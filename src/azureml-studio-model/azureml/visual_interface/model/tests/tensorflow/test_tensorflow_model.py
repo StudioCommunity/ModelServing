@@ -4,11 +4,14 @@ import azureml.visual_interface.model.tensorflow
 import azureml.visual_interface.model.generic
 
 import shutil
+import logging
 
 import tensorflow as tf
 import pandas as pd
 import numpy as np
 from tensorflow.examples.tutorials.mnist import input_data
+
+logger = logging.getLogger(__name__)
 
 mnist = input_data.read_data_sets("MNIST_data/", one_hot=True)
 
@@ -39,12 +42,12 @@ for i in range(1000):
 
 correct_prediction = tf.equal(tf.argmax(y, 1), tf.argmax(y_, 1))
 accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
-print(sess.run(accuracy, feed_dict={x: mnist.test.images, y_: mnist.test.labels}))
+logging.info(sess.run(accuracy, feed_dict={x: mnist.test.images, y_: mnist.test.labels}))
 
 
 def prepare_input():
     batch_xs, batch_ys = mnist.train.next_batch(2)
-    print(batch_xs)
+    logging.info(batch_xs)
     input = pd.DataFrame()
     input["x:0"] = [batch_xs[0]]
     return input
@@ -52,14 +55,14 @@ def prepare_input():
 
 def setup_module(module):
     # remove if exists
-    print("clean resources for pytest")
+    logging.info("clean resources for pytest")
     shutil.rmtree('./AzureMLModel', ignore_errors=True)
     shutil.rmtree('MNIST_data', ignore_errors=True)
 
 
 def teardown_module(module):
     # remove if exists
-    print('clean generated resources')
+    logging.info('clean generated resources')
     shutil.rmtree('./AzureMLModel', ignore_errors=True)
     shutil.rmtree('MNIST_data', ignore_errors=True)
 
@@ -85,15 +88,15 @@ def test_load_model():
         sigdef_output: tf_graph.get_tensor_by_name(tnsr_info.name)
         for sigdef_output, tnsr_info in signature_def.outputs.items()
     }
-    print(input_tensor_mapping)
-    print(output_tensors)
+    logging.info(input_tensor_mapping)
+    logging.info(output_tensors)
 
 
 @pytest.mark.last
 def test_predict():
     # load model(with generic API)
     loaded_generic_model = azureml.visual_interface.model.generic.load()
-    print(dir(loaded_generic_model))
+    logging.info(dir(loaded_generic_model))
     df = prepare_input()
     pred = loaded_generic_model.predict(df)
-    print(np.argmax(pred['y:0'][0]))
+    logging.info(np.argmax(pred['y:0'][0]))

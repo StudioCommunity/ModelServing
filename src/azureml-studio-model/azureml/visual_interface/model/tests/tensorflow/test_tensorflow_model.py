@@ -1,7 +1,7 @@
 import pytest
 
-import azureml.studio.model.tensorflow
-import azureml.studio.model.generic
+import azureml.visual_interface.model.tensorflow
+import azureml.visual_interface.model.generic
 
 import shutil
 
@@ -64,8 +64,8 @@ def teardown_module(module):
 
 
 @pytest.mark.first
-def test_1_save_model():
-    azureml.studio.model.tensorflow.save_model(sess, [x], [y])
+def test_save_model():
+    azureml.visual_interface.model.tensorflow.save_model(sess, [x], [y])
 
 
 @pytest.mark.second
@@ -73,7 +73,7 @@ def test_load_model():
     # load model(with tensorflow API)
     tf_graph = tf.Graph()
     tf_sess = tf.Session(graph=tf_graph)
-    signature_def = azureml.studio.model.tensorflow.load_model(tf_sess)
+    signature_def = azureml.visual_interface.model.tensorflow.load_model(tf_sess)
     # input keys in the signature definition correspond to input DataFrame column names
     input_tensor_mapping = {
         tensor_column_name: tf_graph.get_tensor_by_name(tensor_info.name)
@@ -91,7 +91,7 @@ def test_load_model():
 @pytest.mark.last
 def test_predict():
     # load model(with generic API)
-    loaded_generic_model = azureml.studio.model.generic.load()
+    loaded_generic_model = azureml.visual_interface.model.generic.load()
     print(dir(loaded_generic_model))
     df = prepare_input()
     pred = loaded_generic_model.predict(df)

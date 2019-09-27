@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 from azureml.studio.score.builtin_score_module import *
 from azureml.studio.score.tensorflow_score_module import *
-from azureml.studio.score import ioutil
+from azureml.studio.score.utils import ioutils
 
 def test_tensor(model_path, df):
     with open(model_path + "model_spec.yml") as fp:
@@ -27,7 +27,7 @@ def test_builtin(model_path, df):
     return result
 
 def prepare_input():
-    df = ioutil.read_parquet("outputs/mnist/")
+    df = ioutils.read_parquet("outputs/mnist/")
     print(df.columns)
     return df
 

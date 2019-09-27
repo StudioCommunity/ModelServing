@@ -1,0 +1,1 @@
+ln -s -f ../../../../azureml/studio/model azureml/studio/model

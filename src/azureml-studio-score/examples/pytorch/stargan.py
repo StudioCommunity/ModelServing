@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 from azureml.studio.score.builtin_score_module import *
 from azureml.studio.score.tensorflow_score_module import *
-from azureml.studio.score import ioutil
+from azureml.studio.score.utils import ioutils
 
 def test_builtin(model_path, df):
     module = BuiltinScoreModule(model_path, {"Append score columns to output": "True"})
@@ -14,20 +14,20 @@ def test_builtin(model_path, df):
     return result
 
 def prepare_input():
-    df = ioutil.read_parquet("../dstest/outputs/stargan/")
+    df = ioutils.read_parquet("../dstest/outputs/stargan/")
     results = []
     for index in range(len(df)):
       results.append([[0, 0, 0, 1, 0]])
     df.insert(len(df.columns), "c", results, True)
     print(df.columns)
-    ioutil.save_parquet(df, "outputs/stargan/model_input", True)
+    ioutils.save_parquet(df, "outputs/stargan/model_input", True)
     return df
 
 
 def test(model_path):
     df = prepare_input()
     out = test_builtin(model_path, df)
-    ioutil.save_parquet(out, "outputs/stargan/model_output", True)
+    ioutils.save_parquet(out, "outputs/stargan/model_output", True)
     print(out.columns)
     print(out)
     print(out["0"].shape)
@@ -37,6 +37,6 @@ if __name__ == '__main__':
     # model_path = "model/stargan/"
     # test(model_path)
 
-    out = ioutil.read_parquet("outputs/stargan/model_output")
+    out = ioutils.read_parquet("outputs/stargan/model_output")
     print(out.columns)
     #print(out["0"][0])

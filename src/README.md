@@ -1,12 +1,16 @@
-# Introduction 
+# README
+
+## Introduction
+
 This repository contains some built-in custom modules for azureml studio.
 
-# Content
+## Content
+
 - [Introduction](#introduction)
 - [Content](#content)
 - [Repository Structure](#repository-structure)
 
-# Repository Structure
+## Repository Structure
 
 Python packages are folders that contain python code or other packages and have an \_\_init\_\_.py.
 
@@ -36,7 +40,8 @@ root/
     dataprep/
         builder/                    [gulp task generators/helpers for building Data Prep]
         Core/                       [DataPrep Engine/Lariat]
+```
 
+## Testing
 
-# Testing
 python -m pytest

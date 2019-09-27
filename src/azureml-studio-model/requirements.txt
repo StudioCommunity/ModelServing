@@ -1,0 +1,12 @@
+# https://pip.pypa.io/en/stable/reference/pip_install/#requirements-file-format
+pandas
+cloudpickle
+PyYAML
+pytest
+
+# For test cases:
+torch==1.2.0
+torchvision==0.4.0
+
+# WARNING: do NOT upgrade this version because azureml-core 1.0.48 requires it to be <=0.15.89,>=0.15.35
+ruamel.yaml==0.15.89

@@ -62,9 +62,9 @@ def _save_model(export_path, sess, input_tensor_list, output_tensor_list, graph_
             method_name=tf.saved_model.signature_constants.PREDICT_METHOD_NAME))
 
     builder.add_meta_graph_and_variables(
-        sess, 
+        sess,
         graph_tags,
-        signature_def_map= {
+        signature_def_map={
             str(signature_name): prediction_signature
         },
         main_op=tf.tables_initializer(),
@@ -73,7 +73,8 @@ def _save_model(export_path, sess, input_tensor_list, output_tensor_list, graph_
     builder.save()
 
 
-def save_model(sess, input_tensor_list, output_tensor_list, graph_tags=None, signature_name=None, conda_env=None, path='./AzureMLModel', code_path=None):
+def save_model(sess, input_tensor_list, output_tensor_list, graph_tags=None, signature_name=None, conda_env=None,
+               path='./AzureMLModel', code_path=None):
     """
     Save a Tensorflow model to a path on the local file system.
 
@@ -83,17 +84,19 @@ def save_model(sess, input_tensor_list, output_tensor_list, graph_tags=None, sig
     
     :param output_tensor_list: list of output tensors.
     
-    :param graph_tags: list of graph tags (optional), if not specified, default its value would be [tf.saved_model.tag_constants.SERVING].
+    :param graph_tags: list of graph tags (optional), if not specified, default its value would be [
+    tf.saved_model.tag_constants.SERVING].
     
     :param signature_name: signature name (optional), if not specified, default its value would be 'signature_name'.
 
-    :param conda_env: Either a dictionary representation of a Conda environment or the path to a conda environment yaml file (optional). 
+    :param conda_env: Either a dictionary representation of a Conda environment or the path to a conda environment
+    yaml file (optional).
 
     :param path: Path to a directory containing model, spec, conda yaml data (optional).
 
     :param code_path: Path to save users code(optional).
     """
-    if(not path.endswith('/')):
+    if not path.endswith('/'):
         path += '/'
     if not os.path.exists(path):
         os.makedirs(path)
@@ -104,19 +107,20 @@ def save_model(sess, input_tensor_list, output_tensor_list, graph_tags=None, sig
     if signature_name is None or signature_name == '':
         signature_name = 'signature_name'
 
-    model_file_path = 'model' # sub-directory containing the tensorflow model
-    _save_model(os.path.join(path, model_file_path), sess, input_tensor_list, output_tensor_list, graph_tags, signature_name)
+    model_file_path = 'model'  # sub-directory containing the tensorflow model
+    _save_model(os.path.join(path, model_file_path), sess, input_tensor_list, output_tensor_list, graph_tags,
+                signature_name)
 
     if conda_env is None:
         conda_env = _get_default_conda_env()
     utils.save_conda_env(path, conda_env)
 
     _save_model_spec(path, model_file_path, graph_tags, signature_name)
-    utils.generate_ilearner_files(path) # temp solution, to remove later
+    utils.generate_ilearner_files(path)  # temp solution, to remove later
 
     if code_path is not None:
         dst_code_path = os.path.join(path, CODE_FOLDER_NAME)
-        utils._copytree_include(code_path, dst_code_path, include_extensions=(".py"))
+        utils._copytree_include(code_path, dst_code_path, include_extensions=(".py", ))
 
 
 def rename_col(df, col_name):
@@ -135,10 +139,10 @@ def get_col_schema(name, tensor):
 
 def load_graph(model_file_path, sess):
     with open(model_file_path, mode='rb') as f:
-        fileContent = f.read()
+        file_content = f.read()
 
     graph_def = tf.GraphDef()
-    graph_def.ParseFromString(fileContent)
+    graph_def.ParseFromString(file_content)
     tf.import_graph_def(graph_def)
     graph = tf.get_default_graph()
     init = tf.global_variables_initializer()
@@ -150,7 +154,7 @@ def load_graph(model_file_path, sess):
 # shape = self.x_shape[name]
 def array_from_df_col(col, shape):
     values = ioutils.from_df_column_to_array(col)
-    if shape != None:
+    if shape is not None:
         target_shape = (len(values), *shape)
         # reshape if target_shape doesn't contain None
         if values.shape != target_shape and None not in target_shape:
@@ -181,7 +185,7 @@ class _TFSavedModelWrapper(object):
 
         with tf_graph.as_default():
             self.signature_def = load_tensorflow_saved_model(tf_sess, tf_meta_graph_tags, tf_signature_def_key,
-                                                                   export_dir)
+                                                             export_dir)
 
         # input keys in the signature definition correspond to input DataFrame column names
         self.input_tensor_mapping = {
@@ -246,8 +250,7 @@ class _TFSaverWrapper(object):
             name = tf_config["inputs"][index]["name"]
             tensor = graph.get_tensor_by_name(name + ":0")
             self.x[name] = tensor
-            shape = None
-            if (tensor.shape.ndims == None):
+            if tensor.shape.ndims is None:
                 shape = tf_config["inputs"][index].get("shape", None)
             else:
                 shape = tensor.shape.as_list()[1:]
@@ -275,7 +278,7 @@ class _TFSaverWrapper(object):
         tf_config = config["tensorflow"]
         print(tf_config)
         serialization_format = tf_config.get(constants.SERIALIZATION_METHOD_KEY, "saver")
-        if (serialization_format == "saver"):
+        if serialization_format == "saver":
             self._load_graph_from_checkpoint(model_path, tf_config)
         else:
             self._load_graph(model_path, tf_config)
@@ -308,20 +311,21 @@ class _TFSaverWrapper(object):
         return resultdf
 
     def feed_dict(self, df):
-        dict = {}
+        dictionary = {}
         for name, tensor in self.x.items():
-            if (name not in df.columns):
+            if name not in df.columns:
                 raise Exception(f"Column {name} not in input df columns: {df.columns}")
             values = array_from_df_col(df[name], self.x_shape[name])
-            dict[tensor] = values
-        return dict
+            dictionary[tensor] = values
+        return dictionary
 
 
 class _TensorflowWrapper(GenericModel):
     def __init__(self, model_path, config):
+        super().__init__()
         tf_config = config["tensorflow"]
 
-        if (tf_config.get(constants.SERIALIZATION_METHOD_KEY, "saver") == "saved_model"):
+        if tf_config.get(constants.SERIALIZATION_METHOD_KEY, "saver") == "saved_model":
             export_dir = os.path.join(model_path, tf_config[constants.MODEL_FILE_PATH_KEY])
             tf_meta_graph_tags = tf_config["meta_graph_tags"]
             tf_signature_def_key = tf_config["signature_def_key"]

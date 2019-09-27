@@ -96,7 +96,7 @@ def load_scripts(model_path):
 
 def load_pytorch(model_file, serialization, out_model_path, model_class_file, init_args=None):
     import torch
-    from azureml.visual_interface.model.pytorch import save_model
+    from azureml.visual_interface.model.pytorch import save
     dependencies = []
     modules = {}
     if model_class_file:
@@ -161,7 +161,8 @@ def load_pytorch(model_file, serialization, out_model_path, model_class_file, in
 
     print(f'model loaded: {out_model_path}')
     print(f'model={model}, dependencies={dependencies}')
-    save_model(model, out_model_path, dependencies=dependencies)
+    # TODO: save dependencies
+    save(model, path=out_model_path)
     print(f'MODEL_FOLDER: {os.listdir(out_model_path)}')
 
 def load_keras(model_file, serialization, out_model_path):

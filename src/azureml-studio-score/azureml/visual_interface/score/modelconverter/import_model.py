@@ -79,7 +79,7 @@ class Importer(object):
         
     def load_pytorch(self, model_file, serialization_mode, init_args):
         import torch
-        from azureml.visual_interface.model.pytorch import save_model
+        from azureml.visual_interface.model.pytorch import save
         dependencies = []
         model = None
         device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -96,8 +96,8 @@ class Importer(object):
                     retry = False
                 except ModuleNotFoundError as ex:
                     name = ex.name.rpartition('.')[-1]
-                    if name in modules:
-                        sys.modules[ex.name] = modules[name]
+                    if name in self.modules:
+                        sys.modules[ex.name] = self.modules[name]
                         retry = True
                     else:
                         raise ex
@@ -111,8 +111,8 @@ class Importer(object):
                     retry = False
                 except ModuleNotFoundError as ex:
                     name = ex.name.rpartition('.')[-1]
-                    if name in modules:
-                        sys.modules[ex.name] = modules[name]
+                    if name in self.modules:
+                        sys.modules[ex.name] = self.modules[name]
                         retry = True
                     else:
                         raise ex
@@ -142,7 +142,8 @@ class Importer(object):
         else:
             raise NotImplementedError
 
-        save_model(model, self.out_model_path, dependencies=self.dependencies)
+        # TODO: save dependencies
+        save(model, path=self.out_model_path)
 
     def load_keras(self, model_file, serialization_mode):
         import keras

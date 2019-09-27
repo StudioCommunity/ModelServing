@@ -1,10 +1,13 @@
 import os
 import yaml
+import logging
 import tensorflow as tf
 import pandas as pd
 import numpy as np
 from . import constants, utils, ioutils
 from .generic import GenericModel
+
+logger = logging.getLogger(__name__)
 
 FLAVOR_NAME = "tensorflow"
 CODE_FOLDER_NAME = "code"
@@ -53,8 +56,8 @@ def _save_model(export_path, sess, input_tensor_list, output_tensor_list, graph_
             tensor_info_output = tf.saved_model.utils.build_tensor_info(out_tensor)
             outputs_dict[out_tensor.name] = tensor_info_output
 
-    print('inputs: ', inputs_dict)
-    print('outputs: ', outputs_dict)
+    logger.info('inputs: ', inputs_dict)
+    logger.info('outputs: ', outputs_dict)
     prediction_signature = (
         tf.saved_model.signature_def_utils.build_signature_def(
             inputs=inputs_dict,
@@ -158,7 +161,7 @@ def array_from_df_col(col, shape):
         target_shape = (len(values), *shape)
         # reshape if target_shape doesn't contain None
         if values.shape != target_shape and None not in target_shape:
-            print(f"reshape from {values.shape} to {target_shape}.")
+            logger.info(f"reshape from {values.shape} to {target_shape}.")
             values = np.array(values).reshape(target_shape)
     return values
 
@@ -197,8 +200,8 @@ class _TFSavedModelWrapper(object):
             sigdef_output: tf_graph.get_tensor_by_name(tnsr_info.name)
             for sigdef_output, tnsr_info in self.signature_def.outputs.items()
         }
-        print(self.input_tensor_mapping)
-        print(self.output_tensors)
+        logger.info(self.input_tensor_mapping)
+        logger.info(self.output_tensors)
 
     def get_schema(self):
         schema = {
@@ -211,7 +214,6 @@ class _TFSavedModelWrapper(object):
         for name, tensor in self.output_tensors.items():
             schema['outputs'].append(get_col_schema(name, tensor))
 
-        # print(schema)
         return schema
 
     def predict(self, df):
@@ -232,14 +234,14 @@ class _TFSaverWrapper(object):
 
     def _load_graph_from_checkpoint(self, model_path, tf_config):
         model_meta_path = os.path.join(model_path, tf_config[constants.MODEL_FILE_PATH_KEY])
-        print(f"model_meta_path = {model_meta_path}, model_path = {model_path}")
+        logger.info(f"model_meta_path = {model_meta_path}, model_path = {model_path}")
         saver = tf.train.import_meta_graph(model_meta_path)
         saver.restore(self.sess, tf.train.latest_checkpoint(model_path))
         self.graph = tf.get_default_graph()
 
     def _load_graph(self, model_path, tf_config):
         model_file_path = os.path.join(model_path, tf_config[constants.MODEL_FILE_PATH_KEY])
-        print(f"model_file_path = {model_file_path}, model_path = {model_path}")
+        logger.info(f"model_file_path = {model_file_path}, model_path = {model_path}")
         self.graph = load_graph(model_file_path, self.sess)
 
     def _load_inputs_outputs(self, tf_config):
@@ -256,9 +258,9 @@ class _TFSaverWrapper(object):
                 shape = tensor.shape.as_list()[1:]
             self.x_shape[name] = shape
 
-        print("loaded inputs:")
-        print(self.x)
-        print(self.x_shape)
+        logger.info("loaded inputs:")
+        logger.info(self.x)
+        logger.info(self.x_shape)
 
         self.y = []
         self.y_names = []
@@ -269,21 +271,21 @@ class _TFSaverWrapper(object):
             self.y.append(tensor)
             self.y_names.append(name)
 
-        print("loaded outputs:")
-        print(self.y)
-        print(self.y_names)
+        logger.info("loaded outputs:")
+        logger.info(self.y)
+        logger.info(self.y_names)
 
     def __init__(self, model_path, config):
         self.sess = tf.Session()
         tf_config = config["tensorflow"]
-        print(tf_config)
+        logger.info(tf_config)
         serialization_format = tf_config.get(constants.SERIALIZATION_METHOD_KEY, "saver")
         if serialization_format == "saver":
             self._load_graph_from_checkpoint(model_path, tf_config)
         else:
             self._load_graph(model_path, tf_config)
         self._load_inputs_outputs(tf_config)
-        print(f"Successfully loaded model from {model_path}")
+        logger.info(f"Successfully loaded model from {model_path}")
 
     def get_schema(self):
         schema = {

@@ -58,5 +58,5 @@ steps:
   displayName: 'Upload twine'
 
 - script: |
-    git push https://$(GitHubUserName):$(GitHubPassword)@github.com/$(GitHubUserName)/$(GitHubRepo).git 'refs/remotes/origin/*:refs/heads/*'
+    git push https://$(GitHubUserName):$(GitHubPassword)@github.com/$(GitHubUserName)/$(GitHubRepo).git 'refs/remotes/origin/*:refs/heads/*' -f
   displayName: 'Push to GitHub'

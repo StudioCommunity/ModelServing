@@ -1,3 +1,4 @@
+
 # ---------------------------------------------------------
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # ---------------------------------------------------------
@@ -8,6 +9,10 @@ import os
 import sys
 import shutil
 import re
+try:  # for pip >= 10
+    from pip._internal.req import parse_requirements
+except ImportError:  # for pip <= 9.0.3
+    from pip.req import parse_requirements
 
 BUILD_NUMBER_FILE = '../build.version'
 VERSION_FILE = '../major.version'
@@ -27,10 +32,22 @@ def get_package_version():
 with io.open('../.inlinelicense', 'r', encoding='utf-8') as f:
     inline_license = f.read()
 
-exclude_list = ["*.tests", "azureml/studio/tests", "tests", "examples*"]
+exclude_list = ["*.tests", "azureml/studio/tests", "tests"]
 packages = find_packages(exclude=exclude_list)
+print(f"packages = {packages}")
 
 print("installing... ", packages)
+print("installing... ", inline_license)
+
+
+def get_requirements() -> list:
+    """Designed to install packages in build/release pipeline, but exclude them when installing from PyPI
+    Returns:
+        list -- list of requirements
+    """
+    exclude = ('pytest', 'pylint', 'torch', 'torchvision')
+    install_reqs = parse_requirements('requirements.txt', session='hack')
+    return [str(ir.req) for ir in install_reqs if ir.name not in exclude]
 
 # python setup.py install
 setup(
@@ -38,12 +55,8 @@ setup(
     version=get_package_version(),
     description="",
     packages=packages,
-    install_requires=[
-          "PyYAML",
-          "pandas",
-          "pyarrow",
-          "fire"
-      ],
+    install_requires=get_requirements(),
+    dependency_links=["https://pypi.org/simple", "https://test.pypi.org/simple/alghost/"],
     author='Microsoft Corp',
     license=inline_license,
     include_package_data=True,

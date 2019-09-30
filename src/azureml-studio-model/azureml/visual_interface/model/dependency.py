@@ -3,6 +3,7 @@ import logging
 
 import yaml
 from pip._internal import main as pipmain
+from subprocess import Popen, PIPE, STDOUT
 
 logger = logging.getLogger(__name__)
 
@@ -38,22 +39,31 @@ class DependencyManager(object):
         logger.info(f"pip_dependencies = {', '.join(self.pip_dependencies)}")
 
     def install(self):
-        import conda.cli.python_api as Conda
-
         if len(self.conda_dependencies) == 0:
             logger.info("No conda denpendencies to install")
         else:
-            conda_cmds = [Conda.Commands.INSTALL]
+            conda_cmds = ["conda", "install", "-y"]
             for channel in self.conda_channels:
                 conda_cmds += ["-c", channel]
             conda_cmds += self.conda_dependencies
-            (stdout_str, sterr_str, return_code_int) = Conda.run_command(
-                *conda_cmds, use_exception_handler=True, stdout=sys.stdout, stderr=sys.stderr)
-            logger.info("Finished install conda dependencies")
-            logger.warn(f"sterr: {sterr_str}")
+            logger.info(" ".join(conda_cmds))
+            p = Popen(conda_cmds, stdout=PIPE, stderr=PIPE)
+            stdout = p.stdout.read().decode("utf-8")
+            stderr = p.stderr.read().decode("utf-8")
+            logger.info("Finished to install conda dependencies")
+            logger.info(f"stdout: {stdout}")
+            if stderr:
+                logger.warn(f"sterr: {stderr}")
 
         if not self.pip_dependencies:
             logger.info("No pip dependencies to install")
         else:
-            pipmain(["install"] + self.pip_dependencies)
-            logger.info(f"Finished pip install {' '.join(self.pip_dependencies)}")
+            pip_cmds = ["pip", "install"] + self.pip_dependencies
+            logger.info(" ".join(pip_cmds))
+            p = Popen(pip_cmds, stdout=PIPE, stderr=PIPE)
+            stdout = p.stdout.read().decode("utf-8")
+            stderr = p.stderr.read().decode("utf-8")
+            logger.info("Finished to install pip dependencies")
+            logger.info(f"stdout: {stdout}")
+            if stderr:
+                logger.warn(f"sterr: {stderr}")

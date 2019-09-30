@@ -37,13 +37,7 @@ def test_save_load():
         loss.backward()
         optimizer.step()
 
-    print('epoch {}, loss {}'.format(epoch, loss.item()))
-
-    # ./AzureMLModel
-    # azureml.studio.model.pytorch.save(model, code_path=".")
-    print(f"__file__ = {__file__}")
     code_path = dirname(dirname(abspath(__file__)))
-    print(f"code_path = {code_path}")
     azureml.visual_interface.model.pytorch.save(model, code_path=code_path)
 
     loaded_pytorch_model = azureml.visual_interface.model.pytorch.load()

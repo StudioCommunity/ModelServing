@@ -27,12 +27,12 @@ def generate_conda_env(path=None, additional_conda_deps=None, additional_pip_dep
             "regex"
         ]
     }
+    if additional_conda_deps is not None:
+        env["dependencies"] += additional_conda_deps
     pip_dependencies = []
     if additional_pip_deps is not None:
         pip_dependencies.extend(additional_pip_deps)
     env["dependencies"].append({"pip": pip_dependencies})
-    if additional_conda_deps is not None:
-        env["dependencies"] += additional_conda_deps
     if additional_conda_channels is not None:
         env["channels"] += additional_conda_channels
 

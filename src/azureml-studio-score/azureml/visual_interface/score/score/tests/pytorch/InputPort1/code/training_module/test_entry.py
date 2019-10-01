@@ -1,7 +1,6 @@
-import sys
+import pytest
 from os.path import dirname, abspath
 
-import pytest
 import numpy as np
 import pandas as pd
 import torch
@@ -11,6 +10,10 @@ import azureml.visual_interface.model.pytorch
 import azureml.visual_interface.model.generic
 
 from .model import LinearRegression
+
+import sys
+print(f"__file__ = {__file__}")
+print(f"sys.path = {sys.path}")
 
 
 def test_save_load():
@@ -38,6 +41,8 @@ def test_save_load():
         loss.backward()
         optimizer.step()
 
+    # code_path = dirname(dirname(abspath(__file__)))
+    # azureml.visual_interface.model.pytorch.save(model, code_path=code_path)
     azureml.visual_interface.model.pytorch.save(model)
 
     loaded_pytorch_model = azureml.visual_interface.model.pytorch.load()

@@ -112,3 +112,6 @@ gen/
 
 # file to store tokens, should not be committed
 credential.json
+
+# macOS
+.DS_Store

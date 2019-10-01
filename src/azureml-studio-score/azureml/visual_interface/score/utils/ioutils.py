@@ -4,7 +4,6 @@ import json
 import pandas as pd
 import numpy as np
 
-logging.info(f"in {__file__}")
 logger = logging.getLogger(__name__)
 
 def read_parquet(data_path):

@@ -1,0 +1,25 @@
+{
+  "columnAttributes": [
+    {
+      "name": "x",
+      "type": "Object",
+      "isFeature": true,
+      "elementType": {
+        "typeName": "object",
+        "isNullable": false
+      }
+    },
+    {
+      "name": "Score_0",
+      "type": "Numeric",
+      "isFeature": true,
+      "elementType": {
+        "typeName": "float64",
+        "isNullable": false
+      }
+    }
+  ],
+  "scoreColumns": {},
+  "labelColumns": {},
+  "featureChannels": []
+}

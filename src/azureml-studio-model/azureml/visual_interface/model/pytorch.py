@@ -50,9 +50,11 @@ def save(pytorch_model, path="./AzureMLModel", conda_env=None, additional_pip_de
         conda_env = _get_default_conda_env(additional_pip_deps=additional_pip_deps)
     utils.save_conda_env(path, conda_env)
 
-    if code_path:
-        dst_code_path = os.path.join(path, CODE_FOLDER_NAME)
-        utils._copytree_include(code_path, dst_code_path, include_extensions=(".py"))
+    if not code_path:
+        code_path = os.path.abspath(sys.path[0])
+
+    dst_code_path = os.path.join(path, CODE_FOLDER_NAME)
+    utils._copytree_include(code_path, dst_code_path, include_extensions=(".py"))
 
     try:
         forward_func = getattr(pytorch_model, 'forward')

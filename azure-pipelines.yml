@@ -10,19 +10,26 @@ steps:
   inputs:
     versionSpec: '3.6'
 
-- bash: echo "##vso[task.prependpath]$CONDA/bin"
-  displayName: Add conda to PATH
-
 - script: |
     cd src/azureml-studio-model
     python -m pip install --upgrade pip
     pip install -r requirements.txt
-  displayName: 'Install dependencies'
+  displayName: 'Install azureml-studio-model dependencies'
 
 - script: |
     cd src/azureml-studio-model
-    python -m pytest
-  displayName: 'PyTest'
+    python -m pytest -s
+  displayName: 'PyTest azure-studio-model'
+
+- script: |
+    cd src/azureml-studio-model
+    python setup.py install
+  displayName: 'Install azureml-studio-model'
+
+- script: |
+    cd src/azureml-studio-score 
+    python -m pytest -s --ignore=azureml/visual_interface/score/score/tests/pytorch/InputPort1/
+  displayName: 'PyTest azure-studio-score'
 
 # Save build number to file
 - script: |

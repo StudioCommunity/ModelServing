@@ -53,7 +53,7 @@ class DependencyManager(object):
             logger.info("Finished to install conda dependencies")
             logger.info(f"stdout: {stdout}")
             if stderr:
-                logger.warn(f"sterr: {stderr}")
+                logger.warning(f"sterr: {stderr}")
 
         if not self.pip_dependencies:
             logger.info("No pip dependencies to install")
@@ -66,4 +66,4 @@ class DependencyManager(object):
             logger.info("Finished to install pip dependencies")
             logger.info(f"stdout: {stdout}")
             if stderr:
-                logger.warn(f"sterr: {stderr}")
+                logger.warning(f"sterr: {stderr}")

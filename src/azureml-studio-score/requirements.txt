@@ -2,6 +2,8 @@
 pandas
 cloudpickle
 PyYAML
+fire
+pyarrow==0.12.1
 pytest
 alghost==0.0.83
 

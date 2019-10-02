@@ -27,6 +27,12 @@ steps:
   displayName: 'Install azureml-studio-model'
 
 - script: |
+    cd src/azureml-studio-score
+    python -m pip install --upgrade pip
+    pip install -r requirements.txt
+  displayName: 'Install azureml-studio-score dependencies'
+
+- script: |
     cd src/azureml-studio-score 
     python -m pytest -s --ignore=azureml/visual_interface/score/score/tests/pytorch/InputPort1/
   displayName: 'PyTest azure-studio-score'
@@ -65,5 +71,5 @@ steps:
   displayName: 'Upload twine'
 
 - script: |
-    git push https://$(GitHubUserName):$(GitHubPassword)@github.com/$(GitHubUserName)/$(GitHubRepo).git 'refs/remotes/origin/*:refs/heads/*'
+    git push https://$(GitHubUserName):$(GitHubPassword)@github.com/$(GitHubUserName)/$(GitHubRepo).git 'refs/remotes/origin/*:refs/heads/*' -f
   displayName: 'Push to GitHub'

@@ -46,6 +46,7 @@ def save(pytorch_model, path="./AzureMLModel", conda_env=None, additional_pip_de
     os.makedirs(path, exist_ok=exist_ok)
     _save(pytorch_model, os.path.join(path, MODEL_FILE_NAME))
 
+    # TODO: Provide the option to save result of "conda env export"
     if conda_env is None:
         conda_env = _get_default_conda_env(additional_pip_deps=additional_pip_deps)
     utils.save_conda_env(path, conda_env)

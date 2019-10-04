@@ -51,6 +51,8 @@ def save(pytorch_model, path="./AzureMLModel", conda_env=None, additional_pip_de
         conda_env = _get_default_conda_env(additional_pip_deps=additional_pip_deps)
     utils.save_conda_env(path, conda_env)
 
+    # In the cases where customer manually modified sys.path (e.g. sys.path.append("..")), 
+    # they would have to specify the code path manually.
     if not code_path:
         code_path = os.path.abspath(sys.path[0])
 
@@ -62,7 +64,7 @@ def save(pytorch_model, path="./AzureMLModel", conda_env=None, additional_pip_de
         args = inspect.getfullargspec(forward_func).args
         if 'self' in args:
             args.remove('self')
-    except AttributeError as e:
+    except AttributeError:
         logger.warning("Model without 'forward' function cannot be used to predict", exc_info=True)
         args = []
 

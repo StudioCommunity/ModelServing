@@ -41,6 +41,7 @@ def test_save_load():
     azureml.visual_interface.model.pytorch.save(model)
 
     loaded_pytorch_model = azureml.visual_interface.model.pytorch.load()
+    assert isinstance(loaded_pytorch_model, torch.nn.Module)
 
     loaded_generic_model = azureml.visual_interface.model.generic.load()
     df = pd.DataFrame({"x": [[10], [11], [12]]})

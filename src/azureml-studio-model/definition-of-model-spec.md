@@ -42,7 +42,7 @@ Input defines the input parameter of the model.
 | type        | string  | Yes      | Defines the type of this data. Refer to [Data Types](#data-types) for details. |
 | default     | dynamic | No       | The default value of this parameter. The type of this value is the same with 'type' field. This field is optional, will default to `null` if not specified. If 'type' is ndarray, the default value would be represented as equivalent nested list. |
 | description | string  | No       | The detailed information that describes the input. |
-| optional    | boolean | No       | Indicates where this input is optional. Default value is `False`. |
+| optional    | boolean | No       | Indicates where this input is optional. Default value is `false`. |
 
 ## Output
 
@@ -68,7 +68,7 @@ Data Type is a string describes the data type of the Input/Output parameter.
 
 | Name      | Type                    | Required | Description                                                  |
 | --------- | ----------------------- | -------- | ------------------------------------------------------------ |
-| gpu_support      | boolean | No       | Set to `True` if requires GPU to run the module.             |
+| gpu_support      | boolean | No       | Set to `true` if requires GPU to run the module.             |
 | cpu_core_num      | int     | No       | minimum number of cpu cores |
 | memory_in_MB      | int     | No       | minimum amount of memory in MB |
 
@@ -85,7 +85,7 @@ inputs:
   type: ndarray
   default: [10]
   description: regression feature
-  optional: False
+  optional: false
 outputs:
 - name: y
   type: float
@@ -96,7 +96,7 @@ vintage_detail:
   serialization_format: cloudpickle
   serialization_library_version: 1.1.2
 serving_resource_requirement:
-  gpu_support: True
+  gpu_support: true
   cpu_core_num: 2
   memory_in_MB: 1024
 alghost_version: 0.0.83

@@ -1,7 +1,8 @@
-# Definition of model spec YAML file
-=======================================
+# Definition of model spec YAML
 
-Model Spec is a YAML file to describe a machine learning model
+==========================================
+
+Train anywhere, finetune and serve here.
 
 ## Module Definition
 

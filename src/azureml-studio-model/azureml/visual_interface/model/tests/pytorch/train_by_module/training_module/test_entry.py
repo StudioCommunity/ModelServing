@@ -28,7 +28,7 @@ def test_save_load():
     # Train
     criterion = torch.nn.MSELoss() 
     optimizer = torch.optim.SGD(model.parameters(), lr=0.01)
-    for epoch in range(3):
+    for _ in range(3):
         inputs = Variable(torch.from_numpy(x_train)).to(device)
         labels = Variable(torch.from_numpy(y_train)).to(device)
 
@@ -38,12 +38,12 @@ def test_save_load():
         loss.backward()
         optimizer.step()
 
-    azureml.visual_interface.model.pytorch.save(model)
+    azureml.visual_interface.model.pytorch.save(model, exist_ok=True)
 
     loaded_pytorch_model = azureml.visual_interface.model.pytorch.load()
     assert isinstance(loaded_pytorch_model, torch.nn.Module)
 
     loaded_generic_model = azureml.visual_interface.model.generic.load()
-    df = pd.DataFrame({"x": [[10], [11], [12]]})
+    df = pd.DataFrame({"x": [[10.0], [11.0], [12.0]]})
     predict_result = loaded_generic_model.predict(df)
     assert predict_result.shape[0] == df.shape[0]

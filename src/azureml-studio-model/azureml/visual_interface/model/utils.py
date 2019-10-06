@@ -5,9 +5,12 @@ import json
 import logging
 import shutil
 import sys
+from datetime import datetime
 from sys import version_info
 
 from . import constants
+from . resource_requirement import ResourceRequirement
+from . vintage_detail import VintageDetail
 
 logger = logging.getLogger(__name__)
 
@@ -60,62 +63,43 @@ def save_conda_env(path, conda_env):
     logger.info(f'CONDA_FILE: {fn}')
 
 
-def generate_default_model_spec(flavor_name, model_file_name, conda_file_name=constants.CONDA_FILE_NAME, input_args=[], code_path=None):
-    """
-    Generate default model spec
-    
-    :flavor_name
-
-    :model_file_name
-
-    :conda_file_name (optional)
-
-    :input_args (optional)
-    """
+def generate_model_spec(
+    vintage: str,
+    vintage_detail: VintageDetail = None,
+    conda_file_path: str = constants.CONDA_FILE_NAME,
+    local_dependency_path: str = constants.LOCAL_DEPENDENCY_PATH,
+    inputs: list = None,
+    outputs: list = None,
+    serving_resource_requirement: ResourceRequirement = None,
+    alghost_version: str = None,
+    time_created: datetime = datetime.now()
+):
     spec = {
-        'flavor' : {
-            'framework' : flavor_name
-        },
-        flavor_name: {
-            'model_file_path': model_file_name
-        },
-        'conda': {
-            'conda_file_path': conda_file_name
-        },
+        "vintage" : vintage,
+        "conda_file_path": conda_file_path,
+        "local_dependency_path": local_dependency_path,
+        "time_created": time_created.strftime("%Y-%m-%d %H:%M:%S")
     }
-    if input_args:
-        spec['inputs'] = input_args
-    if code_path:
-        spec["code_path"] = code_path
-    logger.info(f'SPEC={spec}')
+    if vintage_detail:
+        spec["vintage_detail"] = vintage_detail.to_dict()
+    if inputs is not None:
+        spec["inputs"] = [model_input.to_dict() for model_input in inputs]
+    if outputs is not None:
+        spec["outputs"] = [model_output.to_dict() for model_output in outputs]
+    if serving_resource_requirement:
+        spec["serving_resource_requirement"] = serving_resource_requirement.to_dict()
+    if alghost_version:
+        spec["alghost_version"] = alghost_version
+    logger.info(f"spec = {spec}")
     return spec
 
 
-def _save_model_spec(path, spec):
+def save_model_spec(path, spec):
     logger.info(f'MODEL_SPEC: {spec}')
     with open(os.path.join(path, constants.MODEL_SPEC_FILE_NAME), 'w') as fp:
         yaml.dump(spec, fp, default_flow_style=False)
     fn = os.path.join(path, constants.MODEL_SPEC_FILE_NAME)
     print(f'SAVED MODEL_SPEC: {fn}')
-
-
-# TODO: Support multiple code paths
-def save_model_spec(path, flavor_name, model_file_name, conda_file_name=constants.CONDA_FILE_NAME, input_args=[], code_path=None):
-    """
-    Save model spec to local file
-
-    :path
-
-    :flavor_name
-
-    :model_file_name
-
-    :conda_file_name (optional)
-
-    :input_args (optional)
-    """
-    spec = generate_default_model_spec(flavor_name, model_file_name, conda_file_name, input_args, code_path)
-    _save_model_spec(path, spec)
 
 
 def generate_ilearner_files(path):
@@ -142,7 +126,7 @@ def generate_ilearner_files(path):
         fp.writelines('{}')
 
 
-def _get_configuration(artifact_path) -> dict:
+def get_configuration(artifact_path) -> dict:
     model_spec_path = os.path.join(artifact_path, constants.MODEL_SPEC_FILE_NAME)
     if not os.path.exists(model_spec_path):
         raise Exception(f"Could not find {constants.MODEL_SPEC_FILE_NAME} in {artifact_path}")
@@ -167,10 +151,3 @@ def _copytree_include(src_dir, dst_dir, include_extensions: tuple = (), exist_ok
         dst_file_path = os.path.join(dst_dir, file_path)
         os.makedirs(os.path.dirname(dst_file_path), exist_ok=True)
         shutil.copy(src_file_path, dst_file_path)
-
-
-def add_code_path_to_syspath(artifact_path, model_conf):
-    if "code_path" in model_conf:
-        code_path = os.path.join(artifact_path, model_conf["code_path"])
-        sys.path.append(code_path)
-        logger.info(f"Added {code_path} to sys.path")

@@ -30,7 +30,7 @@ def test_save_score():
     # Train
     criterion = torch.nn.MSELoss() 
     optimizer = torch.optim.SGD(model.parameters(), lr=0.01)
-    for epoch in range(3):
+    for _ in range(3):
         inputs = Variable(torch.from_numpy(x_train)).to(device)
         labels = Variable(torch.from_numpy(y_train)).to(device)
 
@@ -50,7 +50,7 @@ def test_save_score():
     azureml.visual_interface.model.pytorch.save(
         pytorch_model=model,
         path=trained_model_path)
-    df = pd.DataFrame({"x": [[10], [11], [12]]})
+    df = pd.DataFrame({"x": [[10.0], [11.0], [12.0]]})
     df.to_parquet(os.path.join(dataset_path, "data.dataset.parquet"), engine="pyarrow")
 
     module_invoker.entrance(trained_model_path, dataset_path, scored_dataset_path, True)

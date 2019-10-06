@@ -19,6 +19,7 @@ steps:
 - script: |
     cd src/azureml-studio-model
     python -m pytest -s
+    rm -rf ./AzureMLModel
   displayName: 'PyTest azure-studio-model'
 
 - script: |

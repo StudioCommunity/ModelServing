@@ -93,6 +93,7 @@ outputs:
 vintage_detail:
   model_file_path: model.pkl
   pytorch_version: 1.1.0
+  torchvision_version: 0.4.0
   serialization_format: cloudpickle
   serialization_library_version: 1.1.2
 serving_resource_requirement:

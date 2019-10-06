@@ -15,8 +15,11 @@ class DependencyManager(object):
         self.conda_channels = []
         self.conda_dependencies = []
         self.pip_dependencies = []
+        self.local_dependency_path = None
     
-    def load(self, conda_yaml_path):
+    def load(self, conda_yaml_path, local_dependency_path=None):
+        logger.info(f"local_dependency_path = {local_dependency_path}")
+        self.local_dependency_path = local_dependency_path
         logger.info(f"Trying to load conda dependency from {conda_yaml_path}")
         with open(conda_yaml_path) as fp:
             config = yaml.safe_load(fp)
@@ -38,7 +41,11 @@ class DependencyManager(object):
         logger.info(f"conda_dependencies = {', '.join(self.conda_dependencies)}")
         logger.info(f"pip_dependencies = {', '.join(self.pip_dependencies)}")
 
+
     def install(self):
+        if self.local_dependency_path:
+            sys.path.append(self.local_dependency_path)
+            logger.info(f"Appended {self.local_dependency_path} to sys.path")
         if len(self.conda_dependencies) == 0:
             logger.info("No conda denpendencies to install")
         else:

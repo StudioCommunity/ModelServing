@@ -6,15 +6,12 @@ import yaml
 
 from . import constants
 from .dependency import DependencyManager
-from .utils import _get_configuration
+from . import utils
 
 logger = logging.getLogger(__name__)
 
 class GenericModel(ABC):
     """Interface class to be inherited by wrapper of different flavors, and expose unifed init and predict function
-    
-    Arguments:
-        ABC {[type]} -- [description]
     """
     
     @abstractmethod
@@ -46,27 +43,31 @@ def load(artifact_path="./AzureMLModel", install_dependencies=False) -> GenericM
         config = yaml.safe_load(fp)
     
     if install_dependencies:
-        conda_yaml_path = os.path.join(artifact_path, config["conda"]["conda_file_path"])
+        conda_yaml_path = os.path.join(artifact_path, config["conda_file_path"])
+        local_dependency_path = config.get("local_dependency_path", None)
+        # TODO: Handle the case where local_dependency_path doesn't exist
+        if local_dependency_path:
+            local_dependency_path = os.path.join(artifact_path, local_dependency_path)
         dependency_manager = DependencyManager()
-        dependency_manager.load(conda_yaml_path)
+        dependency_manager.load(conda_yaml_path, local_dependency_path)
         dependency_manager.install()
     
-    model_conf = _get_configuration(artifact_path)
-    framework = model_conf["flavor"]["framework"].lower()
-    if framework == "pytorch":
+    model_conf = utils.get_configuration(artifact_path)
+    vintage = model_conf["vintage"].lower()
+    if vintage == "pytorch":
         from .pytorch import _load_generic_model
         return _load_generic_model(artifact_path)
-    elif framework == "tensorflow":
+    elif vintage == "tensorflow":
         pass
-    elif framework == "sklearn":
+    elif vintage == "sklearn":
         pass
-    elif framework == "keras":
+    elif vintage == "keras":
         pass
-    elif framework == "python":
+    elif vintage == "python":
         pass
-    elif framework == "onnx":
+    elif vintage == "onnx":
         pass
     else:
-        msg = f"Not Implemented: framework {framework} not supported"
+        msg = f"Not Implemented: vintage {vintage} not supported"
         logger.info(msg)
         raise ValueError(msg)

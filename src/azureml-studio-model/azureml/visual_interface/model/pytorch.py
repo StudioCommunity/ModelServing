@@ -13,15 +13,34 @@ import yaml
 import pandas as pd
 
 from .generic import GenericModel
+from .vintage_detail import VintageDetail
+from .model_input import ModelInput
+from .model_output import ModelOutput
 from . import utils
+from . import constants
 
 logger = logging.getLogger(__name__)
 
 FLAVOR_NAME = "pytorch"
 MODEL_FILE_NAME = "model.pkl"
-CODE_FOLDER_NAME = "code"
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
+
+class PytorchModelDetail(VintageDetail):
+
+    def __init__(
+        self,
+        model_file_path: str,
+        pytorch_version: str = torch.__version__,
+        torchvision_version: str = torchvision.__version__,
+        serialization_format: str = "cloudpickle",
+        serialization_library_version: str = cloudpickle.__version__):
+        self.model_file_path = model_file_path
+        self.pytorch_version = pytorch_version
+        self.torchvision_version = torchvision_version
+        self.serialization_format = serialization_format
+        self.serialization_library_version = serialization_library_version
+
 
 def _get_default_conda_env(additional_pip_deps=[]):
     return utils.generate_conda_env(
@@ -42,7 +61,15 @@ def _save(pytorch_model, path):
         cloudpickle.dump(pytorch_model, fp)
 
 
-def save(pytorch_model, path="./AzureMLModel", conda_env=None, additional_pip_deps: list=[], code_path=None, exist_ok=False):
+def save(
+    pytorch_model,
+    path: str ="./AzureMLModel",
+    conda_env: dict = None,
+    additional_pip_deps: list = [],
+    local_dependency_path: str = None,
+    inputs: list = None,
+    outputs: list = None,
+    exist_ok: bool = False):
     os.makedirs(path, exist_ok=exist_ok)
     _save(pytorch_model, os.path.join(path, MODEL_FILE_NAME))
 
@@ -53,22 +80,41 @@ def save(pytorch_model, path="./AzureMLModel", conda_env=None, additional_pip_de
 
     # In the cases where customer manually modified sys.path (e.g. sys.path.append("..")), 
     # they would have to specify the code path manually.
-    if not code_path:
-        code_path = os.path.abspath(sys.path[0])
+    if not local_dependency_path:
+        local_dependency_path = os.path.abspath(sys.path[0])
+        logger.info(f"using sys.path[0] = {sys.path[0]} as local_dependency_path")
+    dst_code_path = os.path.join(path, constants.LOCAL_DEPENDENCY_PATH)
+    utils._copytree_include(local_dependency_path, dst_code_path, include_extensions=(".py"))
 
-    dst_code_path = os.path.join(path, CODE_FOLDER_NAME)
-    utils._copytree_include(code_path, dst_code_path, include_extensions=(".py"))
+    # TODO: Parse input/output schema from test data
+    if inputs is None:
+        try:
+            forward_func = getattr(pytorch_model, 'forward')
+            args = inspect.getfullargspec(forward_func).args
+            if 'self' in args:
+                args.remove('self')
+            inputs = []
+            for arg in args:
+                inputs.append(ModelInput(arg, "ndarray"))
+        except AttributeError:
+            logger.warning("Model without 'forward' function cannot be used to predict", exc_info=True)
+    
+    model_detail = PytorchModelDetail(
+        model_file_path=MODEL_FILE_NAME,
+        pytorch_version=torch.__version__,
+        torchvision_version=torchvision.__version__,
+        serialization_format="cloudpickle",
+        serialization_library_version=cloudpickle.__version__
+    )
 
-    try:
-        forward_func = getattr(pytorch_model, 'forward')
-        args = inspect.getfullargspec(forward_func).args
-        if 'self' in args:
-            args.remove('self')
-    except AttributeError:
-        logger.warning("Model without 'forward' function cannot be used to predict", exc_info=True)
-        args = []
-
-    utils.save_model_spec(path, FLAVOR_NAME, MODEL_FILE_NAME, input_args=args, code_path=CODE_FOLDER_NAME)
+    model_spec = utils.generate_model_spec(
+        vintage="pytorch",
+        vintage_detail=model_detail,
+        conda_file_path=constants.CONDA_FILE_NAME,
+        local_dependency_path=constants.LOCAL_DEPENDENCY_PATH,
+        inputs=inputs
+    )
+    utils.save_model_spec(path, model_spec)
     utils.generate_ilearner_files(path) # temp solution, to remove later
 
 
@@ -101,9 +147,8 @@ def _load_from_saveddict(model_path, pytorch_conf):
     
 
 def load(artifact_path="./AzureMLModel") -> torch.nn.Module:
-    model_conf = utils._get_configuration(artifact_path)
-    utils.add_code_path_to_syspath(artifact_path, model_conf)
-    pytorch_conf = model_conf['pytorch']
+    model_conf = utils.get_configuration(artifact_path)
+    pytorch_conf = model_conf['vintage_detail']
     model_path = os.path.join(artifact_path, pytorch_conf['model_file_path'])
     serializer = pytorch_conf.get('serialization_format', 'cloudpickle')
     if serializer == 'cloudpickle':
@@ -148,8 +193,11 @@ class _PytorchWrapper(GenericModel):
 
 
 def _load_generic_model(artifact_path) -> _PytorchWrapper:
-    model_conf = utils._get_configuration(artifact_path)
+    model_conf = utils.get_configuration(artifact_path)
     is_gpu = torch.cuda.is_available()   
-    input_args = model_conf.get('inputs', None)
+    inputs = model_conf.get('inputs', None)
+    input_args = None
+    if inputs:
+        input_args = [model_input["name"] for model_input in inputs]
     model = load(artifact_path)
     return _PytorchWrapper(model, is_gpu, input_args)

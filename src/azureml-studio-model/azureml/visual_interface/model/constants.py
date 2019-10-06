@@ -1,5 +1,6 @@
 CONDA_FILE_NAME = "conda.yaml"
 MODEL_SPEC_FILE_NAME = "model_spec.yaml"
+LOCAL_DEPENDENCY_PATH = "local_dependency"
 
 # temp solution, would remove later
 DATA_TYPE_FILE_NAME = "data_type.json"

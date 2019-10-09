@@ -23,7 +23,7 @@ steps:
 
 - script: |
     conda create -n loader_env -y
-    source activate loader_env
+    conda activate loader_env
   displayName: 'Create new conda env for azureml-studio-score'
 
 - script: |

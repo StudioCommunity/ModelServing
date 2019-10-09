@@ -4,7 +4,7 @@ import argparse
 
 import pyarrow.parquet as pq # imported explicitly to avoid known issue of pd.read_parquet
 import pandas as pd
-import fire
+import click
 
 from . import constants
 from .builtin_score_module import BuiltinScoreModule
@@ -18,11 +18,12 @@ logger = logging.getLogger(__name__)
 
 INPUT_FILE_NAME = "data.dataset.parquet" # hard coded, to be replaced, and we presume the data is DataFrame inside parquet
 
-
+@click.command()
+@click.option("--trained-model", help="Path to ModelDirectory")
+@click.option("--dataset", help="Path to DFD")
+@click.option("--append-score-columns-to-output", default="true", help="Preserve all columns from input dataframe or not")
 def entrance(trained_model: str, dataset: str, scored_dataset: str, append_score_columns_to_output: str = "true"):
     logger.info(f"append_score_columns_to_output = {append_score_columns_to_output}")
-    # To bypass the argument parsing by value of Fire. Such that the bahavior is consistent with DS phase
-    append_score_columns_to_output = str(append_score_columns_to_output)
     params = {
         constants.APPEND_SCORE_COLUMNS_TO_OUTPUT_KEY: append_score_columns_to_output
     }
@@ -37,5 +38,5 @@ def entrance(trained_model: str, dataset: str, scored_dataset: str, append_score
 
 
 if __name__ == "__main__":
-    fire.Fire(entrance)
+    entrance()
     

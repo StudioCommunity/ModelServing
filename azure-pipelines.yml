@@ -10,6 +10,9 @@ steps:
   inputs:
     versionSpec: '3.6'
 
+- bash: echo "##vso[task.prependpath]$CONDA/bin"
+  displayName: Add conda to PATH
+
 - script: |
     cd src/azureml-studio-model
     python -m pip install --upgrade pip
@@ -21,22 +24,24 @@ steps:
     python -m pytest -s
   displayName: 'PyTest azure-studio-model'
 
-- script: |
-    pip freeze --exclude-editable | xargs -r pip uninstall -y
-  displayName: 'Clean all installed packages for azureml-studio-score test'
+- bash: conda create --yes --quiet --name loader_env
+  displayName: Create Anaconda environment for azureml-studio-score test
 
-- script: |
+- bash: |
+    source activate loader_env
     cd src/azureml-studio-model
     python setup.py install
   displayName: 'Install azureml-studio-model'
 
-- script: |
+- bash: |
+    source activate loader_env
     cd src/azureml-studio-score
     python -m pip install --upgrade pip
     pip install -r requirements.txt --extra-index-url=https://test.pypi.org/simple
   displayName: 'Install azureml-studio-score dependencies'
 
-- script: |
+- bash: |
+    source activate loader_env
     cd src/azureml-studio-score 
     python -m pytest -s --ignore=azureml/visual_interface/score/score/tests/pytorch/InputPort1/
   displayName: 'PyTest azure-studio-score'

@@ -55,6 +55,7 @@ class DependencyManager(object):
             conda_cmds += self.conda_dependencies
             logger.info(" ".join(conda_cmds))
             p = Popen(conda_cmds, stdout=PIPE, stderr=PIPE)
+            p.wait()
             stdout = p.stdout.read().decode("utf-8")
             stderr = p.stderr.read().decode("utf-8")
             logger.info("Finished to install conda dependencies")
@@ -68,6 +69,7 @@ class DependencyManager(object):
             pip_cmds = ["pip", "install"] + self.pip_dependencies
             logger.info(" ".join(pip_cmds))
             p = Popen(pip_cmds, stdout=PIPE, stderr=PIPE)
+            p.wait()
             stdout = p.stdout.read().decode("utf-8")
             stderr = p.stderr.read().decode("utf-8")
             logger.info("Finished to install pip dependencies")

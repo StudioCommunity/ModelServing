@@ -2,7 +2,7 @@
 
 ==========================================
 
-Train anywhere, finetune and serve here.
+Train anywhere, serve here.
 
 ## Module Definition
 

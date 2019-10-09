@@ -22,9 +22,8 @@ steps:
   displayName: 'PyTest azure-studio-model'
 
 - script: |
-    conda create -n loader_env -y
-    conda activate loader_env
-  displayName: 'Create new conda env for azureml-studio-score'
+    pip freeze --exclude-editable | xargs -r pip uninstall -y
+  displayName: 'Clean all installed packages for azureml-studio-score test'
 
 - script: |
     cd src/azureml-studio-model

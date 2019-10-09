@@ -1,5 +1,5 @@
 import sys
-from os.path import dirname, abspath
+import os
 
 import pytest
 import numpy as np
@@ -7,6 +7,7 @@ import pandas as pd
 import torch
 from torch.autograd import Variable
 # TODO: Substitude visual_interface when Module solves conflict issue in azureml.studio.__init__.py
+from azureml.visual_interface.model import PROJECT_ROOT_PATH
 import azureml.visual_interface.model.pytorch
 import azureml.visual_interface.model.generic
 
@@ -38,12 +39,19 @@ def test_save_load():
         loss.backward()
         optimizer.step()
 
-    azureml.visual_interface.model.pytorch.save(model, exist_ok=True)
+    score_test_path = os.path.join(PROJECT_ROOT_PATH, "azureml-studio-score/azureml/visual_interface/score/score/tests/pytorch")
+    model_save_path = os.path.join(score_test_path, "InputPort1")
+    dataset_save_path = os.path.join(score_test_path, "InputPort2", "data.dataset.parquet")
 
-    loaded_pytorch_model = azureml.visual_interface.model.pytorch.load()
+    azureml.visual_interface.model.pytorch.save(model, path=model_save_path, exist_ok=True)
+
+    loaded_pytorch_model = azureml.visual_interface.model.pytorch.load(model_save_path)
     assert isinstance(loaded_pytorch_model, torch.nn.Module)
 
-    loaded_generic_model = azureml.visual_interface.model.generic.load()
+    loaded_generic_model = azureml.visual_interface.model.generic.load(model_save_path)
     df = pd.DataFrame({"x": [[10.0], [11.0], [12.0]]})
+    if os.path.exists(dataset_save_path):
+        os.remove(dataset_save_path)
+    df.to_parquet(dataset_save_path, engine="pyarrow")
     predict_result = loaded_generic_model.predict(df)
     assert predict_result.shape[0] == df.shape[0]

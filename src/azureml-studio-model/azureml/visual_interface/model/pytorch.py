@@ -84,7 +84,7 @@ def save(
         local_dependency_path = os.path.abspath(sys.path[0])
         logger.info(f"using sys.path[0] = {sys.path[0]} as local_dependency_path")
     dst_code_path = os.path.join(path, constants.LOCAL_DEPENDENCY_PATH)
-    utils._copytree_include(local_dependency_path, dst_code_path, include_extensions=(".py"))
+    utils._copytree_include(local_dependency_path, dst_code_path, include_extensions=(".py"), exist_ok=exist_ok)
 
     # TODO: Parse input/output schema from test data
     if inputs is None:

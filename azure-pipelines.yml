@@ -19,8 +19,12 @@ steps:
 - script: |
     cd src/azureml-studio-model
     python -m pytest -s
-    rm -rf ./AzureMLModel
   displayName: 'PyTest azure-studio-model'
+
+- script: |
+    conda create -n loader_env -y
+    source activate loader_env
+  displayName: 'Create new conda env for azureml-studio-score'
 
 - script: |
     cd src/azureml-studio-model

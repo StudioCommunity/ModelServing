@@ -7,6 +7,18 @@ from subprocess import Popen, PIPE, STDOUT
 
 logger = logging.getLogger(__name__)
 
+
+def _run_install_cmds(cmds, command_name):
+    logger.info(" ".join(cmds))
+    p = Popen(cmds, stdout=PIPE, stderr=PIPE)
+    p.wait()
+    stdout = p.stdout.read().decode("utf-8")
+    stderr = p.stderr.read().decode("utf-8")
+    logger.info(f"stdout: {stdout}")
+    if stderr:
+        logger.warning(f"sterr: {stderr}")
+    logger.info(f"Finished to install {command_name} dependencies")
+
 # Temporary workaround to reconstruct the python environment in training phase.
 # Should deprecate when Module team support reading the conda.yaml in Model Folder and build image according to that
 class DependencyManager(object):
@@ -46,33 +58,19 @@ class DependencyManager(object):
         if self.local_dependency_path:
             sys.path.append(self.local_dependency_path)
             logger.info(f"Appended {self.local_dependency_path} to sys.path")
-        if len(self.conda_dependencies) == 0:
+
+        if not self.conda_dependencies:
             logger.info("No conda denpendencies to install")
         else:
             conda_cmds = ["conda", "install", "-y"]
             for channel in self.conda_channels:
                 conda_cmds += ["-c", channel]
             conda_cmds += self.conda_dependencies
-            logger.info(" ".join(conda_cmds))
-            p = Popen(conda_cmds, stdout=PIPE, stderr=PIPE)
-            p.wait()
-            stdout = p.stdout.read().decode("utf-8")
-            stderr = p.stderr.read().decode("utf-8")
-            logger.info("Finished to install conda dependencies")
-            logger.info(f"stdout: {stdout}")
-            if stderr:
-                logger.warning(f"sterr: {stderr}")
+            _run_install_cmds(conda_cmds, "conda")
 
         if not self.pip_dependencies:
             logger.info("No pip dependencies to install")
         else:
             pip_cmds = ["pip", "install"] + self.pip_dependencies
-            logger.info(" ".join(pip_cmds))
-            p = Popen(pip_cmds, stdout=PIPE, stderr=PIPE)
-            p.wait()
-            stdout = p.stdout.read().decode("utf-8")
-            stderr = p.stderr.read().decode("utf-8")
-            logger.info("Finished to install pip dependencies")
-            logger.info(f"stdout: {stdout}")
-            if stderr:
-                logger.warning(f"sterr: {stderr}")
+            _run_install_cmds(pip_cmds, "pip")
+   

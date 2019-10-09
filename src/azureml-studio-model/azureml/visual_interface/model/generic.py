@@ -53,7 +53,7 @@ def load(artifact_path="./AzureMLModel", install_dependencies=False) -> GenericM
         dependency_manager.install()
     
     model_conf = utils.get_configuration(artifact_path)
-    vintage = model_conf["vintage"].lower()
+    vintage = model_conf[constants.VINTAGE_KEY].lower()
     if vintage == "pytorch":
         from .pytorch import _load_generic_model
         return _load_generic_model(artifact_path)
@@ -68,6 +68,6 @@ def load(artifact_path="./AzureMLModel", install_dependencies=False) -> GenericM
     elif vintage == "onnx":
         pass
     else:
-        msg = f"Not Implemented: vintage {vintage} not supported"
+        msg = f"Not Implemented: {constants.VINTAGE_KEY} {vintage} not supported"
         logger.info(msg)
         raise ValueError(msg)

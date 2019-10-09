@@ -148,7 +148,7 @@ def _load_from_saveddict(model_path, pytorch_conf):
 
 def load(artifact_path="./AzureMLModel") -> torch.nn.Module:
     model_conf = utils.get_configuration(artifact_path)
-    pytorch_conf = model_conf['vintage_detail']
+    pytorch_conf = model_conf[constants.VINTAGE_DETAIL_KEY]
     model_path = os.path.join(artifact_path, pytorch_conf['model_file_path'])
     serializer = pytorch_conf.get('serialization_format', 'cloudpickle')
     if serializer == 'cloudpickle':

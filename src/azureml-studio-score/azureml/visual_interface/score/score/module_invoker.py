@@ -21,6 +21,7 @@ INPUT_FILE_NAME = "data.dataset.parquet" # hard coded, to be replaced, and we pr
 @click.command()
 @click.option("--trained-model", help="Path to ModelDirectory")
 @click.option("--dataset", help="Path to DFD")
+@click.option("--scored-dataset", help="Path to output DFD")
 @click.option("--append-score-columns-to-output", default="true", help="Preserve all columns from input dataframe or not")
 def entrance(trained_model: str, dataset: str, scored_dataset: str, append_score_columns_to_output: str = "true"):
     logger.info(f"append_score_columns_to_output = {append_score_columns_to_output}")

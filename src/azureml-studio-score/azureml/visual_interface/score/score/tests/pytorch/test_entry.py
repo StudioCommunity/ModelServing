@@ -5,8 +5,6 @@ from os.path import dirname, abspath
 import pytest
 import numpy as np
 import pandas as pd
-import torch
-from torch.autograd import Variable
 
 # TODO: Substitude visual_interface when Module solves conflict issue in azureml.studio.__init__.py
 import azureml.visual_interface.model.pytorch

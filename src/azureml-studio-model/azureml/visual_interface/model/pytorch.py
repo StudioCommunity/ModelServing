@@ -13,7 +13,7 @@ import yaml
 import pandas as pd
 
 from .generic import GenericModel
-from .vintage_detail import VintageDetail
+from .flavor import Flavor
 from .model_input import ModelInput
 from .model_output import ModelOutput
 from . import utils
@@ -26,7 +26,7 @@ MODEL_FILE_NAME = "model.pkl"
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
-class PytorchModelDetail(VintageDetail):
+class PytorchFlavor(Flavor):
 
     def __init__(
         self,
@@ -35,6 +35,7 @@ class PytorchModelDetail(VintageDetail):
         torchvision_version: str = torchvision.__version__,
         serialization_format: str = "cloudpickle",
         serialization_library_version: str = cloudpickle.__version__):
+        self.name = "pytorch"
         self.model_file_path = model_file_path
         self.pytorch_version = pytorch_version
         self.torchvision_version = torchvision_version
@@ -99,7 +100,7 @@ def save(
         except AttributeError:
             logger.warning("Model without 'forward' function cannot be used to predict", exc_info=True)
     
-    model_detail = PytorchModelDetail(
+    flavor = PytorchFlavor(
         model_file_path=MODEL_FILE_NAME,
         pytorch_version=torch.__version__,
         torchvision_version=torchvision.__version__,
@@ -108,10 +109,9 @@ def save(
     )
 
     model_spec = utils.generate_model_spec(
-        vintage="pytorch",
-        vintage_detail=model_detail,
+        flavor=flavor,
         conda_file_path=constants.CONDA_FILE_NAME,
-        local_dependency_path=constants.LOCAL_DEPENDENCY_PATH,
+        local_dependency=constants.LOCAL_DEPENDENCY_PATH,
         inputs=inputs
     )
     utils.save_model_spec(path, model_spec)
@@ -125,7 +125,7 @@ def _load_from_cloudpickle(model_path, pytorch_conf):
 
 
 def _load_from_savedmodel(model_path, pytorch_conf):
-    model_file_path = os.path.join(model_path, pytorch_conf['model_file_path'])
+    model_file_path = os.path.join(model_path, pytorch_conf['model_file'])
     model = torch.load(model_file_path, map_location=device)
     return model
 
@@ -134,7 +134,7 @@ def _load_from_saveddict(model_path, pytorch_conf):
     model_class_package = pytorch_conf['model_class_package']
     model_class_name = pytorch_conf['model_class_name']
     model_class_init_args = os.path.join(model_path, pytorch_conf['model_class_init_args'])
-    model_file_path = os.path.join(model_path, pytorch_conf['model_file_path'])
+    model_file_path = os.path.join(model_path, pytorch_conf['model_file'])
     module = importlib.import_module(model_class_package)
     model_class = getattr(module, model_class_name)
     logger.info(f'model_class_init_args = {model_class_init_args}')
@@ -148,7 +148,7 @@ def _load_from_saveddict(model_path, pytorch_conf):
 
 def load(artifact_path="./AzureMLModel") -> torch.nn.Module:
     model_conf = utils.get_configuration(artifact_path)
-    pytorch_conf = model_conf[constants.VINTAGE_DETAIL_KEY]
+    pytorch_conf = model_conf["flavor"]
     model_path = os.path.join(artifact_path, pytorch_conf['model_file_path'])
     serializer = pytorch_conf.get('serialization_format', 'cloudpickle')
     if serializer == 'cloudpickle':

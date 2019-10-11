@@ -9,8 +9,8 @@ from datetime import datetime
 from sys import version_info
 
 from . import constants
-from . resource_requirement import ResourceRequirement
-from . vintage_detail import VintageDetail
+from . resource_config import ResourceConfig
+from . flavor import Flavor
 
 logger = logging.getLogger(__name__)
 
@@ -64,30 +64,27 @@ def save_conda_env(path, conda_env):
 
 
 def generate_model_spec(
-    vintage: str,
-    vintage_detail: VintageDetail = None,
+    flavor: Flavor,
     conda_file_path: str = constants.CONDA_FILE_NAME,
-    local_dependency_path: str = constants.LOCAL_DEPENDENCY_PATH,
+    local_dependency: str = constants.LOCAL_DEPENDENCY_PATH,
     inputs: list = None,
     outputs: list = None,
-    serving_resource_requirement: ResourceRequirement = None,
+    serving_config: ResourceConfig = None,
     alghost_version: str = None,
     time_created: datetime = datetime.now()
 ):
     spec = {
-        "vintage" : vintage,
-        "conda_file_path": conda_file_path,
-        "local_dependency_path": local_dependency_path,
+        "flavor" : flavor.to_dict(),
+        "conda_file": conda_file_path,
+        "local_dependency": local_dependency,
         "time_created": time_created.strftime("%Y-%m-%d %H:%M:%S")
     }
-    if vintage_detail:
-        spec["vintage_detail"] = vintage_detail.to_dict()
     if inputs is not None:
         spec["inputs"] = [model_input.to_dict() for model_input in inputs]
     if outputs is not None:
         spec["outputs"] = [model_output.to_dict() for model_output in outputs]
-    if serving_resource_requirement:
-        spec["serving_resource_requirement"] = serving_resource_requirement.to_dict()
+    if serving_config:
+        spec["serving_config"] = serving_config.to_dict()
     if alghost_version:
         spec["alghost_version"] = alghost_version
     logger.info(f"spec = {spec}")

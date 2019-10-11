@@ -43,8 +43,8 @@ def load(artifact_path="./AzureMLModel", install_dependencies=False) -> GenericM
         config = yaml.safe_load(fp)
     
     if install_dependencies:
-        conda_yaml_path = os.path.join(artifact_path, config["conda_file_path"])
-        local_dependency_path = config.get("local_dependency_path", None)
+        conda_yaml_path = os.path.join(artifact_path, config["conda_file"])
+        local_dependency_path = config.get("local_dependency", None)
         # TODO: Handle the case where local_dependency_path doesn't exist
         if local_dependency_path:
             local_dependency_path = os.path.join(artifact_path, local_dependency_path)
@@ -53,21 +53,21 @@ def load(artifact_path="./AzureMLModel", install_dependencies=False) -> GenericM
         dependency_manager.install()
     
     model_conf = utils.get_configuration(artifact_path)
-    vintage = model_conf[constants.VINTAGE_KEY].lower()
-    if vintage == "pytorch":
+    flavor_name = model_conf["flavor"]["name"].lower()
+    if flavor_name == "pytorch":
         from .pytorch import _load_generic_model
         return _load_generic_model(artifact_path)
-    elif vintage == "tensorflow":
+    elif flavor_name == "tensorflow":
         pass
-    elif vintage == "sklearn":
+    elif flavor_name == "sklearn":
         pass
-    elif vintage == "keras":
+    elif flavor_name == "keras":
         pass
-    elif vintage == "python":
+    elif flavor_name == "python":
         pass
-    elif vintage == "onnx":
+    elif flavor_name == "onnx":
         pass
     else:
-        msg = f"Not Implemented: {constants.VINTAGE_KEY} {vintage} not supported"
+        msg = f"Not Implemented: flavor {flavor_name} not supported"
         logger.info(msg)
         raise ValueError(msg)

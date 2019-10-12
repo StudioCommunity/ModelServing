@@ -4,6 +4,7 @@ import os
 import pytest
 import numpy as np
 import pandas as pd
+import pyarrow.parquet as pq
 import torch
 from torch.autograd import Variable
 # TODO: Substitude visual_interface when Module solves conflict issue in azureml.studio.__init__.py

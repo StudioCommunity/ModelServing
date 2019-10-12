@@ -64,7 +64,7 @@ Data Type is a string describes the data type of the Input/Output parameter.
 | float          | Indicates that the input value is a float.                   |
 | boolean        | Indicates that the input value is a boolean value.           |
 
-## Serving Config 
+## Serving Config
 
 | Name      | Type                    | Required | Description                                                  |
 | --------- | ----------------------- | -------- | ------------------------------------------------------------ |
@@ -98,8 +98,8 @@ outputs:
   description: regression result
 serving_config:
   gpu_support: true
-  cpu_core_num: 2
-  memory_in_GB: 1024
+  cpu_core_num: 0.1
+  memory_in_GB: 0.5
 alghost_version: 0.0.83
 time_created: '2019-10-01 00:00:00.000000'
 ~~~

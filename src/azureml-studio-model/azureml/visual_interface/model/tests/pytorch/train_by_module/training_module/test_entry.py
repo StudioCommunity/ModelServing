@@ -8,7 +8,7 @@ import pyarrow.parquet as pq
 import torch
 from torch.autograd import Variable
 # TODO: Substitude visual_interface when Module solves conflict issue in azureml.studio.__init__.py
-from azureml.visual_interface.model import PROJECT_ROOT_PATH
+from azureml.visual_interface.model.package_info import PROJECT_ROOT_PATH
 import azureml.visual_interface.model.pytorch
 import azureml.visual_interface.model.generic
 

@@ -16,10 +16,11 @@ from .generic import GenericModel
 from .flavor import Flavor
 from .model_input import ModelInput
 from .model_output import ModelOutput
+from .logger import getLogger
 from . import utils
 from . import constants
 
-logger = logging.getLogger(__name__)
+logger = getLogger(__name__)
 
 FLAVOR_NAME = "pytorch"
 MODEL_FILE_NAME = "model.pkl"

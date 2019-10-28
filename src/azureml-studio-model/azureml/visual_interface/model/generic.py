@@ -1,14 +1,14 @@
 import os
-import logging
 from abc import ABC, abstractmethod
 
 import yaml
 
 from . import constants
-from .dependency import DependencyManager
 from . import utils
+from .dependency import DependencyManager
+from .logger import get_logger
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 class GenericModel(ABC):
     """Interface class to be inherited by wrapper of different flavors, and expose unifed init and predict function

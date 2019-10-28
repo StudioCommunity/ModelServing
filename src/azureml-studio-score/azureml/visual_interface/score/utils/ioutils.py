@@ -1,10 +1,11 @@
-import logging
 import os
 import json
 import pandas as pd
 import numpy as np
 
-logger = logging.getLogger(__name__)
+from ..logger import get_logger
+
+logger = get_logger(__name__)
 
 def read_parquet(data_path):
     """

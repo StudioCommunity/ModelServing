@@ -1,5 +1,4 @@
 import inspect
-import logging 
 import os
 import shutil
 import ast
@@ -16,11 +15,11 @@ from .generic import GenericModel
 from .flavor import Flavor
 from .model_input import ModelInput
 from .model_output import ModelOutput
-from .logger import getLogger
+from .logger import get_logger
 from . import utils
 from . import constants
 
-logger = getLogger(__name__)
+logger = get_logger(__name__)
 
 FLAVOR_NAME = "pytorch"
 MODEL_FILE_NAME = "model.pkl"

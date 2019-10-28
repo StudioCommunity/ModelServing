@@ -1,18 +1,16 @@
-import logging
 import click
 import pandas as pd
 import cv2
-from ..utils import ioutils
+
 from . import datauri_util
 from . import mnist
 from . import imagenet
 from . import stargan
+from ..utils import ioutils
+from ..logger import get_logger
 
-logging.basicConfig(format='%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
-                    datefmt='%m/%d/%Y %H:%M:%S',
-                    level=logging.INFO)
-logging.info(f"in {__file__} v1")
-logger = logging.getLogger(__name__)
+logger = get_logger.getLogger(__name__)
+logger.info(f"in {__file__} v1")
 
 def add_data_to_dataframe(input_df, results, target_column):
   if target_column in input_df.columns:
@@ -59,10 +57,10 @@ class PreProcess:
         #print(row['label'])
         img = datauri_util.base64str_to_ndarray(row[self.image_column])
         if self.target_image_size == (28,28):
-          #logging.info(f"### mnist")
+          #logger.info(f"### mnist")
           img = mnist.transform_image_mnist(img)
         elif self.target_image_size == (224,224):
-          #logging.info(f"### imagenet")
+          #logger.info(f"### imagenet")
           img = imagenet.transform_image_imagenet(img)
         else:
           raise Exception("Not Implemented")

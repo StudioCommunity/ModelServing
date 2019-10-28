@@ -1,7 +1,7 @@
-import logging
+from ..logger import get_logger
 
-logging.info(f"in {__file__}")
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
+logger.info(f"in {__file__}")
 
 def add_column_to_dataframe(input_df, results, target_column):
     if target_column in input_df.columns:

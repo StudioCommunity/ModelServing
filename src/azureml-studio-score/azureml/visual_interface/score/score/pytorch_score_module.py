@@ -14,12 +14,10 @@ import pickle
 import os
 import ast
 import cloudpickle
-import logging
 
-logging.basicConfig(format='%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
-                    datefmt='%m/%d/%Y %H:%M:%S',
-                    level=logging.INFO)
-logger = logging.getLogger(__name__)
+from ..logger import get_logger
+
+logger = get_logger(__name__)
 
 
 class PytorchScoreModule(object):

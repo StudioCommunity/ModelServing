@@ -1,13 +1,10 @@
 import time
 import click
 
-import logging
+from ..logger import get_logger
 
-logging.basicConfig(format='%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
-                    datefmt='%m/%d/%Y %H:%M:%S',
-                    level=logging.INFO)
-logging.info(f"Dummy module sleeping")
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
+logger.info(f"Dummy module sleeping")
 
 
 # ignore extra arguments

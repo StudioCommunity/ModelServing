@@ -1,15 +1,14 @@
-import logging
 import click
 import pandas as pd
 import torch
 from torchvision import transforms as T
-from ..utils import ioutils, datauri_utils, dfutils
 
-logging.basicConfig(format='%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
-                    datefmt='%m/%d/%Y %H:%M:%S',
-                    level=logging.INFO)
-logging.info(f"in {__file__} v1")
-logger = logging.getLogger(__name__)
+from ..utils import ioutils, datauri_utils, dfutils
+from ..logger import get_logger
+
+logger = get_logger(__name__)
+logger.info(f"in {__file__} v1")
+
 
 class Process:
   def __init__(self, meta: dict = {}):

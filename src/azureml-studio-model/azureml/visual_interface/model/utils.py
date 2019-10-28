@@ -2,7 +2,6 @@ import os
 import fnmatch
 import yaml
 import json
-import logging
 import shutil
 import sys
 from datetime import datetime
@@ -11,8 +10,9 @@ from sys import version_info
 from . import constants
 from . resource_config import ResourceConfig
 from . flavor import Flavor
+from .logger import get_logger
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 PYTHON_VERSION = "{major}.{minor}.{micro}".format(major=version_info.major,
                                                   minor=version_info.minor,

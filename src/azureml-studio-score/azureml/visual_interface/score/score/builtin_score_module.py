@@ -1,12 +1,12 @@
 import os
-import logging
 
 import pandas as pd
 import azureml.visual_interface.model.generic
 
 from . import constants
+from ..logger import get_logger
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 class BuiltinScoreModule(object):
 

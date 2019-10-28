@@ -4,9 +4,9 @@ import yaml
 from pip._internal import main as pipmain
 from subprocess import Popen, PIPE, STDOUT
 
-from .logger import getLogger
+from .logger import get_logger 
 
-logger = getLogger(__name__)
+logger = get_logger(__name__)
 
 
 def _run_install_cmds(cmds, command_name):

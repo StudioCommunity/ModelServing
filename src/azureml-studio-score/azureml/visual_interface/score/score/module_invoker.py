@@ -1,5 +1,4 @@
 import os
-import logging
 import argparse
 
 import pyarrow.parquet as pq # imported explicitly to avoid known issue of pd.read_parquet
@@ -9,12 +8,13 @@ import click
 from . import constants
 from .builtin_score_module import BuiltinScoreModule
 from ..utils import ioutils
+from ..logger import get_logger
 
 # python -m azureml.studio.score.module_invoker --trained-model ../dstest/model/tensorflow-minist/ --dataset ../dstest/outputs/mnist/ --scored-dataset ../dstest/outputs/mnist/ouput --append-score-columns-to-output True
 # python -m azureml.studio.score.module_invoker --trained-model ../dstest/model/vgg/ --dataset ../dstest/outputs/imagenet/ --scored-dataset ../dstest/outputs/imagenet/ouput --append-score-columns-to-output True
 # python -m azureml.visual_interface.score.score.module_invoker --trained-model ./azureml/visual_interface/score/score/tests/pytorch/InputPort1 --dataset ./azureml/visual_interface/score/score/tests/pytorch/InputPort2 --scored-dataset ./azureml/visual_interface/score/score/tests/pytorch/OutputPort --append-score-columns-to-output True
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 INPUT_FILE_NAME = "data.dataset.parquet" # hard coded, to be replaced, and we presume the data is DataFrame inside parquet
 

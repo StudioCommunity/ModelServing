@@ -1,16 +1,14 @@
 import os
-import logging
 import click
 import pandas as pd
 import json
-from ..utils import ioutils
 import numpy as np
 
-logging.basicConfig(format='%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
-                    datefmt='%m/%d/%Y %H:%M:%S',
-                    level=logging.INFO)
-logging.info(f"in {__file__} v1")
-logger = logging.getLogger(__name__)
+from ..utils import ioutils
+from ..logger import get_logger
+
+logger = get_logger(__name__)
+logger.info(f"in {__file__} v1")
 
 def get_category(prob, categories):
   pred = np.argsort(prob)[::-1] ##[::-1] inverse order

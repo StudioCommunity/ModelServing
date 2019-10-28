@@ -12,10 +12,11 @@ import cloudpickle
 from urllib.request import urlopen
 
 from . import utils
+from .logger import get_logger
 
 FLAVOR_NAME = "python"
 MODEL_FILE_NAME = "model.pkl"  # we cloud pickle the model to load/save the model by default
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 class PythonModel(object):
     """

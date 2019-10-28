@@ -4,17 +4,12 @@ import sys
 import json
 import importlib
 import imp
-
-from pip._internal import main as pipmain
-pipmain(["install", "click"])
 import click
 
-import logging
-logging.basicConfig(format='%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
-                    datefmt='%m/%d/%Y %H:%M:%S',
-                    level=logging.INFO)
-logging.info(f"Import Model")
-logger = logging.getLogger(__name__)
+from ..logger import get_logger
+logger = get_logger(__name__)
+logger.info("Import Model")
+
 
 class Importer(object):
     def __init__(self, input_path, flavor, out_model_path):

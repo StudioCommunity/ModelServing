@@ -1,16 +1,15 @@
-import logging
 import click
 import pandas as pd
-from ..utils import ioutils
 import math
 import numpy as np
 import base64
 
-logging.basicConfig(format='%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
-                    datefmt='%m/%d/%Y %H:%M:%S',
-                    level=logging.INFO)
-logging.info(f"in {__file__} v1")
-logger = logging.getLogger(__name__)
+from ..utils import ioutils
+from ..logger import get_logger
+
+logger = get_logger(__name__)
+logger.info(f"in {__file__} v1")
+
 
 class Process:
   def __init__(self, meta: dict = {}):

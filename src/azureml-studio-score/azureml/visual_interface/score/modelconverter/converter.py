@@ -1,7 +1,6 @@
 import os
 import os.path
 import sys
-import logging
 import urllib.request
 import ast
 import json
@@ -12,11 +11,10 @@ from pip._internal import main as pipmain
 pipmain(["install", "click"])
 import click
 
-logging.basicConfig(format='%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
-                    datefmt='%m/%d/%Y %H:%M:%S',
-                    level=logging.INFO)
-logging.info(f"loader echo")
-logger = logging.getLogger(__name__)
+from ..logger import get_logger
+
+logger = get_logger(__name__)
+logger.info(f"loader echo")
 
 @click.command()
 @click.option('--flavor')

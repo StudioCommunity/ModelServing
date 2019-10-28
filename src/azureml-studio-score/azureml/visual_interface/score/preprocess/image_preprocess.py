@@ -1,15 +1,12 @@
-import logging
 import click
 import pandas as pd
 from torchvision import transforms as T
-from ..utils import ioutils, datauri_utils, dfutils
 
-logging.basicConfig(format='%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
-                    datefmt='%m/%d/%Y %H:%M:%S',
-                    level=logging.DEBUG)
-logging.info(f"in {__file__}")
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+from ..utils import ioutils, datauri_utils, dfutils
+from ..logger import get_logger
+
+logger = get_logger(__name__)
+logger.info(f"in {__file__}")
 
 def tuple_parser(input_str, data_type):
     return tuple(map(data_type, input_str.strip().strip('(').strip(')').split()))

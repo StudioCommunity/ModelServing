@@ -9,12 +9,9 @@ from pip._internal import main as pipmain
 pipmain(["install", "click"])
 import click
 
-import logging
-logging.basicConfig(format='%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
-                    datefmt='%m/%d/%Y %H:%M:%S',
-                    level=logging.INFO)
-logging.info(f"Import Folder from git")
-logger = logging.getLogger(__name__)
+from ..logger import get_logger
+logger = get_logger(__name__)
+logger.info(f"Import Folder from git")
         
 
 @click.command()

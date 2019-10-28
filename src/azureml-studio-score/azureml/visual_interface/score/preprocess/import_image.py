@@ -1,4 +1,3 @@
-import logging
 import os
 import json
 import yaml
@@ -7,15 +6,13 @@ import pandas as pd
 from os import walk
 import base64
 import pyarrow.parquet as pq
-from ..utils import ioutils
-from ..utils import datauri_utils
 
-logging.basicConfig(format='%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
-                    datefmt='%m/%d/%Y %H:%M:%S',
-                    level=logging.INFO)
-logging.info(f"in {__file__}")
-logging.info(f"Load pyarrow.parquet explicitly: {pq}")
-logger = logging.getLogger(__name__)
+from ..utils import ioutils, datauri_utils
+from ..logger import get_logger
+
+logger = get_logger(__name__)
+logger.info(f"in {__file__}")
+logger.info(f"Load pyarrow.parquet explicitly: {pq}")
 
 @click.command()
 @click.option('--input_path', default="inputs/mnist")

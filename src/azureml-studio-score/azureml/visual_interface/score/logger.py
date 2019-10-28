@@ -5,5 +5,5 @@ logging.basicConfig(format='%(asctime)s - %(levelname)s - %(name)s -   %(message
                     level=logging.INFO)
 
 # TODO: Enrich this
-def getLogger(name):
+def get_logger(name):
     return logging.getLogger(name)

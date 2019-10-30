@@ -8,9 +8,8 @@ import numpy as np
 import pandas as pd
 from click.testing import CliRunner
 
-# TODO: Substitude visual_interface when Module solves conflict issue in azureml.studio.__init__.py
-import azureml.visual_interface.model.generic
-from azureml.visual_interface.score.score import module_invoker
+import azureml.studio.model.generic
+from azureml.studio.score.score import module_invoker
 
 
 def test_score():

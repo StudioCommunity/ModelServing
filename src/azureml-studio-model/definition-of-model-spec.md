@@ -4,7 +4,7 @@
 
 Train anywhere, serve here.
 
-## Module Definition
+## Model Definition
 
 | Name | Type | Required | Description |
 | ---- | ---- | -------- | ----------- |
@@ -15,7 +15,7 @@ Train anywhere, serve here.
 | outputs | list<[Output](#Output)> | No |Defines output parameters of the model. Reference: 'Output Definition' table.|
 | serving_config | [Serving Config](#serving-config) | No | Configurations to serve the model, reference 'Serving Config' table. |
 | description | string | No |The detailed information that describes this module.|
-| alghost_version | string | No | Version of alghost which containse model sdk |
+| model_spec_version | string | No | Version of model spec, current coincide with azureml-designer-model version |
 | time_created | datetime | No | Create time of the model folder |
 
 ## Flavor
@@ -101,7 +101,7 @@ serving_config:
   gpu_support: true
   cpu_core_num: 0.1
   memory_in_GB: 0.5
-alghost_version: 0.0.83
+model_spec_version: 0.0.83
 time_created: '2019-10-01 00:00:00.000000'
 ~~~
 

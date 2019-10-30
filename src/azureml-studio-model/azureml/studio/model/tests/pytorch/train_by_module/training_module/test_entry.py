@@ -7,10 +7,9 @@ import pandas as pd
 import pyarrow.parquet as pq
 import torch
 from torch.autograd import Variable
-# TODO: Substitude visual_interface when Module solves conflict issue in azureml.studio.__init__.py
-from azureml.visual_interface.model.package_info import PROJECT_ROOT_PATH
-import azureml.visual_interface.model.pytorch
-import azureml.visual_interface.model.generic
+from azureml.studio.model.package_info import PROJECT_ROOT_PATH
+import azureml.studio.model.pytorch
+import azureml.studio.model.generic
 
 from .model import LinearRegression
 
@@ -40,16 +39,16 @@ def test_save_load():
         loss.backward()
         optimizer.step()
 
-    score_test_path = os.path.join(PROJECT_ROOT_PATH, "azureml-studio-score/azureml/visual_interface/score/score/tests/pytorch")
+    score_test_path = os.path.join(PROJECT_ROOT_PATH, "azureml-studio-score/azureml/studio/score/score/tests/pytorch")
     model_save_path = os.path.join(score_test_path, "InputPort1")
     dataset_save_path = os.path.join(score_test_path, "InputPort2", "data.dataset.parquet")
 
-    azureml.visual_interface.model.pytorch.save(model, path=model_save_path, exist_ok=True)
+    azureml.studio.model.pytorch.save(model, path=model_save_path, exist_ok=True)
 
-    loaded_pytorch_model = azureml.visual_interface.model.pytorch.load(model_save_path)
+    loaded_pytorch_model = azureml.studio.model.pytorch.load(model_save_path)
     assert isinstance(loaded_pytorch_model, torch.nn.Module)
 
-    loaded_generic_model = azureml.visual_interface.model.generic.load(model_save_path)
+    loaded_generic_model = azureml.studio.model.generic.load(model_save_path)
     df = pd.DataFrame({"x": [[10.0], [11.0], [12.0]]})
     if os.path.exists(dataset_save_path):
         os.remove(dataset_save_path)

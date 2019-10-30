@@ -103,3 +103,8 @@ def from_df_column_to_array(col):
         return values
     else:
         return col.values
+
+def save_dfd(df, output_path):
+    from azureml.studio.core.io.data_frame_directory import DataFrameDirectory
+    dfd = DataFrameDirectory.create(df)
+    dfd.dump(output_path)

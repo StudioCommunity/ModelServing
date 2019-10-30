@@ -56,7 +56,7 @@ setup(
     description="",
     packages=packages,
     install_requires=get_requirements(),
-    dependency_links=["https://pypi.org/simple", "https://test.pypi.org/simple/alghost/"],
+    dependency_links=["https://pypi.org/simple"],
     author='Microsoft Corp',
     license=inline_license,
     include_package_data=True,

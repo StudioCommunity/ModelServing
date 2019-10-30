@@ -12,7 +12,7 @@ from ..logger import get_logger
 
 # python -m azureml.studio.score.module_invoker --trained-model ../dstest/model/tensorflow-minist/ --dataset ../dstest/outputs/mnist/ --scored-dataset ../dstest/outputs/mnist/ouput --append-score-columns-to-output True
 # python -m azureml.studio.score.module_invoker --trained-model ../dstest/model/vgg/ --dataset ../dstest/outputs/imagenet/ --scored-dataset ../dstest/outputs/imagenet/ouput --append-score-columns-to-output True
-# python -m azureml.visual_interface.score.score.module_invoker --trained-model ./azureml/visual_interface/score/score/tests/pytorch/InputPort1 --dataset ./azureml/visual_interface/score/score/tests/pytorch/InputPort2 --scored-dataset ./azureml/visual_interface/score/score/tests/pytorch/OutputPort --append-score-columns-to-output True
+# python -m azureml.studio.score.score.module_invoker --trained-model ./azureml/studio/score/score/tests/pytorch/InputPort1 --dataset ./azureml/studio/score/score/tests/pytorch/InputPort2 --scored-dataset ./azureml/studio/score/score/tests/pytorch/OutputPort --append-score-columns-to-output True
 
 logger = get_logger(__name__)
 
@@ -34,8 +34,9 @@ def entrance(trained_model: str, dataset: str, scored_dataset: str, append_score
 
     logger.info(f"input_df =\n{input_df}")
     logger.info(f"output_df =\n{output_df}")
-    logger.info(f"trying to save_parquet1(output_df, {scored_dataset})")
+    logger.info(f"dumping to DFD {scored_dataset}")
     ioutils.save_parquet1(output_df, scored_dataset)
+    ioutils.save_dfd(output_df, scored_dataset)
 
 
 if __name__ == "__main__":

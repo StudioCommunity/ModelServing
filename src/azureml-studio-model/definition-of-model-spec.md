@@ -10,7 +10,7 @@ Train anywhere, serve here.
 | ---- | ---- | -------- | ----------- |
 | flavor | [Flavor](#flavor) | Yes | Description of model source information. Reference 'Flavor' table. |
 | conda_file | string | Yes    | The path to conda.yaml |
-| local_dependency | string | No | The path contains the python packages required to load the model, will be append to sys.path when loading |
+| local_dependencies | list | No | The path contains the python packages required to load the model, will be append to sys.path when loading |
 | inputs | list<[Input](#Input)> | No | Defines input parameters of the model. Reference: 'Input Definition' table. |
 | outputs | list<[Output](#Output)> | No |Defines output parameters of the model. Reference: 'Output Definition' table.|
 | serving_config | [Serving Config](#serving-config) | No | Configurations to serve the model, reference 'Serving Config' table. |
@@ -85,7 +85,8 @@ flavor:
   serialization_format: cloudpickle
   serialization_library_version: 1.1.2
 conda_file: conda.yaml
-local_dependency: local_dependency
+local_dependencies:
+- local_dependencies/train_by_module
 inputs:
 - name: x
   type: ndarray
@@ -111,9 +112,10 @@ AzureMLModel
 ├──model_spec.yaml
 ├──conda.yaml
 ├──model.pkl
-└──local_dependency
-   └──training_module
-      ├──__init__.py
-      ├──model.py
-      └──entry.py
+└──local_dependencies
+   └──train_by_module
+      └──training_module
+          ├──__init__.py
+          ├──model.py
+          └──entry.py
 ```

@@ -1,22 +1,21 @@
 import os
-import fnmatch
-import yaml
 import json
 import shutil
 import sys
+
+import yaml
 from datetime import datetime
-from sys import version_info
 
 from . import constants
-from . resource_config import ResourceConfig
-from . flavor import Flavor
+from .resource_config import ResourceConfig
+from .flavor import Flavor
 from .logger import get_logger
 
 logger = get_logger(__name__)
 
-PYTHON_VERSION = "{major}.{minor}.{micro}".format(major=version_info.major,
-                                                  minor=version_info.minor,
-                                                  micro=version_info.micro)
+PYTHON_VERSION = "{major}.{minor}.{micro}".format(major=sys.version_info.major,
+                                                  minor=sys.version_info.minor,
+                                                  micro=sys.version_info.micro)
 
 
 def generate_conda_env(path=None, additional_conda_deps=None, additional_pip_deps=None,
@@ -66,7 +65,7 @@ def save_conda_env(path, conda_env):
 def generate_model_spec(
     flavor: Flavor,
     conda_file_path: str = constants.CONDA_FILE_NAME,
-    local_dependency: str = constants.LOCAL_DEPENDENCY_PATH,
+    local_dependencies: list = [],
     inputs: list = None,
     outputs: list = None,
     serving_config: ResourceConfig = None,
@@ -76,7 +75,7 @@ def generate_model_spec(
     spec = {
         "flavor" : flavor.to_dict(),
         "conda_file": conda_file_path,
-        "local_dependency": local_dependency,
+        "local_dependencies": local_dependencies,
         "time_created": time_created.strftime("%Y-%m-%d %H:%M:%S")
     }
     if inputs is not None:

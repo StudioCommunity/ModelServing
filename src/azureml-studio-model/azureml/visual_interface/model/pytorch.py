@@ -16,6 +16,8 @@ from .flavor import Flavor
 from .model_input import ModelInput
 from .model_output import ModelOutput
 from .logger import get_logger
+from .local_dependency import LocalDependencyManager
+from .remote_dependency import RemoteDependencyManager
 from . import utils
 from . import constants
 
@@ -61,31 +63,45 @@ def _save(pytorch_model, path):
     with open(path, 'wb') as fp:
         cloudpickle.dump(pytorch_model, fp)
 
-
 def save(
     pytorch_model,
     path: str ="./AzureMLModel",
     conda_env: dict = None,
+    additional_conda_channels: list = [],
+    additional_conda_deps: list = [],
     additional_pip_deps: list = [],
-    local_dependency_path: str = None,
+    local_dependencies: list = [],
     inputs: list = None,
     outputs: list = None,
-    exist_ok: bool = False):
+    exist_ok: bool = False
+    ):
     os.makedirs(path, exist_ok=exist_ok)
     _save(pytorch_model, os.path.join(path, MODEL_FILE_NAME))
 
     # TODO: Provide the option to save result of "conda env export"
-    if conda_env is None:
-        conda_env = _get_default_conda_env(additional_pip_deps=additional_pip_deps)
-    utils.save_conda_env(path, conda_env)
+    if conda_env is not None:
+        utils.save_conda_env(path, conda_env)
+    else:
+        additional_conda_channels.extend(["pytorch"])
+        additional_conda_deps.extend([
+            "pytorch={}".format(torch.__version__),
+            "torchvision={}".format(torchvision.__version__)
+        ])
+        additional_pip_deps.extend(["cloudpickle=={}".format(cloudpickle.__version__)])
+        remote_dependency_manager = RemoteDependencyManager(
+            additional_conda_channels=additional_conda_channels,
+            additional_conda_deps=additional_conda_deps,
+            additional_pip_deps=additional_pip_deps
+        )
+        remote_dependency_manager.save(path)
 
     # In the cases where customer manually modified sys.path (e.g. sys.path.append("..")), 
     # they would have to specify the code path manually.
-    if not local_dependency_path:
-        local_dependency_path = os.path.abspath(sys.path[0])
+    if not local_dependencies:
+        local_dependencies = [os.path.abspath(sys.path[0])]
         logger.info(f"using sys.path[0] = {sys.path[0]} as local_dependency_path")
-    dst_code_path = os.path.join(path, constants.LOCAL_DEPENDENCY_PATH)
-    utils._copytree_include(local_dependency_path, dst_code_path, include_extensions=(".py"), exist_ok=exist_ok)
+    local_dependency_manager = LocalDependencyManager(local_dependencies)
+    local_dependency_manager.save(path)
 
     # TODO: Parse input/output schema from test data
     if inputs is None:
@@ -111,7 +127,7 @@ def save(
     model_spec = utils.generate_model_spec(
         flavor=flavor,
         conda_file_path=constants.CONDA_FILE_NAME,
-        local_dependency=constants.LOCAL_DEPENDENCY_PATH,
+        local_dependencies=local_dependency_manager.copied_local_dependencies,
         inputs=inputs
     )
     utils.save_model_spec(path, model_spec)

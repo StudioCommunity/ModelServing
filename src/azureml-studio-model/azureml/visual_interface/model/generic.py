@@ -5,7 +5,8 @@ import yaml
 
 from . import constants
 from . import utils
-from .dependency import DependencyManager
+from .local_dependency import LocalDependencyManager
+from .remote_dependency import RemoteDependencyManager
 from .logger import get_logger
 
 logger = get_logger(__name__)
@@ -44,13 +45,15 @@ def load(artifact_path="./AzureMLModel", install_dependencies=False) -> GenericM
     
     if install_dependencies:
         conda_yaml_path = os.path.join(artifact_path, config["conda_file"])
-        local_dependency_path = config.get("local_dependency", None)
-        # TODO: Handle the case where local_dependency_path doesn't exist
-        if local_dependency_path:
-            local_dependency_path = os.path.join(artifact_path, local_dependency_path)
-        dependency_manager = DependencyManager()
-        dependency_manager.load(conda_yaml_path, local_dependency_path)
-        dependency_manager.install()
+
+        local_dependencies = config.get("local_dependencies", None)
+        local_dependency_manager = LocalDependencyManager(local_dependencies)
+        local_dependency_manager.load(artifact_path, local_dependencies)
+        local_dependency_manager.install()
+
+        remote_dependency_manager = RemoteDependencyManager()
+        remote_dependency_manager.load(conda_yaml_path)
+        remote_dependency_manager.install()
     
     model_conf = utils.get_configuration(artifact_path)
     flavor_name = model_conf["flavor"]["name"].lower()

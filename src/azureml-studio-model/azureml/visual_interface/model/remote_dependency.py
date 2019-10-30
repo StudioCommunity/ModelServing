@@ -1,13 +1,19 @@
+import os
 import sys
+import shutil
 
 import yaml
-from pip._internal import main as pipmain
 from subprocess import Popen, PIPE, STDOUT
 
+from . import constants
+from . import utils
 from .logger import get_logger 
 
 logger = get_logger(__name__)
 
+PYTHON_VERSION = "{major}.{minor}.{micro}".format(major=sys.version_info.major,
+                                                  minor=sys.version_info.minor,
+                                                  micro=sys.version_info.micro)
 
 def _run_install_cmds(cmds, command_name):
     logger.info(" ".join(cmds))
@@ -22,17 +28,30 @@ def _run_install_cmds(cmds, command_name):
 
 # Temporary workaround to reconstruct the python environment in training phase.
 # Should deprecate when Module team support reading the conda.yaml in Model Folder and build image according to that
-class DependencyManager(object):
+class RemoteDependencyManager(object):
     
-    def __init__(self):
-        self.conda_channels = []
-        self.conda_dependencies = []
-        self.pip_dependencies = []
-        self.local_dependency_path = None
+    def __init__(
+        self,
+        additional_conda_channels=[],
+        additional_conda_deps=[],
+        additional_pip_deps=[]
+        ):
+        self.conda_channels = ["defaults"] + additional_conda_channels
+        self.conda_dependencies = [f"python={PYTHON_VERSION}"] + additional_conda_deps
+        self.pip_dependencies = additional_pip_deps
+
+    def save(self, artifact_path, exist_ok=True):
+        conda_env = {
+            "name": constants.CONDA_ENV_NAME,
+            "channels": self.conda_channels,
+            "dependencies": self.conda_dependencies + [{"pip": self.pip_dependencies}]
+        }
+        conda_file_path = os.path.join(artifact_path, constants.CONDA_FILE_NAME)
+        with open(conda_file_path, "w") as f:
+            yaml.safe_dump(conda_env, stream=f, default_flow_style=False) 
+        logger.info(f"Saved conda to {conda_file_path}")
     
-    def load(self, conda_yaml_path, local_dependency_path=None):
-        logger.info(f"local_dependency_path = {local_dependency_path}")
-        self.local_dependency_path = local_dependency_path
+    def load(self, conda_yaml_path):
         logger.info(f"Trying to load conda dependency from {conda_yaml_path}")
         with open(conda_yaml_path) as fp:
             config = yaml.safe_load(fp)
@@ -54,12 +73,7 @@ class DependencyManager(object):
         logger.info(f"conda_dependencies = {', '.join(self.conda_dependencies)}")
         logger.info(f"pip_dependencies = {', '.join(self.pip_dependencies)}")
 
-
     def install(self):
-        if self.local_dependency_path:
-            sys.path.append(self.local_dependency_path)
-            logger.info(f"Appended {self.local_dependency_path} to sys.path")
-
         if not self.conda_dependencies:
             logger.info("No conda denpendencies to install")
         else:

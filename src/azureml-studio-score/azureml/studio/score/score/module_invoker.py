@@ -35,7 +35,6 @@ def entrance(trained_model: str, dataset: str, scored_dataset: str, append_score
     logger.info(f"input_df =\n{input_df}")
     logger.info(f"output_df =\n{output_df}")
     logger.info(f"dumping to DFD {scored_dataset}")
-    ioutils.save_parquet1(output_df, scored_dataset)
     ioutils.save_dfd(output_df, scored_dataset)
 
 

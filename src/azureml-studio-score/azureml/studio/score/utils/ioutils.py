@@ -17,16 +17,6 @@ def read_parquet(data_path):
     logger.info("parquet read completed.")
     return df
 
-def save_parquet1(df, output_path, writeCsv= False):
-  from azureml.studio.modulehost.handler.port_io_handler import OutputHandler
-  from azureml.studio.common.datatypes import DataTypes
-  from azureml.studio.common.datatable.data_table import DataTable
-  os.makedirs(output_path, exist_ok=True)
-  #requires alghost 70
-  OutputHandler.handle_output(DataTable(df), output_path, 'data.dataset.parquet', DataTypes.DATASET)
-  save_datatype(output_path)
-  logger.info(f"saved parquet to {output_path}, columns {df.columns}")
-
 def transform_to_list(root):
     if isinstance(root, np.ndarray):
         root = root.tolist()

@@ -119,3 +119,32 @@ AzureMLModel
           ├──model.py
           └──entry.py
 ```
+
+Custom
+
+~~~yaml
+flavor:
+  name: generic
+  model_file: subdirectory
+  model_module: xxx
+  model_class: xxx
+conda_file: conda.yaml
+local_dependencies:
+- local_dependencies/train_by_module
+inputs:
+- name: x
+  type: ndarray
+  default: [10]
+  description: regression feature
+  optional: false
+outputs:
+- name: y
+  type: float
+  description: regression result
+serving_config:
+  gpu_support: true
+  cpu_core_num: 0.1
+  memory_in_GB: 0.5
+model_spec_version: 0.0.83
+time_created: '2019-10-01 00:00:00.000000'
+~~~

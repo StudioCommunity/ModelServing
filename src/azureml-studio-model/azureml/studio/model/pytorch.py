@@ -28,6 +28,10 @@ MODEL_FILE_NAME = "model.pkl"
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
+def save(pytorch_model):
+    pass
+    
+
 class PytorchFlavor(Flavor):
 
     def __init__(

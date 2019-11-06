@@ -73,7 +73,7 @@ def generate_model_spec(
     time_created: datetime = datetime.now()
 ):
     spec = {
-        "flavor" : flavor.to_dict(),
+        "flavor" : flavor,
         "conda_file": conda_file_path,
         "local_dependencies": local_dependencies,
         "time_created": time_created.strftime("%Y-%m-%d %H:%M:%S")

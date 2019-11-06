@@ -38,7 +38,7 @@ class PytorchFlavor(Flavor):
         serialization_format: str = "cloudpickle",
         serialization_library_version: str = cloudpickle.__version__):
         self.name = "pytorch"
-        self.model_file_path = model_file_path
+        self.model_file = model_file_path
         self.pytorch_version = pytorch_version
         self.torchvision_version = torchvision_version
         self.serialization_format = serialization_format
@@ -165,7 +165,7 @@ def _load_from_saveddict(model_path, pytorch_conf):
 def load(artifact_path="./AzureMLModel") -> torch.nn.Module:
     model_conf = utils.get_configuration(artifact_path)
     pytorch_conf = model_conf["flavor"]
-    model_path = os.path.join(artifact_path, pytorch_conf['model_file_path'])
+    model_path = os.path.join(artifact_path, pytorch_conf['model_file'])
     serializer = pytorch_conf.get('serialization_format', 'cloudpickle')
     if serializer == 'cloudpickle':
         model = _load_from_cloudpickle(model_path, pytorch_conf)

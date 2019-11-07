@@ -27,4 +27,6 @@ class BayesianModel(GenericModel):
 
     def predict(self, df):
         result = self.model.predict(df.to_numpy())
-        return pd.DataFrame(data=result)
+        result_df = pd.DataFrame(data=result, columns=["score"])
+        result_df.columns = result_df.columns.astype(str)
+        return result_df

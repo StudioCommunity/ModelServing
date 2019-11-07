@@ -9,6 +9,7 @@ Train anywhere, serve here.
 | Name | Type | Required | Description |
 | ---- | ---- | -------- | ----------- |
 | flavor | [Flavor](#flavor) | Yes | Description of model source information. Reference 'Flavor' table. |
+| model_file | string | Yes    | The path to model(file or directory) |
 | conda_file | string | Yes    | The path to conda.yaml |
 | local_dependencies | list | No | The path contains the python packages required to load the model, will be append to sys.path when loading |
 | inputs | list<[Input](#Input)> | No | Defines input parameters of the model. Reference: 'Input Definition' table. |
@@ -22,15 +23,12 @@ Train anywhere, serve here.
 
 Describe the information so that we can load the model.
 
-### Pytorch
+### Custom
 
 | Name        | Type    | Required | Description                                                  |
 | ----------- | ------- | -------- | ------------------------------------------------------------ |
-| name | string  | Yes      |  A specification of model type. Could be platform name (Tensorflow, etc.), library name (Pytorch, Sklearn, etc.) or format name (Onnx, etc.) |
-| model_file | string  | Yes      | Path of the serialized model file |
-| pytorch_version | string  | Yes      | Version of pytorch |
-| serialization_format | string | Yes | The format used to dump the model |
-| serialization_library_version | string  | No       | The version of the serialization library. |
+| class | string  | Yes      | class name of the custom model class which inherits GenericModel |
+| module | string  | Yes      | python module path to the module in which contains the class definition |
 
 ## Input
 
@@ -78,12 +76,8 @@ model_spec.yaml:
 
 ~~~yaml
 flavor:
-  name: pytorch
-  model_file: model.pkl
-  pytorch_version: 1.1.0
-  torchvision_version: 0.4.0
-  serialization_format: cloudpickle
-  serialization_library_version: 1.1.2
+  module: azureml.studio.model.pytorch.cloudpickle
+  class: PytorchCloudPickle
 conda_file: conda.yaml
 local_dependencies:
 - local_dependencies/train_by_module
@@ -124,10 +118,9 @@ Custom
 
 ~~~yaml
 flavor:
-  name: generic
-  model_file: subdirectory
-  model_module: xxx
-  model_class: xxx
+  module: module.path.to.cutom_model_definition
+  class: CustomModelClassWhichInherentsGenericModel
+model_file: model
 conda_file: conda.yaml
 local_dependencies:
 - local_dependencies/train_by_module
@@ -148,3 +141,20 @@ serving_config:
 model_spec_version: 0.0.83
 time_created: '2019-10-01 00:00:00.000000'
 ~~~
+
+folder structure:
+
+```folder
+AzureMLModel
+├──model_spec.yaml
+├──conda.yaml
+├──model
+|  └──data.ilearner
+└──local_dependencies
+   └──local_module_1
+      └──local_module_name
+          ├──__init__.py
+          ├──model.py
+          └──entry.py
+```
+

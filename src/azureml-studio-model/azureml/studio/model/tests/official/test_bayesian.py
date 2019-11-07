@@ -7,8 +7,8 @@ from sklearn.linear_model import BayesianRidge
 
 from bayesian_model import BayesianModel
 
-# from azureml.studio.model.package_info import PROJECT_ROOT_PATH
-from azureml.studio.model.io import save_generic_model
+from azureml.studio.model.package_info import PROJECT_ROOT_PATH
+from azureml.studio.model.io import save_generic_model, load_generic_model
 
 
 def test_save_load():
@@ -26,18 +26,27 @@ def test_save_load():
 
     clf = BayesianRidge(compute_score=True)
     clf.fit(X, y)
-
-    # score_test_path = os.path.join(PROJECT_ROOT_PATH, "azureml-studio-score/azureml/studio/score/score/tests/official")
-    # model_save_path = os.path.join(score_test_path, "InputPort1")
-    # dataset_save_path = os.path.join(score_test_path, "InputPort2", "data.dataset.parquet")
+    y_hat = clf.predict(X)
 
     model = BayesianModel(clf)
+    model.conda = {
+        "name": "test",
+        "channels": "defaults",
+        "dependencies": [{"pip": ["scipy", "sklearn"]}]
+    }
 
-    # save_generic_model(model, path=model_save_path)
-    save_generic_model(model)
+    score_test_path = os.path.join(PROJECT_ROOT_PATH, "azureml-studio-score/azureml/studio/score/score/tests/official")
+    model_save_path = os.path.join(score_test_path, "InputPort1")
+    dataset_save_path = os.path.join(score_test_path, "InputPort2", "data.dataset.parquet")
 
-    # df = pd.DataFrame(data=X)
-    # if os.path.exists(dataset_save_path):
-    #     os.remove(dataset_save_path)
-    # df.columns = df.columns.astype(str)
-    # df.to_parquet(dataset_save_path, engine="pyarrow")
+    save_generic_model(model, path=model_save_path)
+
+    df = pd.DataFrame(data=X)
+    if os.path.exists(dataset_save_path):
+        os.remove(dataset_save_path)
+    df.columns = df.columns.astype(str)
+    df.to_parquet(dataset_save_path, engine="pyarrow")
+    
+    loaded_generic_model = load_generic_model(model_save_path)
+    result_df = loaded_generic_model.predict(df)
+    assert (result_df.to_numpy() == y_hat.reshape(-1, 1)).all()

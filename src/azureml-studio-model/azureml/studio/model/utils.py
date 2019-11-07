@@ -2,6 +2,7 @@ import os
 import json
 import shutil
 import sys
+import importlib
 
 import yaml
 from datetime import datetime
@@ -64,6 +65,7 @@ def save_conda_env(path, conda_env):
 
 def generate_model_spec(
     flavor: Flavor,
+    model_path: str = constants.CUSTOM_MODEL_DIRECTORY,
     conda_file_path: str = constants.CONDA_FILE_NAME,
     local_dependencies: list = [],
     inputs: list = None,
@@ -74,6 +76,7 @@ def generate_model_spec(
 ):
     spec = {
         "flavor" : flavor,
+        "model_path": model_path,
         "conda_file": conda_file_path,
         "local_dependencies": local_dependencies,
         "time_created": time_created.strftime("%Y-%m-%d %H:%M:%S")
@@ -147,3 +150,10 @@ def _copytree_include(src_dir, dst_dir, include_extensions: tuple = (), exist_ok
         dst_file_path = os.path.join(dst_dir, file_path)
         os.makedirs(os.path.dirname(dst_file_path), exist_ok=True)
         shutil.copy(src_file_path, dst_file_path)
+
+
+def get_model_class_by_flavor(flavor: dict):
+    module_path = flavor["module"]
+    class_name = flavor["class"]
+    module = importlib.import_module(module_path)
+    return getattr(module, class_name)

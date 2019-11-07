@@ -23,16 +23,20 @@ class ModelWrapper(object):
     def save(
         cls,
         model: GenericModel,
-        path: str ="./AzureMLModel",
-        exist_ok: bool = True
+        artifact_path: str = "./AzureMLModel",
+        model_relative_to_artifact_path : str = "model",
+        overwrite_if_exists: bool = True
         ):
-        os.makedirs(path, exist_ok=exist_ok)
+        os.makedirs(artifact_path, exist_ok=overwrite_if_exists)
+        model_path = os.path.join(artifact_path, model_relative_to_artifact_path)
+        model.save(model_path, overwrite_if_exists=overwrite_if_exists)
 
         # TODO: Provide the option to save result of "conda env export"
-        if model.conda is not None:
-            utils.save_conda_env(path, model.conda)
-        else:
+        if model.conda:
             # TODO: merge additional_conda_env with conda_env
+            utils.save_conda_env(artifact_path, model.conda)
+        else:
+            # TODO: dump local conda env
             pass
            
         # In the cases where customer manually modified sys.path (e.g. sys.path.append("..")), 
@@ -41,17 +45,19 @@ class ModelWrapper(object):
             model.local_dependencies = [os.path.abspath(sys.path[0])]
             logger.info(f"using sys.path[0] = {sys.path[0]} as local_dependency_path")
         local_dependency_manager = LocalDependencyManager(model.local_dependencies)
-        local_dependency_manager.save(path)
+        local_dependency_manager.save(artifact_path)
 
         model_spec = utils.generate_model_spec(
             flavor=model.flavor,
+            model_path=model_relative_to_artifact_path,
             conda_file_path=constants.CONDA_FILE_NAME,
             local_dependencies=local_dependency_manager.copied_local_dependencies,
             inputs=model.inputs
         )
-        utils.save_model_spec(path, model_spec)
+        utils.save_model_spec(artifact_path, model_spec)
 
 
+    @classmethod
     def load(self, artifact_path="./AzureMLModel", install_dependencies=False) -> GenericModel:
         """Load model as GenericModel
         
@@ -67,9 +73,10 @@ class ModelWrapper(object):
             GenericModel -- [description]
         """
         model_spec_path = os.path.join(artifact_path, constants.MODEL_SPEC_FILE_NAME)
-        logger.info(f'MODEL_FOLDER: {os.listdir(artifact_path)}')
+        logger.info(f"MODEL_FOLDER: {os.listdir(artifact_path)}")
         with open(model_spec_path) as fp:
             config = yaml.safe_load(fp)
+            logger.info(f"Successfully loaded {model_spec_path}")
         
         if install_dependencies:
             conda_yaml_path = os.path.join(artifact_path, config["conda_file"])
@@ -83,22 +90,7 @@ class ModelWrapper(object):
             remote_dependency_manager.load(conda_yaml_path)
             remote_dependency_manager.install()
         
-        model_conf = utils.get_configuration(artifact_path)
-        flavor_name = model_conf["flavor"]["name"].lower()
-        if flavor_name == "pytorch":
-            from .pytorch import _load_generic_model
-            return _load_generic_model(artifact_path)
-        elif flavor_name == "tensorflow":
-            pass
-        elif flavor_name == "sklearn":
-            pass
-        elif flavor_name == "keras":
-            pass
-        elif flavor_name == "python":
-            pass
-        elif flavor_name == "onnx":
-            pass
-        else:
-            msg = f"Not Implemented: flavor {flavor_name} not supported"
-            logger.info(msg)
-            raise ValueError(msg)
+        flavor = config["flavor"]
+        model_class = utils.get_model_class_by_flavor(flavor)
+        model_path = os.path.join(artifact_path, config["model_path"])
+        return model_class.load(model_path)

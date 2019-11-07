@@ -5,22 +5,26 @@ class GenericModel(object):
     """Interface class to be inherited
     """
 
-    _flavor = None
     _conda = None
     _local_dependencies = None
     _inputs = None
     _outputs = None
     _serving_config = None
 
-    @property
-    def flavor(self):
+    class classproperty(property):
+
+        def __get__(self, obj, objtype=None):
+            return super().__get__(objtype)
+
+    @classproperty
+    def flavor(cls):
         return {
-            "module": self.__class__.__module__,
-            "class": self.__class__
+            "module": cls.__module__,
+            "class": cls.__name__
         }
 
     @abstractmethod
-    def save(self, save_to):
+    def save(self, save_to, overwrite_if_exists=True):
         pass
 
     @abstractclassmethod

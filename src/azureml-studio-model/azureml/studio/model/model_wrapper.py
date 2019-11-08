@@ -16,9 +16,6 @@ logger = get_logger(__name__)
 
 class ModelWrapper(object):
 
-    def __init__(self):
-        pass
-
     @classmethod
     def save(
         cls,

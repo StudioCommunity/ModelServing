@@ -71,7 +71,6 @@ def generate_model_spec(
     inputs: list = None,
     outputs: list = None,
     serving_config: ResourceConfig = None,
-    alghost_version: str = None,
     time_created: datetime = datetime.now()
 ):
     spec = {
@@ -87,8 +86,6 @@ def generate_model_spec(
         spec["outputs"] = [model_output.to_dict() for model_output in outputs]
     if serving_config:
         spec["serving_config"] = serving_config.to_dict()
-    if alghost_version:
-        spec["alghost_version"] = alghost_version
     logger.info(f"spec = {spec}")
     return spec
 
@@ -98,7 +95,7 @@ def save_model_spec(path, spec):
     with open(os.path.join(path, constants.MODEL_SPEC_FILE_NAME), 'w') as fp:
         yaml.dump(spec, fp, default_flow_style=False)
     fn = os.path.join(path, constants.MODEL_SPEC_FILE_NAME)
-    print(f'SAVED MODEL_SPEC: {fn}')
+    logger.info(f'SAVED MODEL_SPEC: {fn}')
 
 
 def generate_ilearner_files(path):

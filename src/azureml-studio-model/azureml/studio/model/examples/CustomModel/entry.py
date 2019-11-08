@@ -5,7 +5,7 @@ import numpy as np
 from scipy import stats
 from sklearn.linear_model import BayesianRidge
 
-from bayesian_model import BayesianModel
+from custom_model import CustomModel
 
 from azureml.studio.model.io import save_generic_model, load_generic_model
 
@@ -27,14 +27,14 @@ def main():
     clf.fit(X, y)
     y_hat = clf.predict(X)
 
-    model = BayesianModel(clf)
+    model = CustomModel(clf)
     model.conda = {
         "name": "test",
         "channels": "defaults",
         "dependencies": [{"pip": ["scipy", "sklearn"]}]
     }
 
-    save_generic_model(model)
+    save_generic_model(model, path="./AzureMLModel")
     loaded_generic_model = load_generic_model()
 
     df = pd.DataFrame(data=X)

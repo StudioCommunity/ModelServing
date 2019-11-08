@@ -6,12 +6,13 @@ import pickle
 from azureml.studio.model.generic import GenericModel
 
 
-class BayesianModel(GenericModel):
+class CustomModel(GenericModel):
     
     def __init__(self, model):
         self.model = model
         
     def save(self, save_to, overwrite_if_exists=True):
+        print("Called BayesianModel.save")
         os.makedirs(save_to, exist_ok=overwrite_if_exists)
         model_path = os.path.join(save_to, "data.ilearner")
         with open(model_path, "wb") as fp:

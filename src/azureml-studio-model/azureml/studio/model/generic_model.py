@@ -11,18 +11,6 @@ class GenericModel(object):
     _outputs = None
     _serving_config = None
 
-    class classproperty(property):
-
-        def __get__(self, obj, objtype=None):
-            return super().__get__(objtype)
-
-    @classproperty
-    def flavor(cls):
-        return {
-            "module": cls.__module__,
-            "class": cls.__name__
-        }
-
     @abstractmethod
     def save(self, save_to, overwrite_if_exists=True):
         pass
@@ -83,4 +71,12 @@ class GenericModel(object):
     @serving_config.setter
     @abstractmethod
     def serving_config(self, serving_config):
+        self._serving_config = serving_config
+
+    @abstractmethod
+    def init_properties(self, conda, local_dependencies, inputs, outputs, serving_config):
+        self._conda = conda
+        self._local_dependencies = local_dependencies
+        self._inputs = inputs
+        self._outputs = outputs
         self._serving_config = serving_config

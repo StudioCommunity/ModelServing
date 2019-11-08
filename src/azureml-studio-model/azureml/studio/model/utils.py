@@ -9,7 +9,6 @@ from datetime import datetime
 
 from . import constants
 from .resource_config import ResourceConfig
-from .flavor import Flavor
 from .logger import get_logger
 
 logger = get_logger(__name__)
@@ -64,7 +63,7 @@ def save_conda_env(path, conda_env):
 
 
 def generate_model_spec(
-    flavor: Flavor,
+    flavor: dict,
     model_path: str = constants.CUSTOM_MODEL_DIRECTORY,
     conda_file_path: str = constants.CONDA_FILE_NAME,
     local_dependencies: list = [],
@@ -147,10 +146,3 @@ def _copytree_include(src_dir, dst_dir, include_extensions: tuple = (), exist_ok
         dst_file_path = os.path.join(dst_dir, file_path)
         os.makedirs(os.path.dirname(dst_file_path), exist_ok=True)
         shutil.copy(src_file_path, dst_file_path)
-
-
-def get_model_class_by_flavor(flavor: dict):
-    module_path = flavor["module"]
-    class_name = flavor["class"]
-    module = importlib.import_module(module_path)
-    return getattr(module, class_name)

@@ -1,7 +1,8 @@
 import os
 import sys
 
-from .generic import GenericModel
+from .generic_model import GenericModel
+from .builtin_model import BuiltinModel
 
 import yaml
 
@@ -10,6 +11,7 @@ from . import utils
 from .local_dependency import LocalDependencyManager
 from .remote_dependency import RemoteDependencyManager
 from .logger import get_logger
+from .model_factory import ModelFactory
 
 logger = get_logger(__name__)
 
@@ -44,12 +46,20 @@ class ModelWrapper(object):
         local_dependency_manager = LocalDependencyManager(model.local_dependencies)
         local_dependency_manager.save(artifact_path)
 
+        if not isinstance(model, BuiltinModel):
+            model.flavor = {
+                "name": constants.CUSTOM_MODEL_FLAVOR_NAME,
+                "module": model.__class__.__module__,
+                "class": model.__class__.__name__
+            }
+
         model_spec = utils.generate_model_spec(
             flavor=model.flavor,
             model_path=model_relative_to_artifact_path,
             conda_file_path=constants.CONDA_FILE_NAME,
             local_dependencies=local_dependency_manager.copied_local_dependencies,
-            inputs=model.inputs
+            inputs=model.inputs,
+            outputs=model.outputs
         )
         utils.save_model_spec(artifact_path, model_spec)
 
@@ -88,6 +98,5 @@ class ModelWrapper(object):
             remote_dependency_manager.install()
         
         flavor = config["flavor"]
-        model_class = utils.get_model_class_by_flavor(flavor)
-        model_path = os.path.join(artifact_path, config["model_path"])
-        return model_class.load(model_path)
+        raw_model_path = os.path.join(artifact_path, config["model_path"])
+        model = ModelFactory.load_model(raw_model_path, flavor, inputs)

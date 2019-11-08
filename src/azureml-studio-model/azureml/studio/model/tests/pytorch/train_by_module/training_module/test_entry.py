@@ -7,7 +7,6 @@ import pandas as pd
 import pyarrow.parquet as pq
 import torch
 from torch.autograd import Variable
-from azureml.studio.model.package_info import PROJECT_ROOT_PATH
 import azureml.studio.model.pytorch
 import azureml.studio.model.generic
 

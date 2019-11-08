@@ -43,7 +43,7 @@ steps:
 - bash: |
     source activate loader_env
     cd src/azureml-studio-score 
-    python -m pytest -s --ignore=azureml/studio/score/score/tests/pytorch/InputPort1/ --ignore=azureml/studio/score/score/tests/pytorch/ --ignore=azureml/studio/score/score/tests/official/InputPort1/
+    python -m pytest -s --ignore_glob='InputPort1/' --ignore=azureml/studio/score/score/tests/pytorch/
   displayName: 'PyTest azure-studio-score'
 
 # Save build number to file

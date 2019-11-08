@@ -1,13 +1,13 @@
 import os
+from os.path import dirname, abspath
 
 import pandas as pd
 import numpy as np
 from scipy import stats
 from sklearn.linear_model import BayesianRidge
 
-from custom_model import CustomModel
+from my_custom_model import MyCustomModel
 
-from azureml.studio.model.package_info import PROJECT_ROOT_PATH
 from azureml.studio.model.io import save_generic_model, load_generic_model
 
 
@@ -28,24 +28,18 @@ def test_save_load():
     clf.fit(X, y)
     y_hat = clf.predict(X)
 
-    model = CustomModel(clf)
+    model = MyCustomModel(clf)
     model.conda = {
         "name": "test",
         "channels": "defaults",
         "dependencies": [{"pip": ["scipy", "sklearn"]}]
     }
 
-    score_test_path = os.path.join(PROJECT_ROOT_PATH, "azureml-studio-score/azureml/studio/score/score/tests/official")
-    model_save_path = os.path.join(score_test_path, "InputPort1")
-    dataset_save_path = os.path.join(score_test_path, "InputPort2", "data.dataset.parquet")
+    model_save_path = os.path.join(dirname(abspath(__file__)), "AzureMLModel")
 
     save_generic_model(model, path=model_save_path)
 
     df = pd.DataFrame(data=X)
-    if os.path.exists(dataset_save_path):
-        os.remove(dataset_save_path)
-    df.columns = df.columns.astype(str)
-    df.to_parquet(dataset_save_path, engine="pyarrow")
     
     loaded_generic_model = load_generic_model(model_save_path)
     result_df = loaded_generic_model.predict(df)

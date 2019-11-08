@@ -5,7 +5,7 @@ import pandas as pd
 import torch
 
 from ..logger import get_logger
-from ..generic import GenericModel
+from ..generic_model import GenericModel
 from ..model_input import ModelInput
 from ..model_output import ModelOutput
 
@@ -27,27 +27,35 @@ def get_input_args(pytorch_model):
         logger.warning("Model without 'forward' function cannot be used to predict", exc_info=True)
 
 
-class PytorchBase(GenericModel):
-    
-    def __init__(self, model, is_gpu=False, input_args=None):
-        self.device = "cuda" if is_gpu and torch.cuda.is_available() else "cpu"
-        self.model = model.to(self.device)
-        self.input_args = input_args if input_args else get_input_args(model)
-        self.inputs = [ModelInput(arg, "ndarray") for arg in self.input_args]
-      
-    def predict(self, df):
-        logger.info(f"Device type = {self.device}, input_args = {self.input_args}")
-        output = []
+class PytorchBaseModel(GenericModel):
 
+    raw_model = None
+    
+    def __init__(self, raw_model, is_cuda=False):
+        self._is_cuda = is_cuda
+        self._device = "cuda" if is_cuda and torch.cuda.is_available() else "cpu"
+        self.raw_model = raw_model.to(self._device)
+        if is_cuda and not torch.cuda.is_available():
+            logger.warning("The model is saved on gpu but loaded on cpu because cuda is not available")
+
+    def predict(self, df):
+        outputs = []
         with torch.no_grad():
             logger.info(f"input_df =\n {df}")
             # TODO: Consolidate serveral rows together for efficiency
             for _, row in df.iterrows():
                 input_params = list(map(to_tensor, row[self.input_args]))
-                predicted = self.model(*input_params)
-                output.append(predicted.tolist())
+                predicted = self.raw_model(*input_params)
+                outputs.append(predicted.tolist())
 
-        output_df = pd.DataFrame(output)
+        output_df = pd.DataFrame(outputs)
         output_df.columns = [f"Score_{i}" for i in range(0, output_df.shape[1])]
         logger.info(f"output_df =\n{output_df}")
         return output_df
+    
+    def init_input_args(self):
+        if self.inputs:
+            self.input_args = [model_input.name for model_input in inputs]
+        else:
+            self.input_args = get_input_args(self.raw_model)
+        

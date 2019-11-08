@@ -27,8 +27,17 @@ Describe the information so that we can load the model.
 
 | Name        | Type    | Required | Description                                                  |
 | ----------- | ------- | -------- | ------------------------------------------------------------ |
+| name | string  | Yes      | Custom |
 | class | string  | Yes      | class name of the custom model class which inherits GenericModel |
 | module | string  | Yes      | python module path to the module in which contains the class definition |
+
+### Pytorch
+
+| Name        | Type    | Required | Description                                                  |
+| ----------- | ------- | -------- | ------------------------------------------------------------ |
+| name | string  | Yes      |  A specification of model type. Could be platform name (Tensorflow, etc.), library name (Pytorch, Sklearn, etc.) or format name (Onnx, etc.) |
+| model_file | string  | Yes      | Path of the serialized model file |
+| serialization_method | string | Yes | The format used to dump the model |
 
 ## Input
 
@@ -76,8 +85,9 @@ model_spec.yaml:
 
 ~~~yaml
 flavor:
-  module: azureml.studio.model.pytorch.cloudpickle
-  class: PytorchCloudPickle
+  name: pytorch
+  model_file: model.pkl
+  serialization_method: cloudpickle
 conda_file: conda.yaml
 local_dependencies:
 - local_dependencies/train_by_module

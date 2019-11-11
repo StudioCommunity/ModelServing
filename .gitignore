@@ -1,5 +1,6 @@
 # Test generated model folder
 AzureMLModel
+data.dataset.parquet
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -118,3 +119,4 @@ credential.json
 
 # macOS
 .DS_Store
+src/azureml-studio-model/azureml/studio/model/tests/custom/data.dataset.parquet

@@ -9,7 +9,7 @@ from torch.autograd import Variable
 
 from azureml.studio.model.io import save_pytorch_model, load_generic_model
 
-from .model import LinearRegression
+from model import LinearRegression
 
 
 def main():

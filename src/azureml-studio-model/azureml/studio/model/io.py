@@ -45,8 +45,18 @@ def save_pytorch_model(
     overwrite_if_exists: bool = True
 ):
     from .pytorch.cloudpickle import PytorchCloudPickleModel
+    import torch
+    import torchvision
+    import cloudpickle
     model = PytorchCloudPickleModel(pytorch_model, next(pytorch_model.parameters()).is_cuda)
     logger.info(f"Saving model with is_cuda={next(pytorch_model.parameters()).is_cuda}")
+    # TODO: Move this to class attributes
+    if not conda:
+        conda = {
+            "name": constants.CONDA_ENV_NAME,
+            "channels": ["defaults", "pytorch"],
+            "dependencies": [f"pytorch={torch.__version__}", f"torchvision={torchvision.__version__}"] + [{"pip": [f"cloudpickle=={cloudpickle.__version__}"]}]
+        }
     generic_model = GenericModel(
         core_model = model,
         conda = conda,

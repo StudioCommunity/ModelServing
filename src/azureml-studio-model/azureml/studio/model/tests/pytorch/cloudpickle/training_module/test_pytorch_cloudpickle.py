@@ -1,9 +1,10 @@
 import os
 from os.path import dirname, abspath
 
-import pytest
 import numpy as np
 import pandas as pd
+import pyarrow.parquet
+import pytest
 import torch
 from torch.autograd import Variable
 
@@ -37,9 +38,10 @@ def test_save_load():
         loss.backward()
         optimizer.step()
 
-    model_save_path = os.path.join(dirname(abspath(__file__)), "AzureMLModel")
+    model_save_path = os.path.join(dirname(dirname(abspath(__file__))), "AzureMLModel")
+    local_dependencies = [dirname(dirname(abspath(__file__)))]
 
-    save_pytorch_model(model, path=model_save_path)
+    save_pytorch_model(model, path=model_save_path, local_dependencies=local_dependencies)
     loaded_generic_model = load_generic_model(model_save_path)
     df = pd.DataFrame({"x": [[10.0], [11.0], [12.0]]})
     predict_result = loaded_generic_model.predict(df)
@@ -47,3 +49,6 @@ def test_save_load():
 
     loaded_pytorch_model = loaded_generic_model.raw_model
     assert isinstance(loaded_pytorch_model, torch.nn.Module)
+
+    data_save_path = os.path.join(dirname(dirname(abspath(__file__))), "data.dataset.parquet")
+    df.to_parquet(data_save_path, engine="pyarrow")

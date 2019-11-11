@@ -1,8 +1,9 @@
 import os
 from os.path import dirname, abspath
 
-import pandas as pd
 import numpy as np
+import pandas as pd
+import pyarrow.parquet
 from scipy import stats
 from sklearn.linear_model import BayesianRidge
 
@@ -36,11 +37,16 @@ def test_save_load():
     }
 
     model_save_path = os.path.join(dirname(abspath(__file__)), "AzureMLModel")
+    local_dependencies = [dirname(abspath(__file__))]
 
-    save_generic_model(model, path=model_save_path, conda=conda)
+    save_generic_model(model, path=model_save_path, conda=conda, local_dependencies=local_dependencies)
 
     df = pd.DataFrame(data=X)
+    df.columns = df.columns.astype(str)
     
     loaded_generic_model = load_generic_model(model_save_path)
     result_df = loaded_generic_model.predict(df)
     assert (result_df.to_numpy() == y_hat.reshape(-1, 1)).all()
+
+    data_save_path = os.path.join(dirname(abspath(__file__)), "data.dataset.parquet")
+    df.to_parquet(data_save_path, engine="pyarrow")

@@ -92,10 +92,6 @@ class GenericModel(object):
             logger.info(f"Successfully loaded {model_spec_path}")
         
         flavor = config["flavor"]
-        raw_model_class = ModelFactory.get_model_class(flavor)
-        raw_model_path = os.path.join(artifact_path, config["model_path"])
-        core_model = raw_model_class.load(raw_model_path)
-
         conda = None
         inputs = None
         outputs = None
@@ -107,7 +103,8 @@ class GenericModel(object):
             with open(conda_yaml_path) as fp:
                 conda = yaml.safe_load(fp)
                 logger.info(f"Successfully loaded {conda_yaml_path}")
-        local_dependencies = config.get("local_dpendencies", None)
+        local_dependencies = config.get("local_dependencies", None)
+        logger.info(f"local_dependencies = {local_dependencies}")
         if config.get("inputs", None):
             inputs = [ModelInput.from_dict(model_input) for model_input in config["inputs"]]
         if config.get("outputs", None):
@@ -116,6 +113,7 @@ class GenericModel(object):
             serving_config = ResourceConfig.from_dict(config["serving_config"])
 
         if install_dependencies:
+            logger.info("Installing dependencies")
             if conda:
                 remote_dependency_manager = RemoteDependencyManager()
                 remote_dependency_manager.load(conda_yaml_path)
@@ -125,7 +123,11 @@ class GenericModel(object):
                 local_dependency_manager = LocalDependencyManager()
                 local_dependency_manager.load(artifact_path, local_dependencies)
                 local_dependency_manager.install()
-        
+
+        raw_model_class = ModelFactory.get_model_class(flavor)
+        raw_model_path = os.path.join(artifact_path, config["model_path"])
+        core_model = raw_model_class.load(raw_model_path)
+
         if isinstance(core_model, BuiltinModel):
             logger.info("Config BuiltinModel by flavor and inputs")
             core_model.config(flavor, inputs)

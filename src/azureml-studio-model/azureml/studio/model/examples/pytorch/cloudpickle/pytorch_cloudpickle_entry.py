@@ -12,7 +12,7 @@ from azureml.studio.model.io import save_pytorch_model, load_generic_model
 from .model import LinearRegression
 
 
-def test_save_load():
+def main():
     x_values = [i for i in range(11)]
     x_train = np.array(x_values, dtype=np.float32)
     x_train = x_train.reshape(-1, 1)
@@ -37,7 +37,7 @@ def test_save_load():
         loss.backward()
         optimizer.step()
 
-    model_save_path = os.path.join(dirname(abspath(__file__)), "AzureMLModel")
+    model_save_path = "./AzureMLModel"
 
     save_pytorch_model(model, path=model_save_path)
     loaded_generic_model = load_generic_model(model_save_path)
@@ -47,3 +47,6 @@ def test_save_load():
 
     loaded_pytorch_model = loaded_generic_model.raw_model
     assert isinstance(loaded_pytorch_model, torch.nn.Module)
+
+if __name__ == "__main__":
+    main()

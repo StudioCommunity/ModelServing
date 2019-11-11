@@ -1,6 +1,8 @@
 from . import constants
 from .generic_model import GenericModel
+from .logger import get_logger
 
+logger = get_logger(__name__)
 
 def save_generic_model(
     model,

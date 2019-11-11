@@ -141,6 +141,6 @@ class GenericModel(object):
     @property
     def raw_model(self):
         if isinstance(self.core_model, BuiltinModel):
-            self.core_model.raw_model
+            return self.core_model.raw_model
         else:
             return self.core_model

@@ -21,7 +21,7 @@ steps:
 
 - script: |
     cd src/azureml-studio-model
-    python -m pytest -s --ignore=azureml/studio/model/tests/pytorch
+    python -m pytest -s
   displayName: 'PyTest azure-studio-model'
 
 - bash: conda create --yes --quiet --name loader_env

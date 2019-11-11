@@ -15,3 +15,11 @@ class ModelOutput(object):
 
     def to_dict(self):
         return self.__dict__
+
+    @classmethod
+    def from_dict(cls, value_dict):
+        return cls(
+            name=value_dict.get("name", None),
+            value_type=value_dict.get("value_type", None),
+            description=value_dict.get("description", None)
+        )

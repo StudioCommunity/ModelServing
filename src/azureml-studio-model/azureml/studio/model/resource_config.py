@@ -16,3 +16,11 @@ class ResourceConfig(object):
 
     def to_dict(self):
         return self.__dict__
+    
+    @classmethod
+    def from_dict(cls, value_dict):
+        return cls(
+            gpu_support=value_dict.get("gpu_support", False),
+            cpu_core_num=value_dict.get("cpu_core_num", 1.0),
+            memory_in_GB=value_dict.get("memory_in_GB", 0.5)
+        )

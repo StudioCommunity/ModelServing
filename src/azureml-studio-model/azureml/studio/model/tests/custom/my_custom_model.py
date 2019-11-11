@@ -3,10 +3,10 @@ import os
 import pandas as pd
 import pickle
 
-from azureml.studio.model.generic_model import GenericModel
+from azureml.studio.model.core_model import CoreModel
 
 
-class MyCustomModel(GenericModel):
+class MyCustomModel(CoreModel):
     
     def __init__(self, model):
         self.model = model

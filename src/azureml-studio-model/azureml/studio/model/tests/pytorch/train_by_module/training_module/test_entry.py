@@ -1,14 +1,13 @@
-import sys
 import os
+from os.path import dirname, abspath
 
 import pytest
 import numpy as np
 import pandas as pd
-import pyarrow.parquet as pq
 import torch
 from torch.autograd import Variable
-import azureml.studio.model.pytorch
-import azureml.studio.model.generic
+
+from azureml.studio.model.io import save_pytorch_model, load_generic_model
 
 from .model import LinearRegression
 
@@ -38,19 +37,12 @@ def test_save_load():
         loss.backward()
         optimizer.step()
 
-    score_test_path = os.path.join(PROJECT_ROOT_PATH, "azureml-studio-score/azureml/studio/score/score/tests/pytorch")
-    model_save_path = os.path.join(score_test_path, "InputPort1")
-    dataset_save_path = os.path.join(score_test_path, "InputPort2", "data.dataset.parquet")
+    model_save_path = os.path.join(dirname(abspath(__file__)), "AzureMLModel")
 
-    azureml.studio.model.pytorch.save(model, path=model_save_path, exist_ok=True)
-
-    loaded_pytorch_model = azureml.studio.model.pytorch.load(model_save_path)
-    assert isinstance(loaded_pytorch_model, torch.nn.Module)
-
-    loaded_generic_model = azureml.studio.model.generic.load(model_save_path)
+    save_pytorch_model(model, path=model_save_path)
+    loaded_generic_model = load_generic_model(model_save_path)
     df = pd.DataFrame({"x": [[10.0], [11.0], [12.0]]})
-    if os.path.exists(dataset_save_path):
-        os.remove(dataset_save_path)
-    df.to_parquet(dataset_save_path, engine="pyarrow")
     predict_result = loaded_generic_model.predict(df)
-    assert predict_result.shape[0] == df.shape[0]
+
+    loaded_pytorch_model = load_generic_model.raw_model
+    assert isinstance(loaded_pytorch_model, torch.nn.Module)

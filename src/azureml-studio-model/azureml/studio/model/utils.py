@@ -75,10 +75,11 @@ def generate_model_spec(
     spec = {
         "flavor" : flavor,
         "model_path": model_path,
-        "conda_file": conda_file_path,
         "local_dependencies": local_dependencies,
         "time_created": time_created.strftime("%Y-%m-%d %H:%M:%S")
     }
+    if conda_file_path:
+        spec["conda_file"]: conda_file_path
     if inputs is not None:
         spec["inputs"] = [model_input.to_dict() for model_input in inputs]
     if outputs is not None:

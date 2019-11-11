@@ -4,6 +4,7 @@ MODEL_SPEC_FILE_NAME = "model_spec.yaml"
 LOCAL_DEPENDENCIES_PATH = "local_dependencies"
 CUSTOM_MODEL_DIRECTORY = "model"
 CUSTOM_MODEL_FLAVOR_NAME = "custom"
+PYTORCH_MODEL_FILE_NAME = "model.pkl"
 
 # temp solution, would remove later
 DATA_TYPE_FILE_NAME = "data_type.json"

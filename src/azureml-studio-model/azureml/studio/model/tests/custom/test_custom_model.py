@@ -29,7 +29,7 @@ def test_save_load():
     y_hat = clf.predict(X)
 
     model = MyCustomModel(clf)
-    model.conda = {
+    conda = {
         "name": "test",
         "channels": "defaults",
         "dependencies": [{"pip": ["scipy", "sklearn"]}]
@@ -37,7 +37,7 @@ def test_save_load():
 
     model_save_path = os.path.join(dirname(abspath(__file__)), "AzureMLModel")
 
-    save_generic_model(model, path=model_save_path)
+    save_generic_model(model, path=model_save_path, conda=conda)
 
     df = pd.DataFrame(data=X)
     

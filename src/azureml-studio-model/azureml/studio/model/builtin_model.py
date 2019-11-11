@@ -1,5 +1,4 @@
-from .generic_model import GenericModel
+from .core_model import CoreModel
 
-
-class BuiltinModel(GenericModel):
+class BuiltinModel(CoreModel):
     pass

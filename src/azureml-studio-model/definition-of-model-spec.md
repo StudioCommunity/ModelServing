@@ -166,4 +166,3 @@ AzureMLModel
           ├──model.py
           └──entry.py
 ```
-

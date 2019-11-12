@@ -145,4 +145,4 @@ class GenericModel(object):
         if isinstance(self.core_model, BuiltinModel):
             return self.core_model.raw_model
         else:
-            return self.core_model
+            return None

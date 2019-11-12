@@ -15,7 +15,7 @@ Train anywhere, serve here.
 | inputs | list<[Input](#Input)> | No | Defines input parameters of the model. Reference: 'Input Definition' table. |
 | outputs | list<[Output](#Output)> | No |Defines output parameters of the model. Reference: 'Output Definition' table.|
 | serving_config | [Serving Config](#serving-config) | No | Configurations to serve the model, reference 'Serving Config' table. |
-| description | string | No |The detailed information that describes this module.|
+| description | string | No | The detailed information that describes this model.|
 | model_spec_version | string | No | Version of model spec, current coincide with azureml-designer-model version |
 | time_created | datetime | No | Create time of the model folder |
 

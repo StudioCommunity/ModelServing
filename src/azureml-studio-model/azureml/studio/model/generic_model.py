@@ -88,29 +88,29 @@ class GenericModel(object):
         model_spec_path = os.path.join(artifact_path, constants.MODEL_SPEC_FILE_NAME)
         logger.info(f"MODEL_FOLDER: {os.listdir(artifact_path)}")
         with open(model_spec_path) as fp:
-            config = yaml.safe_load(fp)
+            model_spec = yaml.safe_load(fp)
             logger.info(f"Successfully loaded {model_spec_path}")
         
-        flavor = config["flavor"]
+        flavor = model_spec["flavor"]
         conda = None
         inputs = None
         outputs = None
         serving_config = None
         
         # TODO: Use auxiliary method to handle None in loaded yaml file following Module Team
-        if config.get("conda_file", None):
-            conda_yaml_path = os.path.join(artifact_path, config["conda_file"])
+        if model_spec.get("conda_file", None):
+            conda_yaml_path = os.path.join(artifact_path, model_spec["conda_file"])
             with open(conda_yaml_path) as fp:
                 conda = yaml.safe_load(fp)
                 logger.info(f"Successfully loaded {conda_yaml_path}")
-        local_dependencies = config.get("local_dependencies", None)
+        local_dependencies = model_spec.get("local_dependencies", None)
         logger.info(f"local_dependencies = {local_dependencies}")
-        if config.get("inputs", None):
-            inputs = [ModelInput.from_dict(model_input) for model_input in config["inputs"]]
-        if config.get("outputs", None):
-            outputs = [ModelInput.from_dict(model_output) for model_output in config["inputs"]]
-        if config.get("serving_config", None):
-            serving_config = ResourceConfig.from_dict(config["serving_config"])
+        if model_spec.get("inputs", None):
+            inputs = [ModelInput.from_dict(model_input) for model_input in model_spec["inputs"]]
+        if model_spec.get("outputs", None):
+            outputs = [ModelInput.from_dict(model_output) for model_output in model_spec["inputs"]]
+        if model_spec.get("serving_config", None):
+            serving_config = ResourceConfig.from_dict(model_spec["serving_config"])
 
         if install_dependencies:
             logger.info("Installing dependencies")
@@ -125,12 +125,12 @@ class GenericModel(object):
                 local_dependency_manager.install()
 
         raw_model_class = ModelFactory.get_model_class(flavor)
-        raw_model_path = os.path.join(artifact_path, config["model_path"])
+        raw_model_path = os.path.join(artifact_path, model_spec["model_path"])
         core_model = raw_model_class.load(raw_model_path)
 
         if isinstance(core_model, BuiltinModel):
             logger.info("Config BuiltinModel by flavor and inputs")
-            core_model.config(flavor, inputs)
+            core_model.config(model_spec)
 
         return cls(core_model, conda, local_dependencies, inputs, outputs, serving_config)
         

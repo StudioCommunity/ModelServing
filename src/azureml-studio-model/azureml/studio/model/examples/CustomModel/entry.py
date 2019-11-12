@@ -9,8 +9,7 @@ from custom_model import CustomModel
 
 from azureml.studio.model.io import save_generic_model, load_generic_model
 
-
-def main():
+def get_training_data():
     np.random.seed(0)
     n_samples, n_features = 10, 2
     X = np.random.randn(n_samples, n_features) 
@@ -22,7 +21,10 @@ def main():
     alpha_ = 50.
     noise = stats.norm.rvs(loc=0, scale=1. / np.sqrt(alpha_), size=n_samples)
     y = np.dot(X, w) + noise
+    return X, y
 
+def main():
+    X, y = get_training_data()
     clf = BayesianRidge(compute_score=True)
     clf.fit(X, y)
     y_hat = clf.predict(X)

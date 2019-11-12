@@ -12,8 +12,9 @@ from azureml.studio.model.io import save_pytorch_model, load_generic_model
 
 from .model import LinearRegression
 
+device = "cuda" if torch.cuda.is_available() else "cpu"
 
-def test_save_load():
+def get_training_data():
     x_values = [i for i in range(11)]
     x_train = np.array(x_values, dtype=np.float32)
     x_train = x_train.reshape(-1, 1)
@@ -22,10 +23,9 @@ def test_save_load():
     y_train = np.array(y_values, dtype=np.float32)
     y_train = y_train.reshape(-1, 1)
 
-    device = "cuda" if torch.cuda.is_available() else "cpu"
+    return x_train, y_train
 
-    model = LinearRegression(1, 1).to(device)
-    # Train
+def train(model, x_train, y_train):
     criterion = torch.nn.MSELoss() 
     optimizer = torch.optim.SGD(model.parameters(), lr=0.01)
     for _ in range(3):
@@ -37,6 +37,11 @@ def test_save_load():
         loss = criterion(outputs, labels)
         loss.backward()
         optimizer.step()
+
+def test_save_load():
+    model = LinearRegression(1, 1).to(device)
+    x_train, y_train = get_training_data()
+    train(model, x_train, y_train)
 
     model_save_path = os.path.join(dirname(dirname(abspath(__file__))), "AzureMLModel")
     local_dependencies = [dirname(dirname(abspath(__file__)))]

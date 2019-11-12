@@ -24,7 +24,8 @@ def save_generic_model(
     )
     generic_model.save(
         artifact_path=path,
-        model_relative_to_artifact_path=constants.CUSTOM_MODEL_DIRECTORY
+        model_relative_to_artifact_path=constants.CUSTOM_MODEL_DIRECTORY,
+        overwrite_if_exists=overwrite_if_exists
     )
 
 def load_generic_model(

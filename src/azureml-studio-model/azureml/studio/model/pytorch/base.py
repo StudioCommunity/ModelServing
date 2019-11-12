@@ -30,23 +30,22 @@ class PytorchBaseModel(BuiltinModel):
         "name": "pytorch",
         "is_cuda": False
     }
-    device = "cpu"
+    _device = "cpu"
    
     def __init__(self, raw_model, is_cuda=False):
         self.raw_model = raw_model
         self.flavor["is_cuda"] = is_cuda
 
-    def config(self, flavor: dict, inputs: list):
-        is_cuda = flavor.get("is_cuda", False)
+    def config(self, model_spec: dict):
+        is_cuda = model_spec["flavor"].get("is_cuda", False)
         self.flavor["is_cuda"] = is_cuda
         self._device = "cuda" if is_cuda and torch.cuda.is_available() else "cpu"
         self.raw_model.to(self._device)
-
         if is_cuda and not torch.cuda.is_available():
             logger.warning("The model is saved on gpu but loaded on cpu because cuda is not available")
 
-        if inputs:
-            self.input_args = [model_input.name for model_input in inputs]
+        if model_spec.get("inputs", None):
+            self.input_args = [model_input["name"] for model_input in model_spec["inputs"]]
         else:
             self.input_args = get_input_args(self.raw_model)
 
@@ -68,4 +67,4 @@ class PytorchBaseModel(BuiltinModel):
     def to_tensor(self, entry):
         if isinstance(entry, str):
             entry = ast.literal_eval(entry)
-        return torch.Tensor(list(entry)).to(self.device)
+        return torch.Tensor(list(entry)).to(self._device)

@@ -25,7 +25,7 @@ def test_create_score_test_cases():
             shutil.copytree(model_dir, input_port1_path)
             shutil.copy(data_file, os.path.join(input_port2_path, DATA_FILE_NAME))
 
-            entry_file_name = f"test_{relative_to_tests_root.strip('/').replace('/', '_')}.py"
+            entry_file_name = f"test_{'_'.join(os.path.split(relative_to_tests_root))}.py"
             shutil.copy(template_file_path, os.path.join(dst_test_path, entry_file_name))
 
 if __name__ == "__main__":

@@ -84,8 +84,8 @@ model_spec.yaml:
 ~~~yaml
 flavor:
   name: pytorch
-  model_file: model.pkl
   serialization_method: cloudpickle
+model_file: model.pkl
 conda_file: conda.yaml
 local_dependencies:
 - local_dependencies/train_by_module

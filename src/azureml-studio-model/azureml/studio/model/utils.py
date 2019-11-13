@@ -2,13 +2,12 @@ import os
 import json
 import shutil
 import sys
-import importlib
 
 import yaml
 from datetime import datetime
 
 from . import constants
-from .resource_config import ResourceConfig
+from .model_spec.serving_config import ServingConfig
 from .logger import get_logger
 
 logger = get_logger(__name__)
@@ -69,7 +68,7 @@ def generate_model_spec(
     local_dependencies: list = [],
     inputs: list = None,
     outputs: list = None,
-    serving_config: ResourceConfig = None,
+    serving_config: ServingConfig = None,
     time_created: datetime = datetime.now()
 ):
     spec = {

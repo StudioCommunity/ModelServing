@@ -15,6 +15,6 @@ class ModelFactory(object):
             module = importlib.import_module(module_path)
             return getattr(module, class_name)
         if flavor_name == "pytorch":
-            if flavor["serializtion_method"] == "cloudpickle":
-                from .pytorch.cloudpickle import PytorchCloudPickleModel
+            if flavor["serialization_method"] == "cloudpickle":
+                from .builtin_models.pytorch.cloudpickle import PytorchCloudPickleModel
                 return PytorchCloudPickleModel

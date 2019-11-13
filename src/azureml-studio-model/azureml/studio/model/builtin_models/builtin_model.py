@@ -1,5 +1,6 @@
 from abc import abstractmethod
-from .core_model import CoreModel
+from ..core_model import CoreModel
+
 
 class BuiltinModel(CoreModel):
 

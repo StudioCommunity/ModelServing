@@ -35,7 +35,6 @@ Describe the information so that we can load the model.
 | Name        | Type    | Required | Description                                                  |
 | ----------- | ------- | -------- | ------------------------------------------------------------ |
 | name | string  | Yes      |  A specification of model type. Could be platform name (Tensorflow, etc.), library name (Pytorch, Sklearn, etc.) or format name (Onnx, etc.) |
-| model_file | string  | Yes      | Path of the serialized model file |
 | serialization_method | string | Yes | The format used to dump the model |
 
 ## Input

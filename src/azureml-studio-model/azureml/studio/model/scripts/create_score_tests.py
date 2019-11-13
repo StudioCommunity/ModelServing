@@ -6,6 +6,7 @@ PROJECT_ROOT_PATH = dirname(dirname(dirname(dirname(dirname(dirname(abspath(__fi
 MODEL_FOLDER_NAME = "AzureMLModel"
 DATA_FILE_NAME = "data.dataset.parquet"
 
+
 def test_create_score_test_cases():
     src_tests_root_dir = os.path.join(PROJECT_ROOT_PATH, "azureml-studio-model/azureml/studio/model/tests")
     dst_tests_root_dir = os.path.join(PROJECT_ROOT_PATH, "azureml-studio-score/azureml/studio/score/score/tests")
@@ -27,6 +28,7 @@ def test_create_score_test_cases():
 
             entry_file_name = f"test_{'_'.join(os.path.split(relative_to_tests_root))}.py"
             shutil.copy(template_file_path, os.path.join(dst_test_path, entry_file_name))
+
 
 if __name__ == "__main__":
     test_create_score_test_cases()

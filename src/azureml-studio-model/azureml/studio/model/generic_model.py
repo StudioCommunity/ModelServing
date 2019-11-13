@@ -1,20 +1,18 @@
 import os
 import sys
 
-from abc import abstractmethod, abstractclassmethod
+from abc import abstractmethod
 import yaml
 
 from . import constants
 from . import utils
-from .builtin_model import BuiltinModel
-from .local_dependency import LocalDependencyManager
 from .logger import get_logger
 from .model_factory import ModelFactory
-from .model_input import ModelInput
-from .model_output import ModelOutput
-from .core_model import CoreModel
-from .remote_dependency import RemoteDependencyManager
-from .resource_config import ResourceConfig
+from .builtin_models.builtin_model import BuiltinModel
+from .model_spec.local_dependency import LocalDependencyManager
+from .model_spec.model_input import ModelInput
+from .model_spec.remote_dependency import RemoteDependencyManager
+from .model_spec.serving_config import ServingConfig
 
 logger = get_logger(__name__)
 
@@ -50,7 +48,7 @@ class GenericModel(object):
         artifact_path: str = "./AzureMLModel",
         model_relative_to_artifact_path : str = "model",
         overwrite_if_exists: bool = True
-        ):
+    ):
         os.makedirs(artifact_path, exist_ok=overwrite_if_exists)
         model_path = os.path.join(artifact_path, model_relative_to_artifact_path)
         self.core_model.save(model_path, overwrite_if_exists=overwrite_if_exists)
@@ -110,7 +108,7 @@ class GenericModel(object):
         if model_spec.get("outputs", None):
             outputs = [ModelInput.from_dict(model_output) for model_output in model_spec["inputs"]]
         if model_spec.get("serving_config", None):
-            serving_config = ResourceConfig.from_dict(model_spec["serving_config"])
+            serving_config = ServingConfig.from_dict(model_spec["serving_config"])
 
         if install_dependencies:
             logger.info("Installing dependencies")
@@ -134,7 +132,7 @@ class GenericModel(object):
 
         return cls(core_model, conda, local_dependencies, inputs, outputs, serving_config)
         
-    #TODO: Support non-dataframe input
+    # TODO: Support non-dataframe input
     @abstractmethod
     def predict(self, df):
         # TODO: Some input validation here

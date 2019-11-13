@@ -1,6 +1,7 @@
-from .logger import get_logger
+from ..logger import get_logger
 
 logger = get_logger(__name__)
+
 
 class ModelInput(object):
 
@@ -10,7 +11,8 @@ class ModelInput(object):
         value_type: str,
         default = None,
         description: str = None,
-        optional: bool = False):
+        optional: bool = False
+    ):
         self.name = name
         self.value_type = value_type
         self.default = default

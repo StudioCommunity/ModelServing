@@ -4,6 +4,7 @@ from .logger import get_logger
 
 logger = get_logger(__name__)
 
+
 def save_generic_model(
     model,
     path: str = "./AzureMLModel",
@@ -13,10 +14,10 @@ def save_generic_model(
     outputs: list = [],
     serving_config: dict = None,
     overwrite_if_exists: bool = True
-    ):
+):
     generic_model = GenericModel(
-        core_model = model,
-        conda = conda,
+        core_model=model,
+        conda=conda,
         local_dependencies=local_dependencies,
         inputs=inputs,
         outputs=outputs,
@@ -27,6 +28,7 @@ def save_generic_model(
         model_relative_to_artifact_path=constants.CUSTOM_MODEL_DIRECTORY,
         overwrite_if_exists=overwrite_if_exists
     )
+
 
 def load_generic_model(
     path: str = "./AzureMLModel",
@@ -45,7 +47,7 @@ def save_pytorch_model(
     serving_config: dict = None,
     overwrite_if_exists: bool = True
 ):
-    from .pytorch.cloudpickle import PytorchCloudPickleModel
+    from .builtin_models.pytorch.cloudpickle import PytorchCloudPickleModel
     import torch
     import torchvision
     import cloudpickle
@@ -59,8 +61,8 @@ def save_pytorch_model(
             "dependencies": [f"pytorch={torch.__version__}", f"torchvision={torchvision.__version__}"] + [{"pip": [f"cloudpickle=={cloudpickle.__version__}"]}]
         }
     generic_model = GenericModel(
-        core_model = model,
-        conda = conda,
+        core_model=model,
+        conda=conda,
         local_dependencies=local_dependencies,
         inputs=inputs,
         outputs=outputs,
@@ -68,5 +70,6 @@ def save_pytorch_model(
     )
     generic_model.save(
         artifact_path=path,
-        model_relative_to_artifact_path=constants.PYTORCH_MODEL_FILE_NAME
+        model_relative_to_artifact_path=constants.PYTORCH_MODEL_FILE_NAME,
+        overwrite_if_exists=overwrite_if_exists
     )

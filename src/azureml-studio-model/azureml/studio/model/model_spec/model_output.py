@@ -1,6 +1,7 @@
-from .logger import get_logger
+from ..logger import get_logger
 
 logger = get_logger(__name__)
+
 
 class ModelOutput(object):
 
@@ -8,7 +9,8 @@ class ModelOutput(object):
         self,
         name: str,
         value_type: str,
-        description: str = None):
+        description: str = None
+    ):
         self.name = name
         self.value_type = value_type
         self.description = description

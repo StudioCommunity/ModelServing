@@ -4,10 +4,8 @@ import inspect
 import pandas as pd
 import torch
 
-from ..logger import get_logger
+from ...logger import get_logger
 from ..builtin_model import BuiltinModel
-from ..model_input import ModelInput
-from ..model_output import ModelOutput
 
 logger = get_logger(__name__)
 
@@ -31,6 +29,7 @@ class PytorchBaseModel(BuiltinModel):
         "is_cuda": False
     }
     _device = "cpu"
+    input_args = None
    
     def __init__(self, raw_model, is_cuda=False):
         self.raw_model = raw_model
@@ -53,7 +52,7 @@ class PytorchBaseModel(BuiltinModel):
         outputs = []
         with torch.no_grad():
             logger.info(f"input_df =\n {df}")
-            # TODO: Consolidate serveral rows together for efficiency
+            # TODO: Consolidate several rows together for efficiency
             for _, row in df.iterrows():
                 input_params = list(map(self.to_tensor, row[self.input_args]))
                 predicted = self.raw_model(*input_params)

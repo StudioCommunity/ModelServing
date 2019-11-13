@@ -1,19 +1,18 @@
 import os
 import sys
-import shutil
 
 import yaml
-from subprocess import Popen, PIPE, STDOUT
+from subprocess import Popen, PIPE
 
-from . import constants
-from . import utils
-from .logger import get_logger 
+from .. import constants
+from ..logger import get_logger
 
 logger = get_logger(__name__)
 
 PYTHON_VERSION = "{major}.{minor}.{micro}".format(major=sys.version_info.major,
                                                   minor=sys.version_info.minor,
                                                   micro=sys.version_info.micro)
+
 
 def _run_install_cmds(cmds, command_name):
     logger.info(" ".join(cmds))
@@ -26,6 +25,7 @@ def _run_install_cmds(cmds, command_name):
         logger.warning(f"sterr: {stderr}")
     logger.info(f"Finished to install {command_name} dependencies")
 
+
 # Temporary workaround to reconstruct the python environment in training phase.
 # Should deprecate when Module team support reading the conda.yaml in Model Folder and build image according to that
 class RemoteDependencyManager(object):
@@ -35,18 +35,20 @@ class RemoteDependencyManager(object):
         additional_conda_channels=[],
         additional_conda_deps=[],
         additional_pip_deps=[]
-        ):
+    ):
         self.conda_channels = ["defaults"] + additional_conda_channels
         self.conda_dependencies = [f"python={PYTHON_VERSION}"] + additional_conda_deps
         self.pip_dependencies = additional_pip_deps
 
-    def save(self, artifact_path, exist_ok=True):
+    def save(self, artifact_path, overwrite_if_exists=True):
         conda_env = {
             "name": constants.CONDA_ENV_NAME,
             "channels": self.conda_channels,
             "dependencies": self.conda_dependencies + [{"pip": self.pip_dependencies}]
         }
         conda_file_path = os.path.join(artifact_path, constants.CONDA_FILE_NAME)
+        if os.path.isfile(conda_file_path) and not overwrite_if_exists:
+            raise Exception(f"File {conda_file_path} exists. Set overwrite_is_exists=True if you want to overwrite it.")
         with open(conda_file_path, "w") as f:
             yaml.safe_dump(conda_env, stream=f, default_flow_style=False) 
         logger.info(f"Saved conda to {conda_file_path}")
@@ -88,4 +90,4 @@ class RemoteDependencyManager(object):
         else:
             pip_cmds = ["pip", "install"] + self.pip_dependencies
             _run_install_cmds(pip_cmds, "pip")
-   
+

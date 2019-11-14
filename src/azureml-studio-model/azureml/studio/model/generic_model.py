@@ -62,6 +62,9 @@ class GenericModel(object):
         if self.conda:
             ioutils.save_conda_env(artifact_path, self.conda)
             conda_file_path = constants.CONDA_FILE_NAME
+        else:
+            # TODO: dump local conda env
+            pass
 
         # In the cases where customer manually modified sys.path (e.g. sys.path.append("..")),
         # they would have to specify the code path manually.

@@ -1,3 +1,7 @@
+# Test generated model folder
+AzureMLModel
+data.dataset.parquet
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -112,3 +116,7 @@ gen/
 
 # file to store tokens, should not be committed
 credential.json
+
+# macOS
+.DS_Store
+src/azureml-studio-model/azureml/studio/model/tests/custom/data.dataset.parquet

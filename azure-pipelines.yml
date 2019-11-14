@@ -17,12 +17,39 @@ steps:
     cd src/azureml-studio-model
     python -m pip install --upgrade pip
     pip install -r requirements.txt
-  displayName: 'Install dependencies'
+  displayName: 'Install azureml-studio-model dependencies'
 
 - script: |
     cd src/azureml-studio-model
-    python -m pytest
-  displayName: 'PyTest'
+    python -m pytest -s
+  displayName: 'PyTest azure-studio-model'
+
+- bash: conda create --yes --quiet --name loader_env
+  displayName: Create Anaconda environment for azureml-studio-score test
+
+- bash: |
+    source activate loader_env
+    cd src/azureml-studio-model
+    python setup.py install
+  displayName: 'Install azureml-studio-model'
+
+- script: |
+    cd src/azureml-studio-model/azureml/studio/model/scripts
+    python create_score_tests.py
+  displayName: 'Create score test cases from model test output'
+
+- bash: |
+    source activate loader_env
+    cd src/azureml-studio-score
+    python -m pip install --upgrade pip
+    pip install -r requirements.txt
+  displayName: 'Install azureml-studio-score dependencies'
+
+- bash: |
+    source activate loader_env
+    cd src/azureml-studio-score 
+    python -m pytest -s --ignore='azureml/studio/score/score/tests/pytorch/cloudpickle/InputPort1' --ignore='azureml/studio/score/score/tests/custom/InputPort1'
+  displayName: 'PyTest azure-studio-score'
 
 # Save build number to file
 - script: |
@@ -58,5 +85,5 @@ steps:
   displayName: 'Upload twine'
 
 - script: |
-    git push https://$(GitHubUserName):$(GitHubPassword)@github.com/$(GitHubUserName)/$(GitHubRepo).git 'refs/remotes/origin/*:refs/heads/*'
+    git push https://$(GitHubUserName):$(GitHubPassword)@github.com/$(GitHubUserName)/$(GitHubRepo).git 'refs/remotes/origin/*:refs/heads/*' -f
   displayName: 'Push to GitHub'

@@ -34,8 +34,9 @@ implementation:
       - conda
       - pip:
         - --extra-index-url=https://test.pypi.org/simple
+        - --extra-index-url=https://azuremlsdktestpypi.azureedge.net/Create-Dev-Index/5997766/
         - --extra-index-url=https://CustomModules:ua7fuhttm64csuuwl2cdy5zqq4ptw3otufevwselh23nse2xrtpq@msdata.pkgs.visualstudio.com/_packaging/CustomModules/pypi/simple/
-        - alghost==0.0.83
+        - azureml-designer-classic-modules==0.0.103
         - azureml-studio-model
         - azureml-studio-score
         - cloudpickle
@@ -46,7 +47,7 @@ implementation:
     command:
     - python
     - -m
-    - azureml.visual_interface.score.score.module_invoker
+    - azureml.studio.score.score.module_invoker
     args:
     - --trained-model
     - inputValue: Trained model
@@ -57,6 +58,6 @@ implementation:
     - --scored-dataset
     - outputPath: Scored dataset
   invoking:
-    module: azureml.visual_interface.score.score.builtin_score_module
+    module: azureml.studio.score.score.builtin_score_module
     class: BuiltinScoreModule
     func: run

@@ -24,10 +24,6 @@ def get_input_args(pytorch_model):
 class PytorchBaseModel(BuiltinModel):
 
     raw_model = None
-    flavor = {
-        "name": "pytorch",
-        "is_cuda": False
-    }
     _device = "cpu"
     input_args = None
    

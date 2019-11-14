@@ -6,6 +6,7 @@ import yaml
 
 from . import constants
 from . import utils
+from .utils import ioutils, model_spec_utils
 from .logger import get_logger
 from .model_factory import ModelFactory
 from .builtin_models.builtin_model import BuiltinModel
@@ -38,6 +39,8 @@ class GenericModel(object):
             else:
                 raise Exception("BuiltinModel Can't be initialized without flavor")
         self.conda = conda
+        if not self.conda and isinstance(self.core_model, BuiltinModel):
+            self.conda = self.core_model.default_conda
         self.local_dependencies = local_dependencies
         self.inputs = inputs
         self.outputs = outputs
@@ -54,16 +57,13 @@ class GenericModel(object):
         self.core_model.save(model_path, overwrite_if_exists=overwrite_if_exists)
 
         conda_file_path = None
+
         # TODO: Provide the option to save result of "conda env export"
         if self.conda:
-            # TODO: merge additional_conda_env with conda_env
-            utils.save_conda_env(artifact_path, self.conda)
+            ioutils.save_conda_env(artifact_path, self.conda)
             conda_file_path = constants.CONDA_FILE_NAME
-        else:
-            # TODO: dump local conda env
-            pass
-           
-        # In the cases where customer manually modified sys.path (e.g. sys.path.append("..")), 
+
+        # In the cases where customer manually modified sys.path (e.g. sys.path.append("..")),
         # they would have to specify the code path manually.
         if not self.local_dependencies:
             self.local_dependencies = [os.path.abspath(sys.path[0])]
@@ -71,7 +71,7 @@ class GenericModel(object):
         local_dependency_manager = LocalDependencyManager(self.local_dependencies)
         local_dependency_manager.save(artifact_path)
 
-        model_spec = utils.generate_model_spec(
+        model_spec = model_spec_utils.generate_model_spec(
             flavor=self.core_model.flavor,
             model_path=model_relative_to_artifact_path,
             conda_file_path=conda_file_path,
@@ -79,7 +79,7 @@ class GenericModel(object):
             inputs=self.inputs,
             outputs=self.outputs
         )
-        utils.save_model_spec(artifact_path, model_spec)
+        model_spec_utils.save_model_spec(artifact_path, model_spec)
 
     @classmethod
     def load(cls, artifact_path, install_dependencies=False):
@@ -122,9 +122,9 @@ class GenericModel(object):
                 local_dependency_manager.load(artifact_path, local_dependencies)
                 local_dependency_manager.install()
 
-        raw_model_class = ModelFactory.get_model_class(flavor)
-        raw_model_path = os.path.join(artifact_path, model_spec["model_path"])
-        core_model = raw_model_class.load(raw_model_path)
+        core_model_class = ModelFactory.get_model_class(flavor)
+        core_model_path = os.path.join(artifact_path, model_spec["model_path"])
+        core_model = core_model_class.load(core_model_path)
 
         if isinstance(core_model, BuiltinModel):
             logger.info("Config BuiltinModel by flavor and inputs")

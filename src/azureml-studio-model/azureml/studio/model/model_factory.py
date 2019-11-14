@@ -8,6 +8,17 @@ logger = get_logger(__name__)
 
 
 def _get_default_flavor_name(cls):
+    """
+    Get flavor name from class
+    :param cls: class
+    :return: The module name right after "builtin_models" module path
+    >>> cls1 = azureml.studio.model.builtin_models.sklearn.SklearnModel
+    >>> _get_default_flavor_name(cls1)
+    SklearnModel
+    >>> cls2 = azureml.studio.model.builtin_models.pytorch.cloudpickle
+    >>> _get_default_flavor_name(cls2)
+    pytorch
+    """
     module_name = cls.__module__
     root_module_name = "azureml.studio.model.builtin_models."
     flavor = module_name.replace(root_module_name, "")
@@ -33,17 +44,18 @@ class BuiltinModelMeta(ABCMeta):
             flavor["serialization_method"] = cls.serialization_method
 
         if flavor["name"] is None:
-            raise TypeError(f'Builtin model {cls} should be have a flavor name')
+            raise TypeError(f"Builtin model {cls} should be have a flavor name")
 
         key = _get_flavor_key(flavor)
         if key in FlavorRegistry.flavors:
-            raise TypeError(f'{key} in {cls} is not a unique flavor name')
+            raise TypeError(f"{key} in {cls} is not a unique flavor name")
 
         logger.info(f"register {key} to flavor registry")
         FlavorRegistry.flavors[key] = cls
 
 
 class FlavorRegistry(object):
+    # flavor_key -> cls
     flavors = dict()
 
     @classmethod
@@ -59,7 +71,6 @@ class FlavorRegistry(object):
         if key not in FlavorRegistry.flavors:
             return None
         return FlavorRegistry.flavors[key]
-
 
     @classmethod
     def supported_flavors(cls, flavor_name=None):

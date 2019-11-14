@@ -3,9 +3,11 @@ import inspect
 
 import pandas as pd
 import torch
+import torchvision
 
 from ...logger import get_logger
 from ..builtin_model import BuiltinModel
+from ...utils import conda_merger
 
 logger = get_logger(__name__)
 
@@ -26,7 +28,15 @@ class PytorchBaseModel(BuiltinModel):
     raw_model = None
     _device = "cpu"
     input_args = None
-   
+    extra_conda = {
+        "channels": ["pytorch"],
+        "dependencies": [
+            f"pytorch={torch.__version__}",
+            f"torchvision={torchvision.__version__}"
+        ]
+    }
+    default_conda = conda_merger.merge_envs([BuiltinModel.default_conda, extra_conda])
+
     def __init__(self, raw_model, is_cuda=False):
         self.raw_model = raw_model
         self.flavor["is_cuda"] = is_cuda

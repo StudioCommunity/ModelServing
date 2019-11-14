@@ -11,6 +11,7 @@ from my_custom_model import MyCustomModel
 
 from azureml.studio.model.io import save_generic_model, load_generic_model
 
+
 def get_traininig_data():
     np.random.seed(0)
     n_samples, n_features = 10, 2
@@ -24,6 +25,7 @@ def get_traininig_data():
     noise = stats.norm.rvs(loc=0, scale=1. / np.sqrt(alpha_), size=n_samples)
     y = np.dot(X, w) + noise
     return X, y
+
 
 def test_save_load():
     clf = BayesianRidge(compute_score=True)

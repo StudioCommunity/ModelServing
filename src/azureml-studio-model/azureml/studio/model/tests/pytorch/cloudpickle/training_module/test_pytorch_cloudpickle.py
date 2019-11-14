@@ -4,7 +4,6 @@ from os.path import dirname, abspath
 import numpy as np
 import pandas as pd
 import pyarrow.parquet
-import pytest
 import torch
 from torch.autograd import Variable
 
@@ -13,6 +12,7 @@ from azureml.studio.model.io import save_pytorch_model, load_generic_model
 from .model import LinearRegression
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
+
 
 def get_training_data():
     x_values = [i for i in range(11)]
@@ -24,6 +24,7 @@ def get_training_data():
     y_train = y_train.reshape(-1, 1)
 
     return x_train, y_train
+
 
 def train(model, x_train, y_train):
     criterion = torch.nn.MSELoss() 
@@ -37,6 +38,7 @@ def train(model, x_train, y_train):
         loss = criterion(outputs, labels)
         loss.backward()
         optimizer.step()
+
 
 def test_save_load():
     model = LinearRegression(1, 1).to(device)

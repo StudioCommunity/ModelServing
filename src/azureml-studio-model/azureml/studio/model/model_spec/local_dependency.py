@@ -2,10 +2,8 @@ import os
 import sys
 import shutil
 
-import yaml
-
 from .. import constants
-from .. import utils
+from ..utils import ioutils
 from ..logger import get_logger
 
 logger = get_logger(__name__)
@@ -50,7 +48,7 @@ class LocalDependencyManager(object):
                 if dirname_cnt_dict[dst_ancester_name] > 1:
                     dst_ancester_name = f"{dst_ancester_name}_{dirname_cnt_dict[dst_ancester_name] - 1}"
                 dst_ancestor_path = os.path.join(dst_dir, dst_ancester_name)
-                utils._copytree_include(src_ancestor, dst_ancestor_path, include_extensions=(".py"), exist_ok=exist_ok)
+                ioutils._copytree_include(src_ancestor, dst_ancestor_path, include_extensions=(".py"), exist_ok=exist_ok)
                 self.copied_local_dependencies.append(os.path.join(constants.LOCAL_DEPENDENCIES_PATH, dst_ancester_name))
                 j = i + 1
                 while j < len(src_directories):

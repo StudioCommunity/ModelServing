@@ -72,7 +72,7 @@ def generate_model_spec(
     time_created: datetime = datetime.now()
 ):
     spec = {
-        "flavor" : flavor,
+        "flavor": flavor,
         "model_path": model_path,
         "local_dependencies": local_dependencies,
         "time_created": time_created.strftime("%Y-%m-%d %H:%M:%S")

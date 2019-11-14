@@ -10,6 +10,7 @@ def save_generic_model(
     path: str = "./AzureMLModel",
     conda=None,
     local_dependencies: list = [],
+    # TODO provide method to infer input/output schema from sample data
     inputs: list = [],
     outputs: list = [],
     serving_config: dict = None,

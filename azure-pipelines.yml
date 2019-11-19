@@ -14,42 +14,42 @@ steps:
   displayName: Add conda to PATH
 
 - script: |
-    cd src/azureml-studio-model
+    cd src/azureml-designer-model
     python -m pip install --upgrade pip
     pip install -r requirements.txt
-  displayName: 'Install azureml-studio-model dependencies'
+  displayName: 'Install azureml-designer-model dependencies'
 
 - script: |
-    cd src/azureml-studio-model
+    cd src/azureml-designer-model
     python -m pytest -s
-  displayName: 'PyTest azure-studio-model'
+  displayName: 'PyTest azure-designer-model'
 
 - bash: conda create --yes --quiet --name loader_env
-  displayName: Create Anaconda environment for azureml-studio-score test
+  displayName: Create Anaconda environment for azureml-designer-score test
 
 - bash: |
     source activate loader_env
-    cd src/azureml-studio-model
+    cd src/azureml-designer-model
     python setup.py install
-  displayName: 'Install azureml-studio-model'
+  displayName: 'Install azureml-designer-model'
 
 - script: |
-    cd src/azureml-studio-model/azureml/studio/model/scripts
+    cd src/azureml-designer-model/azureml/designer/model/scripts
     python create_score_tests.py
   displayName: 'Create score test cases from model test output'
 
 - bash: |
     source activate loader_env
-    cd src/azureml-studio-score
+    cd src/azureml-designer-score
     python -m pip install --upgrade pip
     pip install -r requirements.txt
-  displayName: 'Install azureml-studio-score dependencies'
+  displayName: 'Install azureml-designer-score dependencies'
 
 - bash: |
     source activate loader_env
-    cd src/azureml-studio-score 
-    python -m pytest -s --ignore='azureml/studio/score/score/tests/pytorch/cloudpickle/InputPort1' --ignore='azureml/studio/score/score/tests/custom/InputPort1'
-  displayName: 'PyTest azure-studio-score'
+    cd src/azureml-designer-score 
+    python -m pytest -s
+  displayName: 'PyTest azure-designer-score'
 
 # Save build number to file
 - script: |
@@ -64,12 +64,12 @@ steps:
   displayName: Install wheel and twine
 
 - script: |
-    cd src/azureml-studio-model
+    cd src/azureml-designer-model
     python setup.py bdist_wheel
   displayName: 'Create model whl file'
 
 - script: |
-    cd src/azureml-studio-score
+    cd src/azureml-designer-score
     python setup.py bdist_wheel
   displayName: 'Create score whl file'
 
@@ -80,8 +80,8 @@ steps:
 
 # Use command line script to 'twine upload', use -r to pass the repository name and --config-file to pass the environment variable set by the authenticate task.
 - script: |
-    python -m twine upload -r "CustomModules" --config-file $(PYPIRC_PATH) src/azureml-studio-model/dist/*.whl
-    python -m twine upload -r "CustomModules" --config-file $(PYPIRC_PATH) src/azureml-studio-score/dist/*.whl
+    python -m twine upload -r "CustomModules" --config-file $(PYPIRC_PATH) src/azureml-designer-model/dist/*.whl
+    python -m twine upload -r "CustomModules" --config-file $(PYPIRC_PATH) src/azureml-designer-score/dist/*.whl
   displayName: 'Upload twine'
 
 - script: |

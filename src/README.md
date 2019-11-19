@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This repository contains some built-in custom modules for azureml studio.
+This repository contains some built-in custom modules for azureml designer.
 
 ## Content
 

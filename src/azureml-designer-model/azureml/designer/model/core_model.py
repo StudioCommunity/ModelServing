@@ -15,8 +15,9 @@ class CoreModel(ABC):
             overwrite_if_exists {bool} -- Overwrite exist files if true, throw exeption otherwise (default: {True})
         """
         pass
-    
-    @abstractclassmethod
+
+    @classmethod
+    @abstractmethod
     def load(cls, load_from: str):
         """ Load a CoreModel object from path load_from
         

@@ -5,8 +5,8 @@ import pandas as pd
 import torch
 import torchvision
 
-from ...logger import get_logger
 from ..builtin_model import BuiltinModel
+from ...logger import get_logger
 from ...utils import conda_merger
 
 logger = get_logger(__name__)
@@ -27,7 +27,7 @@ class PytorchBaseModel(BuiltinModel):
 
     raw_model = None
     _device = "cpu"
-    input_args = None
+    feature_columns_names = None
     extra_conda = {
         "channels": ["pytorch"],
         "dependencies": [
@@ -37,11 +37,8 @@ class PytorchBaseModel(BuiltinModel):
     }
     default_conda = conda_merger.merge_envs([BuiltinModel.default_conda, extra_conda])
 
-    def __init__(self, raw_model, is_cuda=False):
+    def __init__(self, raw_model, model_spec: dict = {}):
         self.raw_model = raw_model
-        self.flavor["is_cuda"] = is_cuda
-
-    def config(self, model_spec: dict):
         is_cuda = model_spec["flavor"].get("is_cuda", False)
         self.flavor["is_cuda"] = is_cuda
         self._device = "cuda" if is_cuda and torch.cuda.is_available() else "cpu"
@@ -50,9 +47,9 @@ class PytorchBaseModel(BuiltinModel):
             logger.warning("The model is saved on gpu but loaded on cpu because cuda is not available")
 
         if model_spec.get("inputs", None):
-            self.input_args = [model_input["name"] for model_input in model_spec["inputs"]]
+            self.feature_columns_names = [model_input["name"] for model_input in model_spec["inputs"]]
         else:
-            self.input_args = get_input_args(self.raw_model)
+            self.feature_columns_names = get_input_args(self.raw_model)
 
     def predict(self, df):
         outputs = []
@@ -60,7 +57,7 @@ class PytorchBaseModel(BuiltinModel):
             logger.info(f"input_df =\n {df}")
             # TODO: Consolidate several rows together for efficiency
             for _, row in df.iterrows():
-                input_params = list(map(self.to_tensor, row[self.input_args]))
+                input_params = list(map(self.to_tensor, row[self.feature_columns_names]))
                 predicted = self.raw_model(*input_params)
                 outputs.append(predicted.tolist())
 

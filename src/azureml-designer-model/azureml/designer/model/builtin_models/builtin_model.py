@@ -23,6 +23,7 @@ class BuiltinModel(CoreModel, metaclass=BuiltinModelMeta):
         "dependencies": [f"python={PYTHON_VERSION}"]
     }
 
+    @classmethod
     @abstractmethod
-    def config(self, model_spec: dict):
+    def load_with_modelspec(cls, load_from: str, model_spec: dict):
         pass

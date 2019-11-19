@@ -36,7 +36,7 @@ def test_save_load():
     model = MyCustomModel(clf)
     conda = {
         "name": "test",
-        "channels": "defaults",
+        "channels": ["defaults"],
         "dependencies": [{"pip": ["scipy", "sklearn"]}]
     }
 

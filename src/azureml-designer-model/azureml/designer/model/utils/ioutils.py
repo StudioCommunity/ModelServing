@@ -41,3 +41,13 @@ def _copytree_include(src_dir, dst_dir, include_extensions: tuple = (), exist_ok
         dst_file_path = os.path.join(dst_dir, file_path)
         os.makedirs(os.path.dirname(dst_file_path), exist_ok=True)
         shutil.copy(src_file_path, dst_file_path)
+
+
+def validate_path_existence(func):
+
+    def func_wrapper(save_to, overwrite_if_exists):
+        if os.path.isfile(save_to) and not overwrite_if_exists:
+            raise Exception(f"File {save_to} exists. Set overwrite_is_exists=True if you want to overwrite it.")
+        func(save_to, overwrite_if_exists)
+
+    return func_wrapper

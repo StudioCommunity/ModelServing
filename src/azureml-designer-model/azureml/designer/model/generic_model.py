@@ -127,11 +127,10 @@ class GenericModel(object):
 
         core_model_class = ModelFactory.get_model_class(flavor)
         core_model_path = os.path.join(artifact_path, model_spec["model_path"])
-        core_model = core_model_class.load(core_model_path)
-
-        if isinstance(core_model, BuiltinModel):
-            logger.info("Config BuiltinModel by flavor and inputs")
-            core_model.config(model_spec)
+        if issubclass(core_model_class, BuiltinModel):
+            core_model = core_model_class.load_with_modelspec(core_model_path, model_spec)
+        else:
+            core_model = core_model_class.load(core_model_path)
 
         return cls(core_model, conda, local_dependencies, inputs, outputs, serving_config)
         

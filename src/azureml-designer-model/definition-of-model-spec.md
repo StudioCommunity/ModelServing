@@ -14,8 +14,6 @@ Train anywhere, serve here.
 | local_dependencies | list                              | No       | The path contains the python packages required to load the model, will be append to sys.path when loading |
 | inputs             | list<[Input](#input)>             | No       | Defines input parameters of the model. Reference: 'Input Definition' table.                               |
 | outputs            | list<[Output](#output)>           | No       | Defines output parameters of the model. Reference: 'Output Definition' table.                             |
-| task_type          | string                            | No       | Enumerate value of score task type, listed in [Task Types](#task-types)                                   |
-| label_map_file     | string                            | No       | A csv file contains lines of "index, label" without header                                                |
 | serving_config     | [Serving Config](#serving-config) | No       | Configurations to serve the model, reference 'Serving Config' table.                                      |
 | description        | string                            | No       | The detailed information that describes this model.                                                       |
 | time_created       | datetime                          | No       | Create time of the model folder                                                                           |
@@ -40,25 +38,6 @@ Describe the information so that we can load the model.
 | serialization_method | string | Yes      | The format used to dump the model                                                                                                           |
 | is_cuda              | bool   | No       | Whether or not the model need to reside on cuda                                                                                             |
 
-#### Pytorch cloudpickle
-
-| Name                 | Type   | Required | Description                                     |
-|----------------------|--------|----------|-------------------------------------------------|
-| name                 | string | Yes      | pytorch                                         |
-| serialization_method | string | Yes      | cloudpickle                                     |
-| is_cuda              | bool   | No       | Whether or not the model need to reside on cuda |
-
-#### Pytorch state_dict
-
-| Name                 | Type   | Required | Description                                                                                     |
-|----------------------|--------|----------|-------------------------------------------------------------------------------------------------|
-| name                 | string | Yes      | pytorch                                                                                         |
-| serialization_method | string | Yes      | state_dict                                                                                      |
-| is_cuda              | bool   | No       | Whether or not the model need to reside on cuda                                                 |
-| model_class          | string | Yes      | The model class which inherits nn.Module                                                        |
-| model_module         | string | No       | The module in which the model_class resides, if not provided, will try to load from main module |
-| init_params          | dict   | No       | The keyword arguments passed to nn.Module.__init__ function                                     |
-
 ## Input
 
 Input defines the input parameter of the model.
@@ -78,17 +57,6 @@ Input defines the input parameter of the model.
 | name        | string | Yes      | The name of this Output.                                      |
 | type        | string | Yes      | Defines the type of this data. Reference: 'Data Types' table. |
 | description | string | No       | The detailed information that describes the Output.           |
-
-## Task Types
-
-| Name                 | Score Result Column Name                           |
-|----------------------|----------------------------------------------------|
-| Regression           | Regression Assigned Labels                         |
-| BinaryClassification | Binary Class Assigned Labels, Scored Probabilities |
-| MultiClassification  | Scored Labels, Scored Probabilities                |
-| Clustering           | Cluster Assigned Labels                            |
-| ImageGeneration      | Generated Image                                    |
-| TextGeneration       | Generated Text                                     |
 
 ## Data Types
 

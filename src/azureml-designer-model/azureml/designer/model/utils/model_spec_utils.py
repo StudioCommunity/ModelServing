@@ -1,11 +1,11 @@
 import os
 
-import yaml
 from datetime import datetime
 
 from .. import constants
 from ..model_spec.serving_config import ServingConfig
 from ..logger import get_logger
+from ..utils import yamlutils
 
 logger = get_logger(__name__)
 
@@ -40,8 +40,7 @@ def generate_model_spec(
 
 def save_model_spec(path, spec):
     logger.info(f'MODEL_SPEC: {spec}')
-    with open(os.path.join(path, constants.MODEL_SPEC_FILE_NAME), 'w') as fp:
-        yaml.dump(spec, fp, default_flow_style=False)
+    yamlutils.dump_to_yaml_file(spec, os.path.join(path, constants.MODEL_SPEC_FILE_NAME))
     fn = os.path.join(path, constants.MODEL_SPEC_FILE_NAME)
     logger.info(f'SAVED MODEL_SPEC: {fn}')
 
@@ -50,6 +49,5 @@ def get_configuration(artifact_path) -> dict:
     model_spec_path = os.path.join(artifact_path, constants.MODEL_SPEC_FILE_NAME)
     if not os.path.exists(model_spec_path):
         raise Exception(f"Could not find {constants.MODEL_SPEC_FILE_NAME} in {artifact_path}")
-    with open(model_spec_path) as fp:
-        model_conf = yaml.safe_load(fp)
+    model_conf = yamlutils.load_yaml_file(model_spec_path)
     return model_conf

@@ -2,11 +2,10 @@ import os
 import sys
 
 from abc import abstractmethod
-import yaml
 
 from . import constants
 from . import utils
-from .utils import ioutils, model_spec_utils
+from .utils import ioutils, model_spec_utils, yamlutils
 from .logger import get_logger
 from .model_factory import ModelFactory
 from .builtin_models.builtin_model import BuiltinModel
@@ -88,9 +87,8 @@ class GenericModel(object):
     def load(cls, artifact_path, install_dependencies=False):
         model_spec_path = os.path.join(artifact_path, constants.MODEL_SPEC_FILE_NAME)
         logger.info(f"MODEL_FOLDER: {os.listdir(artifact_path)}")
-        with open(model_spec_path) as fp:
-            model_spec = yaml.safe_load(fp)
-            logger.info(f"Successfully loaded {model_spec_path}")
+        model_spec = yamlutils.load_yaml_file(model_spec_path)
+        logger.info(f"Successfully loaded {model_spec_path}")
         
         flavor = model_spec["flavor"]
         conda = None
@@ -101,9 +99,9 @@ class GenericModel(object):
         # TODO: Use auxiliary method to handle None in loaded yaml file following Module Team
         if model_spec.get("conda_file", None):
             conda_yaml_path = os.path.join(artifact_path, model_spec["conda_file"])
-            with open(conda_yaml_path) as fp:
-                conda = yaml.safe_load(fp)
-                logger.info(f"Successfully loaded {conda_yaml_path}")
+            conda = yamlutils.load_yaml_file(conda_yaml_path)
+            logger.info(f"Successfully loaded {conda_yaml_path}")
+
         local_dependencies = model_spec.get("local_dependencies", None)
         logger.info(f"local_dependencies = {local_dependencies}")
         if model_spec.get("inputs", None):

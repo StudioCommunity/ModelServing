@@ -73,8 +73,8 @@ steps:
     python setup.py bdist_wheel
   displayName: 'Create score whl file'
 
-- task: TwineAuthenticate@1
-  displayName: 'Publish model whl file to artifacts'
+- task: TwineAuthenticate@0
+  displayName: 'Authenticate Azure Artifacts with twine'
   inputs:
     artifactFeeds: 'CustomModules, azureml-modules'
 

@@ -49,7 +49,7 @@ def save_pytorch_cloudpickle_model(
     overwrite_if_exists: bool = True
 ):
     from .builtin_models.pytorch.cloudpickle import PytorchCloudPickleModel
-    model = PytorchCloudPickleModel(pytorch_model, next(pytorch_model.parameters()).is_cuda)
+    model = PytorchCloudPickleModel(pytorch_model, {"is_cuda": next(pytorch_model.parameters()).is_cuda})
     logger.info(f"Saving model with is_cuda={next(pytorch_model.parameters()).is_cuda}")
 
     generic_model = GenericModel(

@@ -19,17 +19,14 @@ class PytorchStateDictModel(PytorchBaseModel):
     def __init__(self, raw_model, flavor, inputs):
         if not flavor.get("model_module", None):
             self.flavor["model_module"] = raw_model.__class__.__module__
-            "class": self.core_model.__class__.__name__
         if not flavor.get("model_class", None):
             self.flavor["model_class"] = raw_model.__class__.__name__
         if not flavor.get("init_params", None):
             pass
         super().__init__(raw_model, flavor, inputs)
 
-    @ioutils.validate_path_existence
     def save(self, save_to, overwrite_if_exists=True):
-        if os.path.isfile(save_to) and not overwrite_if_exists:
-            raise Exception(f"File {save_to} exists. Set overwrite_is_exists=True if you want to overwrite it.")
+        ioutils.validate_overwrite(save_to, overwrite_if_exists)
         state_dict = self.raw_model.module.state_dict() if torch.cuda.device_count() > 1 \
             else self.raw_model.state_dict()
         torch.save(state_dict, save_to)

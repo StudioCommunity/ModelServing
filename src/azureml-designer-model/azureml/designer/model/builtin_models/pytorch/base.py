@@ -12,17 +12,6 @@ from ...utils import conda_merger
 logger = get_logger(__name__)
 
 
-def get_input_args(pytorch_model):
-    try:
-        forward_func = getattr(pytorch_model, 'forward')
-        args = inspect.getfullargspec(forward_func).args
-        if 'self' in args:
-            args.remove('self')
-        return args
-    except AttributeError:
-        logger.warning("Model without 'forward' function cannot be used to predict", exc_info=True)
-
-
 class PytorchBaseModel(BuiltinModel):
 
     raw_model = None
@@ -37,34 +26,39 @@ class PytorchBaseModel(BuiltinModel):
     }
     default_conda = conda_merger.merge_envs([BuiltinModel.default_conda, extra_conda])
 
-    def __init__(self, raw_model, flavor: dict = {}, inputs=None):
+    def __init__(self, raw_model, flavor: dict = {}):
         self.raw_model = raw_model
         is_cuda = flavor.get("is_cuda", False)
         self.flavor["is_cuda"] = is_cuda
         self._device = "cuda" if is_cuda and torch.cuda.is_available() else "cpu"
         self.raw_model.to(self._device)
 
-        if inputs:
-            self.feature_columns_names = [model_input["name"] for model_input in model_spec["inputs"]]
-        else:
-            self.feature_columns_names = get_input_args(self.raw_model)
-
-    def predict(self, df):
+    def predict(self, inputs):
         outputs = []
         with torch.no_grad():
-            logger.info(f"input_df =\n {df}")
+            logger.info(f"inputs =\n {inputs}")
             # TODO: Consolidate several rows together for efficiency
-            for _, row in df.iterrows():
-                input_params = list(map(self.to_tensor, row[self.feature_columns_names]))
+            for row in inputs:
+                input_params = list(map(self.to_tensor, row))
                 predicted = self.raw_model(*input_params)
                 outputs.append(predicted.tolist())
 
-        output_df = pd.DataFrame(outputs)
-        output_df.columns = [f"Score_{i}" for i in range(0, output_df.shape[1])]
-        logger.info(f"output_df =\n{output_df}")
-        return output_df
+        return outputs
 
     def to_tensor(self, entry):
         if isinstance(entry, str):
             entry = ast.literal_eval(entry)
         return torch.Tensor(list(entry)).to(self._device)
+    
+    def get_default_feature_columns(self):
+        if not self.raw_model:
+            logger.warning("Can't get defualt_feature_columns with raw_model uninitialized")
+        try:
+            forward_func = getattr(self.raw_model, 'forward')
+            args = inspect.getfullargspec(forward_func).args
+            if 'self' in args:
+                args.remove('self')
+            return args
+        except AttributeError:
+            logger.warning("Model without 'forward' function cannot be used to predict", exc_info=True)
+            return None

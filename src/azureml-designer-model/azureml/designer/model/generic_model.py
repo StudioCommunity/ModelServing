@@ -2,6 +2,7 @@ import os
 import sys
 
 from abc import abstractmethod
+import pandas as pd
 
 from . import constants
 from . import utils
@@ -44,6 +45,16 @@ class GenericModel(object):
         self.inputs = inputs
         self.outputs = outputs
         self.serving_config = serving_config
+
+        if isinstance(core_model, BuiltinModel):
+            if self.inputs:
+                self._feature_columns_names = [model_input.name for model_input in self.inputs]
+                logger.info(f"Loaded feature_columns_names from inputs: {self._feature_columns_names}")
+            else:
+                self._feature_columns_names = self.core_model.get_default_feature_columns()
+                logger.info(f"Loaed feature_columns_names from default: {self._feature_columns_names}")
+            if not self._feature_columns_names:
+                raise Exception("Can't initialize model without feature_columns_names")
 
     def save(
         self,
@@ -126,7 +137,7 @@ class GenericModel(object):
         core_model_class = ModelFactory.get_model_class(flavor)
         core_model_path = os.path.join(artifact_path, model_spec["model_path"])
         if issubclass(core_model_class, BuiltinModel):
-            core_model = core_model_class.load_with_modelspec(core_model_path, model_spec)
+            core_model = core_model_class.load_with_flavor(core_model_path, model_spec.get("flavor", {}))
         else:
             core_model = core_model_class.load(core_model_path)
 
@@ -135,8 +146,17 @@ class GenericModel(object):
     # TODO: Support non-dataframe input
     @abstractmethod
     def predict(self, *args, **kwargs):
-        # TODO: Some input validation here
-        return self.core_model.predict(*args, **kwargs)
+        # TODO: Some input validation and normalization here
+        logger.info(f"args = {args}, kwargs = {kwargs}")
+        if isinstance(self.core_model, BuiltinModel) and isinstance(args[0], pd.DataFrame):
+            logger.info(f"{args[0][self._feature_columns_names].values}")
+            outputs = self.core_model.predict(args[0][self._feature_columns_names].values)
+            output_df = pd.DataFrame(outputs)
+            output_df.columns = [f"Score_{i}" for i in range(0, output_df.shape[1])]
+            logger.info(f"output_df =\n{output_df}")
+            return output_df
+        else:
+            return self.core_model.predict(*args, **kwargs)
 
     @property
     def raw_model(self):

@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod, abstractclassmethod
 
 class CoreModel(ABC):
     flavor = None
+    _conda = None
 
     @abstractmethod
     def save(self, save_to: str, overwrite_if_exists=True):
@@ -30,3 +31,11 @@ class CoreModel(ABC):
     @abstractmethod
     def predict(self, *args, **kwargs):
         pass
+
+    @property
+    def conda(self):
+        return self._conda
+
+    @conda.setter
+    def conda(self, conda):
+        self._conda = conda

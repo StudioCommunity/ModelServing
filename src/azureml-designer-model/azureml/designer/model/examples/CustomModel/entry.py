@@ -32,12 +32,12 @@ def main():
     model = CustomModel(clf)
     model.conda = {
         "name": "test",
-        "channels": "defaults",
+        "channels": ["defaults"],
         "dependencies": [{"pip": ["scipy", "sklearn"]}]
     }
 
     save_generic_model(model, path="./AzureMLModel")
-    loaded_generic_model = load_generic_model()
+    loaded_generic_model = load_generic_model(path="./AzureMLModel", install_dependencies=False)
 
     df = pd.DataFrame(data=X)
     result_df = loaded_generic_model.predict(df)

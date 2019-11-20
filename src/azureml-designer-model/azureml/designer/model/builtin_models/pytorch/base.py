@@ -37,16 +37,14 @@ class PytorchBaseModel(BuiltinModel):
     }
     default_conda = conda_merger.merge_envs([BuiltinModel.default_conda, extra_conda])
 
-    def __init__(self, raw_model, model_spec: dict = {}):
+    def __init__(self, raw_model, flavor: dict = {}, inputs=None):
         self.raw_model = raw_model
-        is_cuda = model_spec["flavor"].get("is_cuda", False)
+        is_cuda = flavor.get("is_cuda", False)
         self.flavor["is_cuda"] = is_cuda
         self._device = "cuda" if is_cuda and torch.cuda.is_available() else "cpu"
         self.raw_model.to(self._device)
-        if is_cuda and not torch.cuda.is_available():
-            logger.warning("The model is saved on gpu but loaded on cpu because cuda is not available")
 
-        if model_spec.get("inputs", None):
+        if inputs:
             self.feature_columns_names = [model_input["name"] for model_input in model_spec["inputs"]]
         else:
             self.feature_columns_names = get_input_args(self.raw_model)

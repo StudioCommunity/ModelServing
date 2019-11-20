@@ -38,7 +38,7 @@ def load_generic_model(
     return GenericModel.load(artifact_path=path, install_dependencies=install_dependencies)
 
 
-def save_pytorch_model(
+def save_pytorch_cloudpickle_model(
     pytorch_model,
     path: str = "./AzureMLModel",
     conda=None,

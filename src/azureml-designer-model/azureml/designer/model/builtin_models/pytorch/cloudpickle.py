@@ -3,8 +3,7 @@ import os
 import cloudpickle
 
 from .base import PytorchBaseModel
-from ...utils import conda_merger
-from ...utils import ioutils
+from ...utils import conda_merger, ioutils
 
 
 class PytorchCloudPickleModel(PytorchBaseModel):
@@ -30,4 +29,4 @@ class PytorchCloudPickleModel(PytorchBaseModel):
     def load_with_modelspec(cls, load_from, model_spec):
         with open(load_from, "rb") as fp:
             model = cloudpickle.load(fp)
-        return cls(model, model_spec)
+        return cls(model, model_spec.get("flavor", {}), model_spec.get("inputs", None))

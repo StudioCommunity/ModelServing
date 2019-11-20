@@ -16,6 +16,16 @@ class PytorchStateDictModel(PytorchBaseModel):
     extra_conda = {}
     default_conda = conda_merger.merge_envs([PytorchBaseModel.default_conda, extra_conda])
 
+    def __init__(self, raw_model, flavor, inputs):
+        if not flavor.get("model_module", None):
+            self.flavor["model_module"] = raw_model.__class__.__module__
+            "class": self.core_model.__class__.__name__
+        if not flavor.get("model_class", None):
+            self.flavor["model_class"] = raw_model.__class__.__name__
+        if not flavor.get("init_params", None):
+            pass
+        super().__init__(raw_model, flavor, inputs)
+
     @ioutils.validate_path_existence
     def save(self, save_to, overwrite_if_exists=True):
         if os.path.isfile(save_to) and not overwrite_if_exists:
@@ -46,4 +56,4 @@ class PytorchStateDictModel(PytorchBaseModel):
         model = model_class(**init_params)
         model.load_state_dict(torch.load(load_from))
 
-        return cls(model, model_spec)
+        return cls(model, model_spec.get("flavor", {}), model_spec.get("inputs", None))

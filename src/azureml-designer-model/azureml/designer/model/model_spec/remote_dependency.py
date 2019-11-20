@@ -1,11 +1,11 @@
 import os
 import sys
 
-import yaml
 from subprocess import Popen, PIPE
 
 from .. import constants
 from ..logger import get_logger
+from ..utils import yamlutils
 
 logger = get_logger(__name__)
 
@@ -49,14 +49,12 @@ class RemoteDependencyManager(object):
         conda_file_path = os.path.join(artifact_path, constants.CONDA_FILE_NAME)
         if os.path.isfile(conda_file_path) and not overwrite_if_exists:
             raise Exception(f"File {conda_file_path} exists. Set overwrite_is_exists=True if you want to overwrite it.")
-        with open(conda_file_path, "w") as f:
-            yaml.safe_dump(conda_env, stream=f, default_flow_style=False) 
+        yamlutils.dump_to_yaml_file(conda_env, conda_file_path)
         logger.info(f"Saved conda to {conda_file_path}")
     
     def load(self, conda_yaml_path):
         logger.info(f"Trying to load conda dependency from {conda_yaml_path}")
-        with open(conda_yaml_path) as fp:
-            config = yaml.safe_load(fp)
+        config = yamlutils.load_yaml_file(conda_yaml_path)
 
         if isinstance(config["channels"], list):
             self.conda_channels = config["channels"]

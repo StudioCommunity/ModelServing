@@ -73,16 +73,21 @@ steps:
     python setup.py bdist_wheel
   displayName: 'Create score whl file'
 
-- task: TwineAuthenticate@1
-  displayName: 'Publish model whl file to artifacts'
+- task: TwineAuthenticate@0
+  displayName: 'Authenticate Azure Artifacts with twine'
   inputs:
-    artifactFeed: CustomModules
+    artifactFeeds: 'CustomModules,azureml-modules'
 
 # Use command line script to 'twine upload', use -r to pass the repository name and --config-file to pass the environment variable set by the authenticate task.
 - script: |
     python -m twine upload -r "CustomModules" --config-file $(PYPIRC_PATH) src/azureml-designer-model/dist/*.whl
     python -m twine upload -r "CustomModules" --config-file $(PYPIRC_PATH) src/azureml-designer-score/dist/*.whl
   displayName: 'Upload twine'
+
+- script: |
+    python -m twine upload -r "azureml-modules" --config-file $(PYPIRC_PATH) src/azureml-designer-model/dist/*.whl
+    python -m twine upload -r "azureml-modules" --config-file $(PYPIRC_PATH) src/azureml-designer-score/dist/*.whl
+  displayName: 'Upload twine to azureml-modules'
 
 - script: |
     git push https://$(GitHubUserName):$(GitHubPassword)@github.com/$(GitHubUserName)/$(GitHubRepo).git 'refs/remotes/origin/*:refs/heads/*' -f

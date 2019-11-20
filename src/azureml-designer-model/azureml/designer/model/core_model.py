@@ -28,5 +28,5 @@ class CoreModel(ABC):
 
     # TODO: support non-dataframe data structure
     @abstractmethod
-    def predict(self, df):
+    def predict(self, *args, **kwargs):
         pass

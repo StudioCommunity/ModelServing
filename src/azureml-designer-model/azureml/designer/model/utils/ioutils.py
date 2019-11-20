@@ -1,10 +1,9 @@
 import os
 import shutil
 
-import yaml
-
 from .. import constants
 from ..logger import get_logger
+from ..utils import yamlutils
 
 logger = get_logger(__name__)
 
@@ -14,13 +13,11 @@ def save_conda_env(path, conda_env):
     if conda_env is None:
         raise Exception("conda_env is empty")
     if isinstance(conda_env, str) and os.path.isfile(conda_env):
-            with open(conda_env, "r") as f:
-                conda_env = yaml.safe_load(f)
+        conda_env = yamlutils.load_yaml_file(conda_env)
     if not isinstance(conda_env, dict):
         raise Exception("Could not load conda_env %s" % conda_env)
     logger.info(f'CONDA: {conda_env}')
-    with open(os.path.join(path, constants.CONDA_FILE_NAME), "w") as f:
-        yaml.safe_dump(conda_env, stream=f, default_flow_style=False)
+    yamlutils.dump_to_yaml_file(conda_env, os.path.join(path, constants.CONDA_FILE_NAME))
     fn = os.path.join(path, constants.CONDA_FILE_NAME)
     logger.info(f'CONDA_FILE: {fn}')
 

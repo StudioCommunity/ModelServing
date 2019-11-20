@@ -137,9 +137,9 @@ class GenericModel(object):
         
     # TODO: Support non-dataframe input
     @abstractmethod
-    def predict(self, df):
+    def predict(self, *args, **kwargs):
         # TODO: Some input validation here
-        return self.core_model.predict(df)
+        return self.core_model.predict(*args, **kwargs)
 
     @property
     def raw_model(self):

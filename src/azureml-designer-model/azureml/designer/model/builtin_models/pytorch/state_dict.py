@@ -16,14 +16,13 @@ class PytorchStateDictModel(PytorchBaseModel):
     extra_conda = {}
     default_conda = conda_merger.merge_envs([PytorchBaseModel.default_conda, extra_conda])
 
-    def __init__(self, raw_model, flavor, inputs):
+    def __init__(self, raw_model, flavor):
         if not flavor.get("model_module", None):
             self.flavor["model_module"] = raw_model.__class__.__module__
         if not flavor.get("model_class", None):
             self.flavor["model_class"] = raw_model.__class__.__name__
-        if not flavor.get("init_params", None):
-            pass
-        super().__init__(raw_model, flavor, inputs)
+        self.flavor["init_params"] = flavor.get("init_params", {})
+        super().__init__(raw_model, flavor)
 
     def save(self, save_to, overwrite_if_exists=True):
         ioutils.validate_overwrite(save_to, overwrite_if_exists)
@@ -32,25 +31,25 @@ class PytorchStateDictModel(PytorchBaseModel):
         torch.save(state_dict, save_to)
 
     @classmethod
-    def load_with_modelspec(cls, load_from, model_spec):
-        model_module_path = dictutils.get_value_by_key_path(model_spec, "flavor/model_module")
+    def load_with_flavor(cls, load_from, flavor):
+        model_module = flavor.get("model_module", None)
         model_class = torch.nn.Module
-        if not model_module_path:
+        if not model_module:
             logger.warning("No model_module specified, using nn.Module as default.")
         else:
-            model_class_name = dictutils.get_value_by_key_path(model_spec, "flavor/model_class")
+            model_class_name = flavor.get("model_class", None)
             if not model_class_name:
                 logger.warning("No model_class specified, using nn.Module as default.")
             else:
                 try:
-                    model_module = importlib.import_module(model_module_path)
+                    model_module = importlib.import_module(model_module)
                     model_class = getattr(model_module, model_class_name)
                 except Exception as e:
                     logger.error(f"Failed to load {model_class} from {model_module}")
                     raise
 
-        init_params = dictutils.get_value_by_key_path(model_spec, "flavor/init_params", default_value={})
+        init_params = flavor.get("init_params", {})
         model = model_class(**init_params)
         model.load_state_dict(torch.load(load_from))
 
-        return cls(model, model_spec.get("flavor", {}), model_spec.get("inputs", None))
+        return cls(model, flavor)

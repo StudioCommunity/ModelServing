@@ -65,3 +65,38 @@ def save_pytorch_cloudpickle_model(
         model_relative_to_artifact_path=constants.PYTORCH_MODEL_FILE_NAME,
         overwrite_if_exists=overwrite_if_exists
     )
+
+
+def save_pytorch_state_dict_model(
+    pytorch_model,
+    init_params: dict = {},
+    path: str = "./AzureMLModel",
+    conda=None,
+    local_dependencies: list = [],
+    inputs: list = [],
+    outputs: list = [],
+    serving_config: dict = None,
+    overwrite_if_exists: bool = True
+):
+    from .builtin_models.pytorch.cloudpickle import PytorchCloudPickleModel
+    from .builtin_models.pytorch.state_dict import PytorchStateDictModel
+    flavor = {
+        "is_cuda": next(pytorch_model.parameters()).is_cuda,
+        "init_params": init_params
+    }
+    model = PytorchStateDictModel(pytorch_model, flavor)
+    logger.info(f"Saving model with flavor: {flavor}")
+
+    generic_model = GenericModel(
+        core_model=model,
+        conda=conda,
+        local_dependencies=local_dependencies,
+        inputs=inputs,
+        outputs=outputs,
+        serving_config=serving_config
+    )
+    generic_model.save(
+        artifact_path=path,
+        model_relative_to_artifact_path=constants.PYTORCH_MODEL_FILE_NAME,
+        overwrite_if_exists=overwrite_if_exists
+    )

@@ -2,6 +2,7 @@ import os
 import sys
 
 from abc import abstractmethod
+import numpy as np
 import pandas as pd
 
 from . import constants
@@ -143,18 +144,32 @@ class GenericModel(object):
 
         return cls(core_model, conda, local_dependencies, inputs, outputs, serving_config)
         
-    # TODO: Support non-dataframe input
     @abstractmethod
     def predict(self, *args, **kwargs):
+        """
+        Pass args to core_model, form result Dataframe with scored label
+        :param args:
+        :param kwargs:
+        :return:
+        """
         # TODO: Some input validation and normalization here
         logger.info(f"args = {args}, kwargs = {kwargs}")
-        if isinstance(self.core_model, BuiltinModel) and isinstance(args[0], pd.DataFrame):
-            logger.info(f"{args[0][self._feature_columns_names].values}")
-            outputs = self.core_model.predict(args[0][self._feature_columns_names].values)
-            output_df = pd.DataFrame(outputs)
-            output_df.columns = [f"Score_{i}" for i in range(0, output_df.shape[1])]
-            logger.info(f"output_df =\n{output_df}")
-            return output_df
+        if isinstance(self.core_model, BuiltinModel):
+            # For BuiltinModel, we assume there's only one positional input parameter in args[0], which a DFD or ImageDirectory
+            # The assumption is because Score Module support only one data input port
+            if isinstance(args[0], pd.DataFrame):
+                outputs = self.core_model.predict(args[0][self._feature_columns_names].values)
+                output_df = pd.DataFrame(outputs)
+                output_df.columns = [f"Score_{i}" for i in range(0, output_df.shape[1])]
+                logger.info(f"output_df =\n{output_df}")
+                return output_df
+            # Else assume args[0] is a ImageDirectory
+            else:
+                image_id_list = []
+                ground_truth_label_list = []
+                predict_ret_list = []
+                for image, label, image_id in args[0].iter_images():
+                    image_ndarray = np.array(image)
         else:
             return self.core_model.predict(*args, **kwargs)
 

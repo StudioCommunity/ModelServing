@@ -67,8 +67,10 @@ class GenericModel(object):
         model_path = os.path.join(artifact_path, model_relative_to_artifact_path)
         self.core_model.save(model_path, overwrite_if_exists=overwrite_if_exists)
 
-        conda_file_path = None
+        if not self.conda:
+            self.conda = self.core_model.conda
 
+        conda_file_path = None
         # TODO: Provide the option to save result of "conda env export"
         if self.conda:
             ioutils.save_conda_env(artifact_path, self.conda)
@@ -165,11 +167,15 @@ class GenericModel(object):
                 return output_df
             # Else assume args[0] is a ImageDirectory
             else:
+                outputs = []
                 image_id_list = []
                 ground_truth_label_list = []
                 predict_ret_list = []
+                # TODO: Implement batch inference
                 for image, label, image_id in args[0].iter_images():
                     image_ndarray = np.array(image)
+                    images_ndarray = np.expand_dims(image_ndarray, axis=0)
+                    outputs.append(self.core_model.predict(image_ndarray))
         else:
             return self.core_model.predict(*args, **kwargs)
 

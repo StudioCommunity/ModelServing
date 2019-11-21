@@ -20,12 +20,11 @@ class BuiltinScoreModule(object):
         logger.info(f"self.append_score_column_to_output = {self.append_score_column_to_output}")
 
         self.model = load_generic_model(model_path, install_dependencies=True)
-        input_columns_names = self.model.inputs
         logger.info("Generic model loaded")
 
-
-    def run(self, df, global_param=None):
-        output_label = self.model.predict(df)
+    def run(self, input_directory, global_param=None):
+        # output_label = self.model.predict(df)
+        output_label = self.model.predict(input_directory)
         logger.info(f"output_label = {output_label}")
         if self.append_score_column_to_output:
             if isinstance(output_label, pd.DataFrame):

@@ -27,6 +27,7 @@ class GenericModel(object):
     inputs = None
     outputs = None
     serving_config = None
+    _data_input_port_type = None
 
     def __init__(self, core_model, conda=None, local_dependencies=None, inputs=None, outputs=None, serving_config=None):
         self.core_model = core_model
@@ -161,21 +162,26 @@ class GenericModel(object):
             # The assumption is because Score Module support only one data input port
             if isinstance(args[0], pd.DataFrame):
                 outputs = self.core_model.predict(args[0][self._feature_columns_names].values)
+                # TODO: formulate output_df according to task_type
                 output_df = pd.DataFrame(outputs)
                 output_df.columns = [f"Score_{i}" for i in range(0, output_df.shape[1])]
                 logger.info(f"output_df =\n{output_df}")
                 return output_df
-            # Else assume args[0] is a ImageDirectory
+            # Else assume args[0] is a generator of ImageDirectory.iter_images()
+            # Didn't use ImageDirectory object to prevent relying on azureml.designer.core
             else:
                 outputs = []
                 image_id_list = []
                 ground_truth_label_list = []
                 predict_ret_list = []
                 # TODO: Implement batch inference
-                for image, label, image_id in args[0].iter_images():
+                for image, label, image_id in args[0]:
                     image_ndarray = np.array(image)
-                    images_ndarray = np.expand_dims(image_ndarray, axis=0)
-                    outputs.append(self.core_model.predict(image_ndarray))
+                    image_ndarray = np.moveaxis(image_ndarray, -1, 0)
+                    logger.info(f"image_ndarray.shape = {image_ndarray.shape}")
+                    output = self.core_model.predict([[image_ndarray, ]])
+                    outputs.append(output)
+                return outputs
         else:
             return self.core_model.predict(*args, **kwargs)
 
@@ -185,3 +191,11 @@ class GenericModel(object):
             return self.core_model.raw_model
         else:
             return None
+
+    @property
+    def data_input_port_type(self):
+        return self._data_input_port_type
+    
+    @data_input_port_type.setter
+    def data_input_port_type(self, value):
+        self._data_input_port_type = value

@@ -32,15 +32,20 @@ class PytorchBaseModel(BuiltinModel):
         self.flavor["is_cuda"] = is_cuda
         self._device = "cuda" if is_cuda and torch.cuda.is_available() else "cpu"
         self.raw_model.to(self._device)
+        self.raw_model.eval()
 
-    def predict(self, inputs):
+    def predict(self, inputs: list):
         outputs = []
         with torch.no_grad():
-            logger.info(f"inputs =\n {inputs}")
+            logger.info(f"len(inputs) = {len(inputs)}")
             # TODO: Consolidate several rows together for efficiency
             for row in inputs:
                 input_params = list(map(self.to_tensor, row))
+                logger.info(f"len(input_params) = {len(input_params)}")
+                for i, input_param in enumerate(input_params):
+                    logger.info(f"input_params[{i}].shape = {input_param.shape}")
                 predicted = self.raw_model(*input_params)
+                logger.info(f"predicted = {predicted}")
                 outputs.append(predicted.tolist())
 
         return outputs
@@ -48,7 +53,8 @@ class PytorchBaseModel(BuiltinModel):
     def to_tensor(self, entry):
         if isinstance(entry, str):
             entry = ast.literal_eval(entry)
-        return torch.Tensor(list(entry)).to(self._device)
+        # return torch.Tensor(list(entry)).to(self._device)
+        return torch.Tensor(entry).unsqueeze(0).to(self._device)
     
     def get_default_feature_columns(self):
         if not self.raw_model:

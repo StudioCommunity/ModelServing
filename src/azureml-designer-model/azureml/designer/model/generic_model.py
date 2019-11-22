@@ -13,6 +13,7 @@ from .model_factory import ModelFactory
 from .builtin_models.builtin_model import BuiltinModel
 from .model_spec.local_dependency import LocalDependencyManager
 from .model_spec.model_input import ModelInput
+from .model_spec.task_type import TaskType
 from .model_spec.remote_dependency import RemoteDependencyManager
 from .model_spec.serving_config import ServingConfig
 
@@ -26,10 +27,12 @@ class GenericModel(object):
     local_dependencies = None
     inputs = None
     outputs = None
+    task_type = None
+    label_map = None
     serving_config = None
-    _data_input_port_type = None
 
-    def __init__(self, core_model, conda=None, local_dependencies=None, inputs=None, outputs=None, serving_config=None):
+    def __init__(self, core_model, conda=None, local_dependencies=None, inputs=None, task_type=None,
+                 label_map=None, outputs=None, serving_config=None):
         self.core_model = core_model
         if not self.core_model.flavor:
             if not isinstance(core_model, BuiltinModel):
@@ -40,12 +43,15 @@ class GenericModel(object):
                 }
             else:
                 raise Exception("BuiltinModel Can't be initialized without flavor")
+
         self.conda = conda
         if not self.conda and isinstance(self.core_model, BuiltinModel):
             self.conda = self.core_model.default_conda
         self.local_dependencies = local_dependencies
         self.inputs = inputs
         self.outputs = outputs
+        self.task_type = task_type
+        self.label_map = label_map
         self.serving_config = serving_config
 
         if isinstance(core_model, BuiltinModel):
@@ -168,7 +174,8 @@ class GenericModel(object):
                 logger.info(f"output_df =\n{output_df}")
                 return output_df
             # Else assume args[0] is a generator of ImageDirectory.iter_images()
-            # Didn't use ImageDirectory object to prevent relying on azureml.designer.core
+            # Didn't use ImageDirectory object to prevent depending on azureml.designer.core
+            # This logic should be refactored after we resolve cyclic dependency
             else:
                 outputs = []
                 image_id_list = []
@@ -178,9 +185,12 @@ class GenericModel(object):
                 for image, label, image_id in args[0]:
                     image_ndarray = np.array(image)
                     image_ndarray = np.moveaxis(image_ndarray, -1, 0)
+                    image_ndarray = np.expand_dims(image_ndarray, axis=0)
                     logger.info(f"image_ndarray.shape = {image_ndarray.shape}")
                     output = self.core_model.predict([[image_ndarray, ]])
-                    outputs.append(output)
+                    outputs += output
+                if task_type == TaskType.MultiClassification:
+                    pass
                 return outputs
         else:
             return self.core_model.predict(*args, **kwargs)
@@ -191,11 +201,3 @@ class GenericModel(object):
             return self.core_model.raw_model
         else:
             return None
-
-    @property
-    def data_input_port_type(self):
-        return self._data_input_port_type
-    
-    @data_input_port_type.setter
-    def data_input_port_type(self, value):
-        self._data_input_port_type = value

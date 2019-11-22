@@ -19,7 +19,7 @@ def test_save_load():
         "model_type": "densenet201",
         "pretrained": True,
         "memory_efficient": False,
-        "num_classes": 20
+        "num_classes": 3
     }
     model = DenseNet(**init_params)
 

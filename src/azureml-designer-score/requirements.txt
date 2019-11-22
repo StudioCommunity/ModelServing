@@ -5,7 +5,8 @@ PyYAML
 click
 pyarrow==0.12.1
 pytest
-azureml-designer-core==0.0.23
+# azureml-designer-core==0.0.23
+azureml-designer-core==0.0.25.post7243179
 
 # WARNING: do NOT upgrade this version because azureml-core 1.0.48 requires it to be <=0.15.89,>=0.15.35
 ruamel.yaml==0.15.89

@@ -14,6 +14,7 @@ from .builtin_models.builtin_model import BuiltinModel
 from .model_spec.local_dependency import LocalDependencyManager
 from .model_spec.model_input import ModelInput
 from .model_spec.task_type import TaskType
+from .model_spec.label_map import LabelMap
 from .model_spec.remote_dependency import RemoteDependencyManager
 from .model_spec.serving_config import ServingConfig
 
@@ -94,6 +95,12 @@ class GenericModel(object):
         local_dependency_manager = LocalDependencyManager(self.local_dependencies)
         local_dependency_manager.save(artifact_path)
 
+        label_map_file_name = None
+        if self.label_map:
+            label_map_file_name = constants.LABEL_MAP_FILE_NAME
+            label_map_path = os.path.join(artifact_path, label_map_file_name)
+            self.label_map.save(label_map_path)
+
         model_spec = model_spec_utils.generate_model_spec(
             flavor=self.core_model.flavor,
             model_path=model_relative_to_artifact_path,
@@ -102,6 +109,7 @@ class GenericModel(object):
             inputs=self.inputs,
             outputs=self.outputs,
             task_type=self.task_type,
+            label_map_path=label_map_file_name,
             serving_config=self.serving_config
         )
         model_spec_utils.save_model_spec(artifact_path, model_spec)
@@ -131,6 +139,11 @@ class GenericModel(object):
             inputs = [ModelInput.from_dict(model_input) for model_input in model_spec["inputs"]]
         if model_spec.get("outputs", None):
             outputs = [ModelInput.from_dict(model_output) for model_output in model_spec["inputs"]]
+        if model_spec.get("task_type", None):
+            task_type = TaskType[model_spec["task_type"]]
+        if model_spec.get("label_map", None):
+            load_from = os.path.join(artifact_path, model_spec["label_map"])
+            label_map = LabelMap.create_from_csv(load_from)
         if model_spec.get("serving_config", None):
             serving_config = ServingConfig.from_dict(model_spec["serving_config"])
 
@@ -153,7 +166,7 @@ class GenericModel(object):
         else:
             core_model = core_model_class.load(core_model_path)
 
-        return cls(core_model, conda, local_dependencies, inputs, outputs, serving_config)
+        return cls(core_model, conda, local_dependencies, inputs, outputs, task_type, label_map, serving_config)
         
     @abstractmethod
     def predict(self, *args, **kwargs):
@@ -191,7 +204,7 @@ class GenericModel(object):
                     logger.info(f"image_ndarray.shape = {image_ndarray.shape}")
                     output = self.core_model.predict([[image_ndarray, ]])
                     outputs += output
-                if task_type == TaskType.MultiClassification:
+                if self.task_type == TaskType.MultiClassification:
                     pass
                 return outputs
         else:

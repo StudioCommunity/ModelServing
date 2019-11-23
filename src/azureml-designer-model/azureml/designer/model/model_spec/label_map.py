@@ -5,13 +5,12 @@ import pandas as pd
 from ..utils import ioutils
 from .. import constants
 
-# TODO: Add validation here
+# TODO: Add unittest
 class LabelMap(object):
 
     _index_to_label = {}
 
-    def save(self, artifact_path, overwrite_if_exists=True):
-        save_to = os.path.join(artifact_path, constants.LABEL_MAP_FILE_NAME)
+    def save(self, save_to, overwrite_if_exists=True):
         ioutils.validate_overwrite(save_to, overwrite_if_exists)
         index_list = list(self._index_to_label.keys())
         label_list = list(self._index_to_label.values())
@@ -37,6 +36,16 @@ class LabelMap(object):
         label_map.index_to_label_dict = dict(enumerate(label_list))
         return label_map
     
+    # TODO: Add input validation here
+    @classmethod
+    def create(cls, param):
+        if isinstance(param, str):
+            return cls.create_from_csv(param)
+        if isinstance(param, dict):
+            return cls.create_from_dict(param)
+        if isinstance(param, list):
+            return cls.create_from_list(param)
+    
     @property
     def index_to_label_dict(self):
         return self._index_to_label
@@ -44,3 +53,8 @@ class LabelMap(object):
     @index_to_label_dict.setter
     def index_to_label_dict(self, value):
         self._index_to_label = value
+
+    
+    # TODO: implement this
+    def transform(self):
+        pass

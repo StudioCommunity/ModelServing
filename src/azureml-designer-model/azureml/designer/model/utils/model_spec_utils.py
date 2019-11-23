@@ -26,7 +26,7 @@ def generate_model_spec(
     spec = {
         "flavor": flavor,
         "model_path": model_path,
-        "task_type": task_type.name
+        "task_type": task_type.name,
         "local_dependencies": local_dependencies,
         "time_created": time_created.strftime("%Y-%m-%d %H:%M:%S")
     }
@@ -37,7 +37,7 @@ def generate_model_spec(
     if outputs is not None:
         spec["outputs"] = [model_output.to_dict() for model_output in outputs]
     if label_map_path:
-        spec["label_map_path"] = label_map_path
+        spec["label_map"] = label_map_path
     if serving_config:
         spec["serving_config"] = serving_config.to_dict()
     logger.info(f"spec = {spec}")

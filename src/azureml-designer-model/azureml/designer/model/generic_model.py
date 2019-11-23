@@ -100,7 +100,9 @@ class GenericModel(object):
             conda_file_path=conda_file_path,
             local_dependencies=local_dependency_manager.copied_local_dependencies,
             inputs=self.inputs,
-            outputs=self.outputs
+            outputs=self.outputs,
+            task_type=self.task_type,
+            serving_config=self.serving_config
         )
         model_spec_utils.save_model_spec(artifact_path, model_spec)
 

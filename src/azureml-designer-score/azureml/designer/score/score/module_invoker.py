@@ -4,6 +4,7 @@ import argparse
 import pyarrow.parquet as pq # imported explicitly to avoid known issue of pd.read_parquet
 import pandas as pd
 import click
+from azureml.studio.core.io.image_directory import ImageDirectory
 
 from . import constants
 from .builtin_score_module import BuiltinScoreModule
@@ -16,11 +17,11 @@ from ..logger import get_logger
 
 logger = get_logger(__name__)
 
-INPUT_FILE_NAME = "data.dataset.parquet" # hard coded, to be replaced, and we presume the data is DataFrame inside parquet
+DFD_DATA_FILE_NAME = "data.dataset.parquet" # hard coded, to be replaced, and we presume the data is DataFrame inside parquet
 
 @click.command()
 @click.option("--trained-model", help="Path to ModelDirectory")
-@click.option("--dataset", help="Path to DFD")
+@click.option("--dataset", help="Path to DFD/ImageDirectory")
 @click.option("--scored-dataset", help="Path to output DFD")
 @click.option("--append-score-columns-to-output", default="true", help="Preserve all columns from input dataframe or not")
 def entrance(trained_model: str, dataset: str, scored_dataset: str, append_score_columns_to_output: str = "true"):
@@ -29,8 +30,15 @@ def entrance(trained_model: str, dataset: str, scored_dataset: str, append_score
         constants.APPEND_SCORE_COLUMNS_TO_OUTPUT_KEY: append_score_columns_to_output
     }
     score_module = BuiltinScoreModule(trained_model, params)
-    input_df = pd.read_parquet(os.path.join(dataset, INPUT_FILE_NAME), engine="pyarrow")
-    output_df = score_module.run(input_df)
+    # TODO: Determine dataset type be model input type. Or let module team provide method to determine directory type
+    dfd_data_file_path = os.path.join(dataset, DFD_DATA_FILE_NAME)
+    if os.path.exists(dfd_data_file_path):
+        input_df = pd.read_parquet(dfd_data_file_path, engine="pyarrow")
+        output_df = score_module.run(input_df)
+    # Assume dataset is a ImageDirectory
+    else:
+        image_directory = ImageDirectory.load(dataset)
+        output_df = score_module.run(image_directory)
 
     logger.info(f"input_df =\n{input_df}")
     logger.info(f"output_df =\n{output_df}")

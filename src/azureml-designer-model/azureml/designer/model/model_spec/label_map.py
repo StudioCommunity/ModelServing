@@ -49,7 +49,7 @@ class LabelMap(object):
     @property
     def index_to_label_dict(self):
         return self._index_to_label
-    
+
     @index_to_label_dict.setter
     def index_to_label_dict(self, value):
         self._index_to_label = value
@@ -57,4 +57,7 @@ class LabelMap(object):
     
     # TODO: implement this
     def transform(self):
+        pass
+
+    def inverse_transform(self):
         pass

@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 
 from . import constants
-from . import utils
+from .constants import ScoreColumnConstants
 from .utils import ioutils, model_spec_utils, yamlutils
 from .logger import get_logger
 from .model_factory import ModelFactory
@@ -32,8 +32,8 @@ class GenericModel(object):
     label_map = None
     serving_config = None
 
-    def __init__(self, core_model, conda=None, local_dependencies=None, inputs=None, task_type=None,
-                 label_map=None, outputs=None, serving_config=None):
+    def __init__(self, core_model, conda=None, local_dependencies=None, inputs=None, outputs=None, task_type=None,
+                 label_map=None, serving_config=None):
         self.core_model = core_model
         if not self.core_model.flavor:
             if not isinstance(core_model, BuiltinModel):
@@ -140,7 +140,9 @@ class GenericModel(object):
         if model_spec.get("outputs", None):
             outputs = [ModelInput.from_dict(model_output) for model_output in model_spec["inputs"]]
         if model_spec.get("task_type", None):
+            logger.info(f"model_spec['task_type'] = {model_spec['task_type']}")
             task_type = TaskType[model_spec["task_type"]]
+            logger.info(f"task_tye = {task_type}")
         if model_spec.get("label_map", None):
             load_from = os.path.join(artifact_path, model_spec["label_map"])
             label_map = LabelMap.create_from_csv(load_from)
@@ -166,7 +168,16 @@ class GenericModel(object):
         else:
             core_model = core_model_class.load(core_model_path)
 
-        return cls(core_model, conda, local_dependencies, inputs, outputs, task_type, label_map, serving_config)
+        return cls(
+            core_model=core_model,
+            conda=conda,
+            local_dependencies=local_dependencies,
+            inputs=inputs,
+            outputs=outputs,
+            task_type=task_type,
+            label_map=label_map,
+            serving_config=serving_config
+        )
         
     @abstractmethod
     def predict(self, *args, **kwargs):
@@ -205,8 +216,26 @@ class GenericModel(object):
                     output = self.core_model.predict([[image_ndarray, ]])
                     outputs += output
                 if self.task_type == TaskType.MultiClassification:
-                    pass
-                return outputs
+                    logger.info(f"MultiClass Classification Task, Result Contains Scored Label and Scored Probability")
+                    # From base_learner.py
+                    def _gen_scored_probability_column_name(label):
+                        """Generate scored probability column names with pattern "Scored Probabilities_label" """
+                        return '_'.join((ScoreColumnConstants.ScoredProbabilitiesMulticlassColumnNamePattern, str(label)))
+
+                    label_ids = [row[0] for row in outputs]
+                    probs = [row[1] for row in outputs]
+                    if probs:
+                        class_cnt = len(probs[0])
+                    else:
+                        return pd.DataFrame()
+                    index_to_label = self.label_map.index_to_label_dict
+
+                    result_df = pd.DataFrame(data=probs,
+                                     columns=[_gen_scored_probability_column_name(index_to_label.get(i, i)) for i in range(0, class_cnt)])
+                    result_df[ScoreColumnConstants.ScoredLabelsColumnName] = [index_to_label.get(i, i) for i in label_ids]
+                    return result_df
+                else:
+                    return pd.DataFrame(outputs)
         else:
             return self.core_model.predict(*args, **kwargs)
 

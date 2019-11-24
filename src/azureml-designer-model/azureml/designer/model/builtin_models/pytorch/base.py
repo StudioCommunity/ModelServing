@@ -54,7 +54,7 @@ class PytorchBaseModel(BuiltinModel):
                     softmax = torch.nn.Softmax(dim=1)
                     pred_probs = softmax(model_output).cpu().numpy()[0]
                     pred_index = torch.argmax(model_output, 1)[0].cpu().item()
-                    pred_result = [pred_index] + list(pred_probs)
+                    pred_result = pred_index, list(pred_probs)
                     # logger.info(f"pred_result = {pred_result}")
                     outputs.append(pred_result)
                 else:

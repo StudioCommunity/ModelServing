@@ -4,7 +4,9 @@ import argparse
 import pyarrow.parquet as pq # imported explicitly to avoid known issue of pd.read_parquet
 import pandas as pd
 import click
+from azureml.studio.core.io.any_directory import AnyDirectory
 from azureml.studio.core.io.image_directory import ImageDirectory
+from azureml.studio.core.io.data_frame_directory import DataFrameDirectory
 
 from . import constants
 from .builtin_score_module import BuiltinScoreModule
@@ -30,17 +32,17 @@ def entrance(trained_model: str, dataset: str, scored_dataset: str, append_score
         constants.APPEND_SCORE_COLUMNS_TO_OUTPUT_KEY: append_score_columns_to_output
     }
     score_module = BuiltinScoreModule(trained_model, params)
-    # TODO: Determine dataset type be model input type. Or let module team provide method to determine directory type
-    dfd_data_file_path = os.path.join(dataset, DFD_DATA_FILE_NAME)
-    if os.path.exists(dfd_data_file_path):
-        input_df = pd.read_parquet(dfd_data_file_path, engine="pyarrow")
-        output_df = score_module.run(input_df)
-    # Assume dataset is a ImageDirectory
-    else:
+    any_directory = AnyDirectory.load(dataset)
+    if any_directory.type == "DataFrameDirectory":
+        input_dfd = DataFrameDirectory.load(dataset)
+        logger.info(f"input_dfd =\n{input_dfd}")
+        output_df = score_module.run(input_dfd)
+    elif any_directory.type == "ImageDirectory":
         image_directory = ImageDirectory.load(dataset)
         output_df = score_module.run(image_directory)
+    else:
+        raise Exception(f"Unsupported directory type: {type(any_directory)}.")
 
-    logger.info(f"input_df =\n{input_df}")
     logger.info(f"output_df =\n{output_df}")
     logger.info(f"dumping to DFD {scored_dataset}")
     ioutils.save_dfd(output_df, scored_dataset)

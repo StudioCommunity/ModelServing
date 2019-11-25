@@ -4,7 +4,7 @@ import shutil
 
 PROJECT_ROOT_PATH = dirname(dirname(dirname(dirname(dirname(dirname(abspath(__file__)))))))
 MODEL_FOLDER_NAME = "AzureMLModel"
-DFD_DATA_FILE_NAME = "data.dataset.parquet"
+DFD_DIR_NAME = "dfd"
 IMAGE_DIR_NAME = "images"
 
 
@@ -15,7 +15,7 @@ def test_create_score_test_cases():
 
     for root, dirs, files in os.walk(src_tests_root_dir):
         if MODEL_FOLDER_NAME in dirs:
-            if not DFD_DATA_FILE_NAME in files and not IMAGE_DIR_NAME in dirs:
+            if not DFD_DIR_NAME in dirs and not IMAGE_DIR_NAME in dirs:
                 continue
             model_dir = os.path.join(root, MODEL_FOLDER_NAME)
             relative_to_tests_root = os.path.relpath(root, src_tests_root_dir)
@@ -23,11 +23,10 @@ def test_create_score_test_cases():
             input_port1_path = os.path.join(dst_test_path, "InputPort1")
             input_port2_path = os.path.join(dst_test_path, "InputPort2")
             shutil.copytree(model_dir, input_port1_path)
-            if DFD_DATA_FILE_NAME in files:
-                os.makedirs(input_port2_path, exist_ok=True)
-                src_data_file = os.path.join(root, DFD_DATA_FILE_NAME)
-                dst_data_file = os.path.join(input_port2_path, DFD_DATA_FILE_NAME)
-                shutil.copy(src_data_file, dst_data_file)
+            if DFD_DIR_NAME in dirs:
+                src_dfd = os.path.join(root, DFD_DIR_NAME)
+                dst_dfd = input_port2_path
+                shutil.copytree(src_dfd, dst_dfd)
             elif IMAGE_DIR_NAME in dirs:
                 src_image_dir = os.path.join(root, IMAGE_DIR_NAME)
                 dst_image_dir = input_port2_path

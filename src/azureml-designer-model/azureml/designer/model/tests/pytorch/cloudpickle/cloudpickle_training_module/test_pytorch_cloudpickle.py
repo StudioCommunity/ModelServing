@@ -57,5 +57,10 @@ def test_save_load():
     loaded_pytorch_model = loaded_generic_model.raw_model
     assert isinstance(loaded_pytorch_model, torch.nn.Module)
 
-    data_save_path = os.path.join(dirname(dirname(abspath(__file__))), "data.dataset.parquet")
+    dfd_path = os.path.join(dirname(dirname(abspath(__file__))), "dfd")
+    os.makedirs(dfd_path, exist_ok=True)
+    data_save_path = os.path.join(dfd_path, "data.dataset.parquet")
     df.to_parquet(data_save_path, engine="pyarrow")
+    meta_path = os.path.join(dfd_path, "_meta.yaml")
+    with open(meta_path, "w") as fp:
+        fp.write("type: DataFrameDirectory\nextension: {}\nformat: Parquet\ndata: data.dataset.parquet")

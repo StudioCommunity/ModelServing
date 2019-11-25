@@ -5,12 +5,14 @@ from abc import abstractmethod
 from .. import constants
 from ..core_model import CoreModel
 from ..model_factory import BuiltinModelMeta
+from ..model_spec.task_type import TaskType
 
 PYTHON_VERSION = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
 
 
 class BuiltinModel(CoreModel, metaclass=BuiltinModelMeta):
     serialization_method = None
+    task_type = TaskType.Regression
 
     flavor = {
         "name": None,

@@ -28,7 +28,6 @@ class PytorchBaseModel(BuiltinModel):
     }
     default_conda = conda_merger.merge_envs([BuiltinModel.default_conda, extra_conda])
     # To determine whether or not apply softmax on model predict result
-    task_type = TaskType.MultiClassification
 
     def __init__(self, raw_model, flavor: dict = {}):
         self.raw_model = raw_model
@@ -57,8 +56,10 @@ class PytorchBaseModel(BuiltinModel):
                     pred_result = pred_index, list(pred_probs)
                     # logger.info(f"pred_result = {pred_result}")
                     outputs.append(pred_result)
-                else:
+                elif self.task_type == TaskType.Regression:
                     outputs.append(model_output.squeeze(0).tolist())
+                else:
+                    raise Exception(f"Task_type: {self.task_type.name} not implemented yet.")
 
         return outputs
 

@@ -29,7 +29,9 @@ class BuiltinScoreModule(object):
             result_df = self.model.predict(input_directory.iter_images())
             return result_df
         else:
-            output_label = self.model.predict(input_directory)
+            # Temp workaround
+            df = input_directory.data
+            output_label = self.model.predict(df)
             logger.info(f"output_label = {output_label}")
             if self.append_score_column_to_output:
                 if isinstance(output_label, pd.DataFrame):

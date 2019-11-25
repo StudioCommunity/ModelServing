@@ -56,6 +56,7 @@ class GenericModel(object):
         self.serving_config = serving_config
 
         if isinstance(core_model, BuiltinModel):
+            # Init feature_columns
             if self.inputs:
                 self._feature_columns_names = [model_input.name for model_input in self.inputs]
                 logger.info(f"Loaded feature_columns_names from inputs: {self._feature_columns_names}")
@@ -64,6 +65,10 @@ class GenericModel(object):
                 logger.info(f"Loaed feature_columns_names from default: {self._feature_columns_names}")
             if not self._feature_columns_names:
                 raise Exception("Can't initialize model without feature_columns_names")
+
+            # Init task_type
+            if task_type:
+                self.core_model.task_type = task_type
 
     def save(
         self,
@@ -125,6 +130,8 @@ class GenericModel(object):
         conda = None
         inputs = None
         outputs = None
+        task_type = None
+        label_map = None
         serving_config = None
         
         # TODO: Use auxiliary method to handle None in loaded yaml file following Module Team

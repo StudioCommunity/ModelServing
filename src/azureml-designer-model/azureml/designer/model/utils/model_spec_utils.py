@@ -18,7 +18,7 @@ def generate_model_spec(
         local_dependencies: list = [],
         inputs: list = None,
         outputs: list = None,
-        task_type: TaskType = TaskType.Regression,
+        task_type=None,
         label_map_path: str = None,
         serving_config: ServingConfig = None,
         time_created: datetime = datetime.now()
@@ -26,7 +26,6 @@ def generate_model_spec(
     spec = {
         "flavor": flavor,
         "model_path": model_path,
-        "task_type": task_type.name,
         "local_dependencies": local_dependencies,
         "time_created": time_created.strftime("%Y-%m-%d %H:%M:%S")
     }
@@ -36,6 +35,8 @@ def generate_model_spec(
         spec["inputs"] = [model_input.to_dict() for model_input in inputs]
     if outputs is not None:
         spec["outputs"] = [model_output.to_dict() for model_output in outputs]
+    if task_type:
+        spec["task_type"] = task_type.name
     if label_map_path:
         spec["label_map"] = label_map_path
     if serving_config:

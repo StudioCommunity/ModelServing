@@ -3,14 +3,15 @@ import json
 import os
 import math
 import numpy as np
+import pandas as pd
 from collections import defaultdict
 import importlib
 
 from azureml.core.model import Model
 from azureml.studio.common.error import ModuleError
 
-from .ScoreExceptions import InputDataError, ResourceLoadingError
-from .DAGExecutionEngine import DAGraph, DAGExecutionEngine, PerformanceCounter, set_global_modelpackage
+from .score_exceptions import InputDataError, ResourceLoadingError
+from .dag_execution_engine import DAGraph, DAGExecutionEngine, PerformanceCounter, set_global_modelpackage
 
 import logging
 
@@ -289,5 +290,7 @@ class NpEncoder(json.JSONEncoder):
             return float(obj)
         elif isinstance(obj, np.ndarray):
             return obj.tolist()
+        elif isinstance(obj, pd.Timestamp):
+            return str(obj)
         else:
             return super(NpEncoder, self).default(obj)

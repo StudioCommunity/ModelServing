@@ -83,7 +83,7 @@ def create_dirs(base_dir, directories):
 
 
 def copy_scripts(target_dir, overwrite=True):
-    candidates = ['Score.py', 'DAGExecutionEngine.py', 'main.py', 'ScoreExceptions.py', 'Processor.py', 'rundocker.py']
+    candidates = ['main.py', 'rundocker.py']
     for candidate in candidates:
         target_file = os.path.join(target_dir, candidate)
         if os.path.exists(target_file) and not overwrite:
@@ -179,7 +179,7 @@ def write_dockerfile(base_image, target_dir):
     with open(os.path.join(target_dir, 'Dockerfile'), 'w') as fp:
         fp.write(dockerfile)
 
-# python -m azureml.designer.score.dagengine.CreateDebugEnv.py create_from_params subscription resourcegroup workspace deployment realtimeendpoint
-# python -m azureml.designer.score.dagengine.CreateDebugEnv.py create_from_params 74eccef0-4b8d-4f83-b5f9-fa100d155b22 clwantest clwantest "" s7-test2
+# python -m azureml.designer.score.dagengine.create_debug_env.py create_from_params subscription resourcegroup workspace deployment realtimeendpoint
+# python -m azureml.designer.score.dagengine.debug.create_debug_env create_from_params 74eccef0-4b8d-4f83-b5f9-fa100d155b22 clwantest clwantest "" s7-test2
 if __name__ == '__main__':
     fire.Fire({'create_from_params': create_from_params, 'create_from_url': create_from_url})

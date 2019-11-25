@@ -12,7 +12,7 @@ try:
 except ImportError:
     pass
 
-driver_module_spec = imp.spec_from_file_location('service_driver', 'Score.py')
+driver_module_spec = imp.spec_from_file_location('service_driver', 'score.py')
 driver_module = imp.module_from_spec(driver_module_spec)
 driver_module_spec.loader.exec_module(driver_module)
 

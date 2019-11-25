@@ -21,7 +21,7 @@ from azureml.studio.modulehost.deployment_service_module_host import DeploymentS
 from azureml.studio.modulehost.handler.data_handler import ZipHandler
 from azureml.studio.modulehost.handler.port_io_handler import InputHandler
 from azureml.studio.modulehost.module_reflector import ModuleEntry
-from .ScoreExceptions import InputDataError, ResourceLoadingError
+from .score_exceptions import InputDataError, ResourceLoadingError
 
 import logging
 
@@ -324,6 +324,19 @@ class ResourceLoader(object):
         'TransformationDirectory': 'data.itransform'
     }
 
+    @staticmethod
+    def from_name(name):
+        """Given a name of DataType, find a corresponding item in DataTypes enum.
+
+        :param name: The name of DataType.
+        :return: The corresponding item in DataTypes enum.
+        """
+        for e in DataTypes:
+            if e.value.ws20_name == name:
+                return e
+        else:
+            raise ValueError(f"Failed to load instance of DataTypes from dict")
+
     # 'ModelDirectory' 'TransformDirectory' 'AnyDirectory' 'DataFramDirectory' 'AnyFile'
     @classmethod
     def load_static_source(cls, static_source):
@@ -336,7 +349,7 @@ class ResourceLoader(object):
                 if is_path:
                     data_type = None
                 else:
-                    data_type = DataTypes.from_name(static_source.type_id)
+                    data_type = ResourceLoader.from_name(static_source.type_id)
             else:
                 data_type = cls.typename2datatype[static_source.type_name]
                 logger.warning(f'StaticSource({static_source.model_name}) has no type_id')

@@ -1,6 +1,6 @@
 import os
 import json
-import Score
+import azureml.designer.score.dagengine.score as Score
 
 
 class MockRequest(object):
@@ -13,7 +13,7 @@ class MockRequest(object):
         return self.data
 
 
-def testrun(input_file, output_dir):
+def run(input_file, output_dir):
     basename = os.path.basename(input_file)
     output_file = os.path.join(output_dir, 'out.' + basename)
     with open(input_file, 'r') as fp:
@@ -50,5 +50,5 @@ if __name__ == "__main__":
     for input_file in os.listdir(input_dir):
         input_file = os.path.join(input_dir, input_file)
         if os.path.isfile(input_file):
-            testrun(input_file, output_dir)
+            run(input_file, output_dir)
     print(f'Output files are available in folder "{output_dir}"')

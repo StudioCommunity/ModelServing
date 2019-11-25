@@ -32,7 +32,7 @@ def get_package_version():
 with io.open('../.inlinelicense', 'r', encoding='utf-8') as f:
     inline_license = f.read()
 
-exclude_list = ["*.tests", "azureml/designer/tests", "tests"]
+exclude_list = ["*.tests", "azureml/designer/tests", "tests", "azureml.designer.score.preprocess", "azureml.designer.score.postprocess", "azureml.designer.score.modelconverter", "examples.*"]
 packages = find_packages(exclude=exclude_list)
 print(f"packages = {packages}")
 

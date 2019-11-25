@@ -42,6 +42,7 @@ steps:
     source activate loader_env
     cd src/azureml-designer-score
     python -m pip install --upgrade pip
+    pip install keyring artifacts-keyring
     pip install -r requirements.txt --extra-index-url=https://msdata.pkgs.visualstudio.com/_packaging/azureml-modules%40Local/pypi/simple/
   displayName: 'Install azureml-designer-score dependencies'
 

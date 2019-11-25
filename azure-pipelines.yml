@@ -39,9 +39,9 @@ steps:
   displayName: 'Create score test cases from model test output'
 
 - bash: |
-    export VSS_NUGET_EXTERNAL_FEED_ENDPOINTS='{"endpointCredentials": [{"endpoint":"https://msdata.pkgs.visualstudio.com/_packing/azureml-modules/pypi/simple","username":"azureml-modules","password":"o6yytfzzs5wltlabc3yvee6uat43hzt4htwhr4svr52my3ri5wba"}]}'
-    export ARTIFACTS_KEYRING_NONINTERACTIVE_MODE=true
     source activate loader_env
+    export VSS_NUGET_EXTERNAL_FEED_ENDPOINTS="{'endpointCredentials': [{'endpoint':'https://msdata.pkgs.visualstudio.com/_packing/azureml-modules/pypi/simple','username':'azureml-modules','password':'o6yytfzzs5wltlabc3yvee6uat43hzt4htwhr4svr52my3ri5wba'}]}"
+    export ARTIFACTS_KEYRING_NONINTERACTIVE_MODE=true
     cd src/azureml-designer-score
     python -m pip install --upgrade pip
     pip install keyring --pre

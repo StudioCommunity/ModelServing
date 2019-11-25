@@ -31,7 +31,9 @@ def get_package_version():
 with io.open('../.inlinelicense', 'r', encoding='utf-8') as f:
     inline_license = f.read()
 
-exclude_list = ["*.tests", "azureml/designer/tests", "tests"]
+# Donot exclude test directory follow Module Team's practice.
+# exclude_list = ["*.tests", "azureml/designer/tests", "tests"]
+exclude_list = []
 packages = find_packages(exclude=exclude_list)
 print(f"packages = {packages}")
 

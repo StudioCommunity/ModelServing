@@ -1,10 +1,11 @@
 name: Score for Deep Learning Models
 id: 412abbd1-794f-4888-a72f-a16220b9a521
+version: 0.0.0.1
 category: Machine Learning\Score
 description: Buildin Score Module for a set of limited flavors
 inputs:
 - name: Trained model
-  type: ModelFolder
+  type: ModelDirectory
   port: true
   description: Trained predictive model
 - name: Dataset
@@ -18,7 +19,7 @@ inputs:
     return the scores and true labels if available.
 outputs:
 - name: Scored dataset
-  type: TabularDataFolder
+  type: DataFrameDirectory
   description: Dataset with obtained scores
 implementation:
   container:
@@ -35,12 +36,13 @@ implementation:
       - pip:
         # Remove extra-index-url because register tool automatically add that
         - azureml-designer-model==0.1.20191125.8
-        - azureml-designer-score==0.1.20191125.8
+        - azureml-designer-score==0.1.20191126.1
         - azureml-designer-core==0.0.25
         - cloudpickle
         - PyYAML
-        - unidecode 
-        - inflect
+        - click
+        - pandas
+        - pyarrow==0.12.1
     command:
     - python
     - -m

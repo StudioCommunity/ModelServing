@@ -218,6 +218,7 @@ class GenericModel(object):
                     image_id_list.append(image_id)
                     ground_truth_label_list.append(label)
                     image_ndarray = np.array(image)
+                    image_ndarray = np.true_divide(image_ndarray, 255.0)
                     image_ndarray = np.moveaxis(image_ndarray, -1, 0)
                     image_ndarray = np.expand_dims(image_ndarray, axis=0)
                     logger.info(f"image_ndarray.shape = {image_ndarray.shape}")

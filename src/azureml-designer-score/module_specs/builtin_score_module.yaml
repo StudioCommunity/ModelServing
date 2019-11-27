@@ -8,7 +8,7 @@ inputs:
   port: true
   description: Trained predictive model
 - name: Dataset
-  type: TabularDataFolder
+  type: AnyDirectory
   port: True
   description: input data to score
 - name: Append score columns to output
@@ -33,15 +33,12 @@ implementation:
       - python=3.6.8
       - conda
       - pip:
-        - --extra-index-url=https://test.pypi.org/simple
-        - --extra-index-url=https://azuremlsdktestpypi.azureedge.net/Create-Dev-Index/5997766/
-        - --extra-index-url=https://CustomModules:ua7fuhttm64csuuwl2cdy5zqq4ptw3otufevwselh23nse2xrtpq@msdata.pkgs.visualstudio.com/_packaging/CustomModules/pypi/simple/
-        - azureml-designer-classic-modules==0.0.103
-        - azureml-designer-model
-        - azureml-designer-score
+        # Remove extra-index-url because register tool automatically add that
+        - azureml-designer-model==0.1.20191125.8
+        - azureml-designer-score==0.1.20191125.8
+        - azureml-designer-core==0.0.25
         - cloudpickle
         - PyYAML
-        - pyarrow==0.12.1
         - unidecode 
         - inflect
     command:

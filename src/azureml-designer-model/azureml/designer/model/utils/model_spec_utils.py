@@ -30,7 +30,7 @@ def generate_model_spec(
         "time_created": time_created.strftime("%Y-%m-%d %H:%M:%S")
     }
     if conda_file_path:
-        spec["conda_file"]: conda_file_path
+        spec["conda_file"] = conda_file_path
     if inputs is not None:
         spec["inputs"] = [model_input.to_dict() for model_input in inputs]
     if outputs is not None:

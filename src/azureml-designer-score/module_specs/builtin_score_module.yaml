@@ -35,8 +35,8 @@ implementation:
       - conda
       - pip:
         # Remove extra-index-url because register tool automatically add that
-        - azureml-designer-model==0.1.20191125.8
-        - azureml-designer-score==0.1.20191126.1
+        - azureml-designer-model==0.1.20191126.2
+        - azureml-designer-score==0.1.20191126.2
         - azureml-designer-core==0.0.25
         - cloudpickle
         - PyYAML

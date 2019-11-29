@@ -62,7 +62,7 @@ class GenericModel(object):
                 logger.info(f"Loaded feature_columns_names from inputs: {self._feature_columns_names}")
             else:
                 self._feature_columns_names = self.core_model.get_default_feature_columns()
-                logger.info(f"Loaed feature_columns_names from default: {self._feature_columns_names}")
+                logger.info(f"Loaded feature_columns_names from default: {self._feature_columns_names}")
             if not self._feature_columns_names:
                 raise Exception("Can't initialize model without feature_columns_names")
 
@@ -195,41 +195,50 @@ class GenericModel(object):
         """
         # TODO: Some input validation and normalization here
         logger.info(f"args = {args}, kwargs = {kwargs}")
+        input_data = args[0]
         if isinstance(self.core_model, BuiltinModel):
-            # For BuiltinModel, we assume there's only one positional input parameter in args[0], which a DFD or ImageDirectory
+            # For BuiltinModel, we assume there's only one positional input parameter in args[0],
+            # which is a DFD or ImageDirectory
             # The assumption is because Score Module support only one data input port
-            if isinstance(args[0], pd.DataFrame):
-                outputs = self.core_model.predict(args[0][self._feature_columns_names].values)
+            if isinstance(input_data, pd.DataFrame):
+                predict_ret_list = self.core_model.predict(input_data[self._feature_columns_names].values)
                 # TODO: formulate output_df according to task_type
-                output_df = pd.DataFrame(outputs)
+                output_df = pd.DataFrame(predict_ret_list)
                 output_df.columns = [f"Score_{i}" for i in range(0, output_df.shape[1])]
                 logger.info(f"output_df =\n{output_df}")
                 return output_df
             # Else assume args[0] is a generator of ImageDirectory.iter_images()
             # Didn't use ImageDirectory object to prevent depending on azureml.designer.core
-            # This logic should be refactored after we resolve cyclic dependency
             else:
-                outputs = []
                 image_id_list = []
                 ground_truth_label_list = []
                 predict_ret_list = []
                 # TODO: Implement batch inference
                 for image, label, image_id in args[0]:
+                    image_id_list.append(image_id)
+                    ground_truth_label_list.append(label)
                     image_ndarray = np.array(image)
+                    image_ndarray = np.true_divide(image_ndarray, 255.0)
                     image_ndarray = np.moveaxis(image_ndarray, -1, 0)
                     image_ndarray = np.expand_dims(image_ndarray, axis=0)
                     logger.info(f"image_ndarray.shape = {image_ndarray.shape}")
                     output = self.core_model.predict([[image_ndarray, ]])
-                    outputs += output
+                    predict_ret_list += output
+                # Temp Workaround for Densenet Demo
+                _IDENTIFIER_NAME = 'identifier'
+                _LABEL_NAME = 'label'
+                data_df = pd.DataFrame({_IDENTIFIER_NAME: image_id_list, _LABEL_NAME: ground_truth_label_list})
                 if self.task_type == TaskType.MultiClassification:
                     logger.info(f"MultiClass Classification Task, Result Contains Scored Label and Scored Probability")
+
                     # From base_learner.py
                     def _gen_scored_probability_column_name(label):
                         """Generate scored probability column names with pattern "Scored Probabilities_label" """
-                        return '_'.join((ScoreColumnConstants.ScoredProbabilitiesMulticlassColumnNamePattern, str(label)))
+                        return '_'.join(
+                            (ScoreColumnConstants.ScoredProbabilitiesMulticlassColumnNamePattern, str(label)))
 
-                    label_ids = [row[0] for row in outputs]
-                    probs = [row[1] for row in outputs]
+                    label_ids = [row[0] for row in predict_ret_list]
+                    probs = [row[1] for row in predict_ret_list]
                     if probs:
                         class_cnt = len(probs[0])
                     else:
@@ -237,13 +246,22 @@ class GenericModel(object):
                     index_to_label = self.label_map.index_to_label_dict
 
                     result_df = pd.DataFrame(data=probs,
-                                     columns=[_gen_scored_probability_column_name(index_to_label.get(i, i)) for i in range(0, class_cnt)])
-                    result_df[ScoreColumnConstants.ScoredLabelsColumnName] = [index_to_label.get(i, i) for i in label_ids]
+                                             columns=[_gen_scored_probability_column_name(index_to_label.get(i, i)) for
+                                                      i in range(0, class_cnt)])
+                    result_df[ScoreColumnConstants.ScoredLabelsColumnName] = [index_to_label.get(i, i) for i in
+                                                                              label_ids]
+                    result_df = pd.concat([data_df, result_df], axis=1)
                     return result_df
                 else:
-                    return pd.DataFrame(outputs)
+                    return pd.DataFrame(predict_ret_list)
         else:
             return self.core_model.predict(*args, **kwargs)
+
+    def _preprocess(self):
+        pass
+
+    def _postprocess(self):
+        pass
 
     @property
     def raw_model(self):

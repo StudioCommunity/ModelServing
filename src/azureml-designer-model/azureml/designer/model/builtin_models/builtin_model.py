@@ -25,10 +25,10 @@ class BuiltinModel(CoreModel, metaclass=BuiltinModelMeta):
         "dependencies": [f"python={PYTHON_VERSION}"]
     }
 
-    # Builtin models don't instantiate load without flavor method
+    # Load without flavor method shouldn't be called by Builtin models, instantiated to be placeholder
     @classmethod
     def load(cls, load_from):
-        pass
+        raise Exception("Load without flavor method shouldn't be called by Builtin models.")
 
     @classmethod
     @abstractmethod

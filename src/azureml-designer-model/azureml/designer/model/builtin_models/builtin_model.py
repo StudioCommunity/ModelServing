@@ -2,7 +2,7 @@ import sys
 
 from abc import abstractmethod
 
-from .. import constants
+from ..constants import ModelSpecConstants
 from ..core_model import CoreModel
 from ..model_factory import BuiltinModelMeta
 from ..model_spec.task_type import TaskType
@@ -15,12 +15,12 @@ class BuiltinModel(CoreModel, metaclass=BuiltinModelMeta):
     task_type = TaskType.Regression
 
     flavor = {
-        "name": None,
-        "serialization_method": None
+        ModelSpecConstants.FLAVOR_NAME_KEY: None,
+        ModelSpecConstants.SERIALIZATION_METHOD_KEY: None
     }
 
     default_conda = {
-        "name": constants.CONDA_ENV_NAME,
+        "name": ModelSpecConstants.CONDA_ENV_NAME,
         'channels': ['defaults'],
         "dependencies": [f"python={PYTHON_VERSION}"]
     }

@@ -4,6 +4,7 @@ import importlib
 import torch
 
 from .base import PytorchBaseModel
+from ...constants import ModelSpecConstants
 from ...logger import get_logger
 from ...utils import conda_merger, ioutils, dictutils
 
@@ -17,11 +18,15 @@ class PytorchStateDictModel(PytorchBaseModel):
     default_conda = conda_merger.merge_envs([PytorchBaseModel.default_conda, extra_conda])
 
     def __init__(self, raw_model, flavor):
-        if not flavor.get("model_module", None):
-            self.flavor["model_module"] = raw_model.__class__.__module__
-        if not flavor.get("model_class", None):
-            self.flavor["model_class"] = raw_model.__class__.__name__
-        self.flavor["init_params"] = flavor.get("init_params", {})
+        self.flavor[ModelSpecConstants.MODEL_MODULE_KEY] = flavor.get(
+            ModelSpecConstants.MODEL_MODULE_KEY,
+            raw_model.__class__.__module__)
+        self.flavor[ModelSpecConstants.MODEL_CLASS_KEY] = flavor.get(
+            ModelSpecConstants.MODEL_CLASS_KEY,
+            raw_model.__class__.__name__)
+        self.flavor[ModelSpecConstants.INIT_PARAMS_KEY] = flavor.get(
+            ModelSpecConstants.INIT_PARAMS_KEY,
+            {})
         super().__init__(raw_model, flavor)
 
     def save(self, save_to, overwrite_if_exists=True):
@@ -32,12 +37,12 @@ class PytorchStateDictModel(PytorchBaseModel):
 
     @classmethod
     def load_with_flavor(cls, load_from, flavor):
-        model_module = flavor.get("model_module", None)
+        model_module = flavor.get(ModelSpecConstants.MODEL_MODULE_KEY, None)
         model_class = torch.nn.Module
         if not model_module:
             logger.warning("No model_module specified, using nn.Module as default.")
         else:
-            model_class_name = flavor.get("model_class", None)
+            model_class_name = flavor.get(ModelSpecConstants.MODEL_CLASS_KEY, None)
             if not model_class_name:
                 logger.warning("No model_class specified, using nn.Module as default.")
             else:
@@ -48,7 +53,7 @@ class PytorchStateDictModel(PytorchBaseModel):
                     logger.error(f"Failed to load {model_class} from {model_module}")
                     raise
 
-        init_params = flavor.get("init_params", {})
+        init_params = flavor.get(ModelSpecConstants.INIT_PARAMS_KEY, {})
         model = model_class(**init_params)
         model.load_state_dict(torch.load(load_from))
 

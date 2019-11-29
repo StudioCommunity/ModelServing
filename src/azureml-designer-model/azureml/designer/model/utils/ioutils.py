@@ -1,7 +1,7 @@
 import os
 import shutil
 
-from .. import constants
+from ..constants import ModelSpecConstants
 from ..logger import get_logger
 from ..utils import yamlutils
 
@@ -17,8 +17,8 @@ def save_conda_env(path, conda_env):
     if not isinstance(conda_env, dict):
         raise Exception("Could not load conda_env %s" % conda_env)
     logger.info(f'CONDA: {conda_env}')
-    yamlutils.dump_to_yaml_file(conda_env, os.path.join(path, constants.CONDA_FILE_NAME))
-    fn = os.path.join(path, constants.CONDA_FILE_NAME)
+    yamlutils.dump_to_yaml_file(conda_env, os.path.join(path, ModelSpecConstants.CONDA_FILE_NAME))
+    fn = os.path.join(path, ModelSpecConstants.CONDA_FILE_NAME)
     logger.info(f'CONDA_FILE: {fn}')
 
 

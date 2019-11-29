@@ -5,14 +5,14 @@ from abc import abstractmethod
 import numpy as np
 import pandas as pd
 
-from . import constants
-from .constants import ScoreColumnConstants
+from .constants import ScoreColumnConstants, ModelSpecConstants
 from .utils import ioutils, model_spec_utils, yamlutils
 from .logger import get_logger
 from .model_factory import ModelFactory
 from .builtin_models.builtin_model import BuiltinModel
 from .model_spec.local_dependency import LocalDependencyManager
 from .model_spec.model_input import ModelInput
+from .model_spec.model_output import ModelOutput
 from .model_spec.task_type import TaskType
 from .model_spec.label_map import LabelMap
 from .model_spec.remote_dependency import RemoteDependencyManager
@@ -38,9 +38,9 @@ class GenericModel(object):
         if not self.core_model.flavor:
             if not isinstance(core_model, BuiltinModel):
                 self.core_model.flavor = {
-                    "name": constants.CUSTOM_MODEL_FLAVOR_NAME,
-                    "module": self.core_model.__class__.__module__,
-                    "class": self.core_model.__class__.__name__
+                    ModelSpecConstants.FLAVOR_NAME_KEY: ModelSpecConstants.CUSTOM_MODEL_FLAVOR_NAME,
+                    ModelSpecConstants.MODEL_MODULE_KEY: self.core_model.__class__.__module__,
+                    ModelSpecConstants.MODEL_CLASS_KEY: self.core_model.__class__.__name__
                 }
             else:
                 raise Exception("BuiltinModel Can't be initialized without flavor")
@@ -72,8 +72,8 @@ class GenericModel(object):
 
     def save(
         self,
-        artifact_path: str = "./AzureMLModel",
-        model_relative_to_artifact_path : str = "model",
+        artifact_path: str = ModelSpecConstants.DEFAULT_ARTIFACT_SAVE_PATH,
+        model_relative_to_artifact_path : str = ModelSpecConstants.CUSTOM_MODEL_DIRECTORY,
         overwrite_if_exists: bool = True
     ):
         os.makedirs(artifact_path, exist_ok=overwrite_if_exists)
@@ -87,7 +87,7 @@ class GenericModel(object):
         # TODO: Provide the option to save result of "conda env export"
         if self.conda:
             ioutils.save_conda_env(artifact_path, self.conda)
-            conda_file_path = constants.CONDA_FILE_NAME
+            conda_file_path = ModelSpecConstants.CONDA_FILE_NAME
         else:
             # TODO: dump local conda env
             pass
@@ -102,7 +102,7 @@ class GenericModel(object):
 
         label_map_file_name = None
         if self.label_map:
-            label_map_file_name = constants.LABEL_MAP_FILE_NAME
+            label_map_file_name = ModelSpecConstants.LABEL_MAP_FILE_NAME
             label_map_path = os.path.join(artifact_path, label_map_file_name)
             self.label_map.save(label_map_path)
 
@@ -121,12 +121,12 @@ class GenericModel(object):
 
     @classmethod
     def load(cls, artifact_path, install_dependencies=False):
-        model_spec_path = os.path.join(artifact_path, constants.MODEL_SPEC_FILE_NAME)
+        model_spec_path = os.path.join(artifact_path, ModelSpecConstants.MODEL_SPEC_FILE_NAME)
         logger.info(f"MODEL_FOLDER: {os.listdir(artifact_path)}")
         model_spec = yamlutils.load_yaml_file(model_spec_path)
         logger.info(f"Successfully loaded {model_spec_path}")
         
-        flavor = model_spec["flavor"]
+        flavor = model_spec[ModelSpecConstants.FLAVOR_KEY]
         conda = None
         inputs = None
         outputs = None
@@ -135,26 +135,25 @@ class GenericModel(object):
         serving_config = None
         
         # TODO: Use auxiliary method to handle None in loaded yaml file following Module Team
-        if model_spec.get("conda_file", None):
-            conda_yaml_path = os.path.join(artifact_path, model_spec["conda_file"])
+        if model_spec.get(ModelSpecConstants.CONDA_FILE_KEY, None):
+            conda_yaml_path = os.path.join(artifact_path, model_spec[ModelSpecConstants.CONDA_FILE_KEY])
             conda = yamlutils.load_yaml_file(conda_yaml_path)
             logger.info(f"Successfully loaded {conda_yaml_path}")
 
-        local_dependencies = model_spec.get("local_dependencies", None)
+        local_dependencies = model_spec.get(ModelSpecConstants.LOCAL_DEPENDENCIES_KEY, None)
         logger.info(f"local_dependencies = {local_dependencies}")
-        if model_spec.get("inputs", None):
-            inputs = [ModelInput.from_dict(model_input) for model_input in model_spec["inputs"]]
-        if model_spec.get("outputs", None):
-            outputs = [ModelInput.from_dict(model_output) for model_output in model_spec["inputs"]]
-        if model_spec.get("task_type", None):
-            logger.info(f"model_spec['task_type'] = {model_spec['task_type']}")
-            task_type = TaskType[model_spec["task_type"]]
+        if model_spec.get(ModelSpecConstants.INPUTS_KEY, None):
+            inputs = [ModelInput.from_dict(model_input) for model_input in model_spec[ModelSpecConstants.INPUTS_KEY]]
+        if model_spec.get(ModelSpecConstants.OUTPUTS_KEY, None):
+            outputs = [ModelOutput.from_dict(model_output) for model_output in model_spec[ModelSpecConstants.OUTPUTS_KEY]]
+        if model_spec.get(ModelSpecConstants.TASK_TYPE_KEY, None):
+            task_type = TaskType[model_spec[ModelSpecConstants.TASK_TYPE_KEY]]
             logger.info(f"task_tye = {task_type}")
-        if model_spec.get("label_map", None):
-            load_from = os.path.join(artifact_path, model_spec["label_map"])
+        if model_spec.get(ModelSpecConstants.LABEL_MAP_FILE_KEY, None):
+            load_from = os.path.join(artifact_path, model_spec[ModelSpecConstants.LABEL_MAP_FILE_KEY])
             label_map = LabelMap.create_from_csv(load_from)
-        if model_spec.get("serving_config", None):
-            serving_config = ServingConfig.from_dict(model_spec["serving_config"])
+        if model_spec.get(ModelSpecConstants.SERVING_CONFIG_KEY, None):
+            serving_config = ServingConfig.from_dict(model_spec[ModelSpecConstants.SERVING_CONFIG_KEY])
 
         if install_dependencies:
             logger.info("Installing dependencies")
@@ -169,9 +168,9 @@ class GenericModel(object):
                 local_dependency_manager.install()
 
         core_model_class = ModelFactory.get_model_class(flavor)
-        core_model_path = os.path.join(artifact_path, model_spec["model_path"])
+        core_model_path = os.path.join(artifact_path, model_spec[ModelSpecConstants.MODEL_FILE_KEY])
         if issubclass(core_model_class, BuiltinModel):
-            core_model = core_model_class.load_with_flavor(core_model_path, model_spec.get("flavor", {}))
+            core_model = core_model_class.load_with_flavor(core_model_path, model_spec.get(ModelSpecConstants.FLAVOR_KEY, {}))
         else:
             core_model = core_model_class.load(core_model_path)
 

@@ -6,6 +6,7 @@ import torch
 import torchvision
 
 from ..builtin_model import BuiltinModel
+from ...constants import ModelSpecConstants
 from ...logger import get_logger
 from ...utils import conda_merger
 from ...model_spec.task_type import TaskType
@@ -27,12 +28,11 @@ class PytorchBaseModel(BuiltinModel):
         ]
     }
     default_conda = conda_merger.merge_envs([BuiltinModel.default_conda, extra_conda])
-    # To determine whether or not apply softmax on model predict result
 
     def __init__(self, raw_model, flavor: dict = {}):
         self.raw_model = raw_model
-        is_cuda = flavor.get("is_cuda", False)
-        self.flavor["is_cuda"] = is_cuda
+        is_cuda = flavor.get(ModelSpecConstants.IS_CUDA_KEY, False)
+        self.flavor[ModelSpecConstants.IS_CUDA_KEY] = is_cuda
         self._device = "cuda" if is_cuda and torch.cuda.is_available() else "cpu"
         self.raw_model.to(self._device)
         self.raw_model.eval()

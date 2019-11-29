@@ -20,6 +20,9 @@ def test_create_score_test_cases():
             model_dir = os.path.join(root, MODEL_FOLDER_NAME)
             relative_to_tests_root = os.path.relpath(root, src_tests_root_dir)
             dst_test_path = os.path.join(dst_tests_root_dir, relative_to_tests_root)
+            if os.path.exists(dst_test_path):
+                print(f"Removed test case in {dst_test_path}")
+                shutil.rmtree(dst_test_path)
             input_port1_path = os.path.join(dst_test_path, "InputPort1")
             input_port2_path = os.path.join(dst_test_path, "InputPort2")
             shutil.copytree(model_dir, input_port1_path)

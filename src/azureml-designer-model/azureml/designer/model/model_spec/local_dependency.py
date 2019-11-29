@@ -2,7 +2,7 @@ import os
 import sys
 import shutil
 
-from .. import constants
+from ..constants import ModelSpecConstants
 from ..utils import ioutils
 from ..logger import get_logger
 
@@ -17,7 +17,7 @@ class LocalDependencyManager(object):
 
     def save(self, artifact_path, exist_ok=True) -> list:
         src_abs_paths = [os.path.abspath(_) for _ in self.local_dependencies]
-        dst_dir = os.path.join(artifact_path, constants.LOCAL_DEPENDENCIES_PATH)
+        dst_dir = os.path.join(artifact_path, ModelSpecConstants.LOCAL_DEPENDENCIES_PATH)
 
         # Copy pyfiles
         src_py_files = list(filter(lambda x: x.endswith(".py"), src_abs_paths))
@@ -29,7 +29,7 @@ class LocalDependencyManager(object):
             os.makedirs(pyfiles_basepath, exist_ok=exist_ok)
             for filename, src_path in zip(py_filenames, src_py_files):
                 shutil.copyfile(src_path, os.path.join(pyfiles_basepath, filename))
-            self.copied_local_dependencies.append(os.path.join(constants.LOCAL_DEPENDENCIES_PATH, "pyfiles"))
+            self.copied_local_dependencies.append(os.path.join(ModelSpecConstants.LOCAL_DEPENDENCIES_PATH, "pyfiles"))
 
         # Copy directories
         src_directories = list(filter(lambda x: not x.endswith(".py"), src_abs_paths))
@@ -49,7 +49,7 @@ class LocalDependencyManager(object):
                     dst_ancester_name = f"{dst_ancester_name}_{dirname_cnt_dict[dst_ancester_name] - 1}"
                 dst_ancestor_path = os.path.join(dst_dir, dst_ancester_name)
                 ioutils._copytree_include(src_ancestor, dst_ancestor_path, include_extensions=(".py"), exist_ok=exist_ok)
-                self.copied_local_dependencies.append(os.path.join(constants.LOCAL_DEPENDENCIES_PATH, dst_ancester_name))
+                self.copied_local_dependencies.append(os.path.join(ModelSpecConstants.LOCAL_DEPENDENCIES_PATH, dst_ancester_name))
                 j = i + 1
                 while j < len(src_directories):
                     if src_directories[j].startswith(src_ancestor):

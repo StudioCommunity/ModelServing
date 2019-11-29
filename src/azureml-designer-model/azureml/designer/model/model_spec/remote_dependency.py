@@ -3,7 +3,7 @@ import sys
 
 from subprocess import Popen, PIPE
 
-from .. import constants
+from ..constants import ModelSpecConstants
 from ..logger import get_logger
 from ..utils import yamlutils
 
@@ -42,11 +42,11 @@ class RemoteDependencyManager(object):
 
     def save(self, artifact_path, overwrite_if_exists=True):
         conda_env = {
-            "name": constants.CONDA_ENV_NAME,
+            "name": ModelSpecConstants.CONDA_ENV_NAME,
             "channels": self.conda_channels,
             "dependencies": self.conda_dependencies + [{"pip": self.pip_dependencies}]
         }
-        conda_file_path = os.path.join(artifact_path, constants.CONDA_FILE_NAME)
+        conda_file_path = os.path.join(artifact_path, ModelSpecConstants.CONDA_FILE_NAME)
         if os.path.isfile(conda_file_path) and not overwrite_if_exists:
             raise Exception(f"File {conda_file_path} exists. Set overwrite_is_exists=True if you want to overwrite it.")
         yamlutils.dump_to_yaml_file(conda_env, conda_file_path)

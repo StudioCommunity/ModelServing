@@ -55,8 +55,8 @@ Describe the information so that we can load the model.
 | name                 | string | Yes      | pytorch                                                                                         |
 | serialization_method | string | Yes      | state_dict                                                                                      |
 | is_cuda              | bool   | No       | Whether or not the model need to reside on cuda                                                 |
-| model_class          | string | Yes      | The model class which inherits nn.Module                                                        |
-| model_module         | string | No       | The module in which the model_class resides, if not provided, will try to load from main module |
+| class                | string | Yes      | The model class which inherits nn.Module                                                        |
+| module               | string | No       | The module in which the model_class resides, if not provided, will try to load from main module |
 | init_params          | dict   | No       | The keyword arguments passed to nn.Module.__init__ function                                     |
 
 ## Input

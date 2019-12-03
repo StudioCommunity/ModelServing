@@ -2,7 +2,7 @@ import os
 from os.path import dirname, abspath
 import shutil
 
-PROJECT_ROOT_PATH = dirname(dirname(dirname(dirname(dirname(dirname(abspath(__file__)))))))
+PROJECT_ROOT_PATH = dirname(dirname(abspath(__file__)))
 MODEL_FOLDER_NAME = "AzureMLModel"
 DFD_DIR_NAME = "dfd"
 IMAGE_DIR_NAME = "images"
@@ -15,7 +15,7 @@ def test_create_score_test_cases():
 
     for root, dirs, files in os.walk(src_tests_root_dir):
         if MODEL_FOLDER_NAME in dirs:
-            if not DFD_DIR_NAME in dirs and not IMAGE_DIR_NAME in dirs:
+            if DFD_DIR_NAME not in dirs and IMAGE_DIR_NAME not in dirs:
                 continue
             model_dir = os.path.join(root, MODEL_FOLDER_NAME)
             relative_to_tests_root = os.path.relpath(root, src_tests_root_dir)

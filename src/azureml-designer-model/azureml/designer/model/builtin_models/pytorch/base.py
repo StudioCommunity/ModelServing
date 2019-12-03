@@ -41,20 +41,18 @@ class PytorchBaseModel(BuiltinModel):
         outputs = []
         with torch.no_grad():
             logger.info(f"len(inputs) = {len(inputs)}")
-            # TODO: Consolidate several rows together for efficiency
+            # TODO: Stack several rows together for efficiency
             for row in inputs:
                 input_params = list(map(self.to_tensor, row))
                 logger.info(f"len(input_params) = {len(input_params)}")
                 for i, input_param in enumerate(input_params):
                     logger.info(f"input_params[{i}].shape = {input_param.shape}")
                 model_output = self.raw_model(*input_params)
-                # logger.info(f"model_output = {model_output}")
                 if self.task_type == TaskType.MultiClassification:
                     softmax = torch.nn.Softmax(dim=1)
                     pred_probs = softmax(model_output).cpu().numpy()[0]
                     pred_index = torch.argmax(model_output, 1)[0].cpu().item()
                     pred_result = pred_index, list(pred_probs)
-                    # logger.info(f"pred_result = {pred_result}")
                     outputs.append(pred_result)
                 elif self.task_type == TaskType.Regression:
                     outputs.append(model_output.squeeze(0).tolist())
@@ -62,6 +60,14 @@ class PytorchBaseModel(BuiltinModel):
                     raise Exception(f"Task_type: {self.task_type.name} not implemented yet.")
 
         return outputs
+
+    # Convert all elements to tensor, and stack rows of tensors into a 1-dim higher tensor
+    def _pre_process(self, input_tuple_list):
+        pass
+
+    # Transform raw_model output to task-specified output format
+    def _post_process(self):
+        pass
 
     def to_tensor(self, entry):
         if isinstance(entry, str):

@@ -23,8 +23,12 @@ def test_score():
     runner = CliRunner()
     result = runner.invoke(
         module_invoker.entrance,
-        ["--trained-model", trained_model_path,
-        "--dataset", dataset_path,
-        "--scored-dataset", scored_dataset_path,
-        "--append-score-columns-to-output", "true"])
+        [
+            "--trained-model", trained_model_path,
+            "--dataset", dataset_path,
+            "--scored-dataset", scored_dataset_path,
+            "--append-score-columns-to-output", "true"
+        ]
+    )
+
     assert result.exit_code == 0

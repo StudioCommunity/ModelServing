@@ -28,7 +28,7 @@ class BuiltinModel(CoreModel, metaclass=BuiltinModelMeta):
     # Load without flavor method shouldn't be called by Builtin models, instantiated to be placeholder
     @classmethod
     def load(cls, load_from):
-        raise Exception("Load without flavor method shouldn't be called by Builtin models.")
+        raise Exception("Load without flavor method shouldn't be called for Builtin models.")
 
     @classmethod
     @abstractmethod

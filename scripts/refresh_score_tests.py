@@ -9,8 +9,8 @@ IMAGE_DIR_NAME = "images"
 
 
 def test_create_score_test_cases():
-    src_tests_root_dir = os.path.join(PROJECT_ROOT_PATH, "azureml-designer-model/azureml/designer/model/tests")
-    dst_tests_root_dir = os.path.join(PROJECT_ROOT_PATH, "azureml-designer-score/azureml/designer/score/score/tests")
+    src_tests_root_dir = os.path.join(PROJECT_ROOT_PATH, "src/azureml-designer-model/azureml/designer/model/tests")
+    dst_tests_root_dir = os.path.join(PROJECT_ROOT_PATH, "src/azureml-designer-score/azureml/designer/score/score/tests")
     template_file_path = os.path.join(dirname(abspath(__file__)), "entry_template.py")
 
     for root, dirs, files in os.walk(src_tests_root_dir):

@@ -17,6 +17,7 @@ def mock_image_directory_iterator(directory_path):
             file_path = os.path.join(root, filename)
             yield Image.open(file_path).convert('RGB'), 0, filename
 
+
 def test_save_load():
     init_params = {
         "model_type": "densenet201",
@@ -47,7 +48,7 @@ def test_save_load():
     image_directory = os.path.join(dirname(dirname(abspath(__file__))), "images")
     image_iterator = mock_image_directory_iterator(image_directory)
     predict_result = loaded_generic_model.predict(image_iterator)
-    print(f"predict_result = {predict_result}")
+    print(f"predict_result =\n{predict_result}")
 
     loaded_pytorch_model = loaded_generic_model.raw_model
     assert isinstance(loaded_pytorch_model, torch.nn.Module)

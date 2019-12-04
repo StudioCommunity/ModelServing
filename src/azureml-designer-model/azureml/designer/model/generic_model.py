@@ -31,6 +31,10 @@ class GenericModel(object):
     task_type = None
     label_map = None
     serving_config = None
+    # Can be set in Score Module, or just use default value
+    _batch_size = 2
+    # Can be set in training phase
+    _label_column_name = "ground_truth_label"
 
     def __init__(self, core_model, conda=None, local_dependencies=None, inputs=None, outputs=None, task_type=None,
                  label_map=None, serving_config=None):
@@ -73,7 +77,7 @@ class GenericModel(object):
     def save(
         self,
         artifact_path: str = ModelSpecConstants.DEFAULT_ARTIFACT_SAVE_PATH,
-        model_relative_to_artifact_path : str = ModelSpecConstants.CUSTOM_MODEL_DIRECTORY,
+        model_relative_to_artifact_path: str = ModelSpecConstants.CUSTOM_MODEL_DIRECTORY,
         overwrite_if_exists: bool = True
     ):
         os.makedirs(artifact_path, exist_ok=overwrite_if_exists)
@@ -199,19 +203,45 @@ class GenericModel(object):
         if isinstance(self.core_model, BuiltinModel):
             input_data = args[0]
             preprocessed_data = self._pre_process(input_data)
-            predict_result = self.core_model.predict(preprocessed_data)
-            postprocessed_data = self._post_process(predict_result)
-            return postprocessed_data
+            if isinstance(preprocessed_data, np.ndarray):
+                predict_result = self.core_model.predict(preprocessed_data)
+                postprocessed_data = self._post_process(predict_result)
+                return postprocessed_data
+            else:
+                ground_truth_label_list = []
+                image_id_list = []
+                predict_result = []
+                batch_inputs = []
+                for image, label, image_id in preprocessed_data:
+                    ground_truth_label_list.append(label)
+                    image_id_list.append(image_id)
+                    batch_inputs.append((image,))
+                    if len(batch_inputs) == self.batch_size:
+                        batch_outputs = self.core_model.predict(batch_inputs)
+                        predict_result += batch_outputs
+                        del batch_inputs[:]
+                if batch_inputs:
+                    batch_outputs = self.core_model.predict(batch_inputs)
+                    predict_result += batch_outputs
+                logger.info(f"predict_result = {predict_result}")
+
+                # This is a temp solution for the current implementation of ImageDirectory
+                # Because ImageDirectory only provide iterator,
+                # which means I can't get label and image_id in Score Module
+                postprocessed_data = self._post_process(predict_result)
+                origin_data_df = pd.DataFrame({"id": image_id_list, self.label_column_name: ground_truth_label_list})
+                final_result = pd.concat([origin_data_df, postprocessed_data], axis=1)
+                return final_result
         else:
             return self.core_model.predict(*args, **kwargs)
 
     def _pre_process(self, input_data):
         """
-        We will deal with two types of data (DataFrame and list of images) until DataFrame++ is implemented
+        We will deal with two types of data (DataFrame and image generator) until DataFrame++ is implemented
         For DataFrame, we select feature columns as transform to ndarray
-        For list of images, just pass through, and core_model will deal with it by its own flavor-specified method
-        :param input_data: DataFrame or list of images
-        :return: ndarray if input_data is DataFrame, list of images otherwise
+        For image generator, just pass through, and core_model will deal with it by its own flavor-specified method
+        :param input_data: DataFrame or image generator
+        :return: ndarray if input_data is DataFrame, image generator otherwise
         """
         if isinstance(input_data, pd.DataFrame):
             return input_data[self._feature_columns_names].values
@@ -219,7 +249,7 @@ class GenericModel(object):
             return input_data
 
     # Form result DataFrame according to task_type
-    def _post_process(self, predict_ret_list):
+    def _post_process(self, predict_ret_list) -> pd.DataFrame:
         if self.task_type == TaskType.MultiClassification:
             logger.info(f"MultiClass Classification Task, Result Contains Scored Label and Scored Probability")
 
@@ -249,3 +279,19 @@ class GenericModel(object):
             return self.core_model.raw_model
         else:
             return None
+
+    @property
+    def batch_size(self):
+        return self._batch_size
+
+    @batch_size.setter
+    def batch_size(self, value: int):
+        self._batch_size = value
+
+    @property
+    def label_column_name(self):
+        return self._label_column_name
+
+    @label_column_name.setter
+    def label_column_name(self, value: str):
+        self._label_column_name = value

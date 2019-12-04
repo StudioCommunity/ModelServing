@@ -22,6 +22,14 @@ logger = get_logger(__name__)
 
 
 class GenericModel(object):
+    """
+    Generic Model does the flavor-independent things, in general, save/load/predict:
+    1. Save/Load model with model_spec.yaml
+    2. Handle dependencies.
+    3. Select Feature columns.
+    4. Partition input data into mini-batches if needed.
+    5. Formulate output DataFrame of which the schema can be understood by Evaluate Module
+    """
 
     core_model = None
     conda = None

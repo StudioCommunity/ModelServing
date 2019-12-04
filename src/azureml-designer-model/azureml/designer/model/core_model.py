@@ -2,6 +2,13 @@ from abc import ABC, abstractmethod
 
 
 class CoreModel(ABC):
+    """
+    CoreModel deals with flavor-specified behaviors.
+    1. Save/Load raw_model
+    2. Preprocess data in flavor-specified manner. e.g. torchvision.transform.
+    3. Postprocess data according to task_type in flavor-specified manner. e.g. torch.nn.Softmax
+    4. Provide default conda dependency
+    """
     flavor = None
     _conda = None
 

@@ -34,7 +34,7 @@ steps:
   displayName: 'Install azureml-designer-model'
 
 - script: |
-    cd src/azureml-designer-model/azureml/designer/model/scripts
+    cd scripts
     python create_score_tests.py
   displayName: 'Create score test cases from model test output'
 

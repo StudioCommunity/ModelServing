@@ -1,7 +1,7 @@
-import sys
 import copy
+import sys
 
-from .processor import load_graph, handle_request, handle_not_supported, handle_empty
+from .processor import load_graph, handle_request, handle_empty
 from .processor import pip_install, enable_rawhttp
 
 import logging

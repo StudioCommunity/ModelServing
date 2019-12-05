@@ -1,6 +1,6 @@
+import os
 import sys
 import json
-import os
 import math
 import numpy as np
 import pandas as pd
@@ -8,10 +8,10 @@ from collections import defaultdict
 import importlib
 
 from azureml.core.model import Model
-from azureml.studio.common.error import ModuleError
 
-from .score_exceptions import InputDataError, ResourceLoadingError
-from .dag_execution_engine import DAGraph, DAGExecutionEngine, PerformanceCounter, set_global_modelpackage
+from .score_exceptions import InputDataError, ModuleError
+from .dag_execution_engine import DagGraph
+from .common import set_global_setting, ModelZip, PerformanceCounter
 
 import logging
 
@@ -92,12 +92,10 @@ def transform_nan(val):
 def load_graph():
     try:
         path = get_modelpackage_path()
-        logger.info(f'Init: ModelPackage is available at {path}')
-        modelpackage = set_global_modelpackage(path)
-        json_string = modelpackage.get_graph_json()
-        logger.info('Init: Graph json is ready')
-        graph = DAGraph()
-        graph.load(json_string)
+        modelzip = ModelZip(path)
+        set_global_setting('AZUREML_DESIGNER_DS_PATH', modelzip.get_dir())
+        json_string = modelzip.get_graph_json()
+        graph = DagGraph(json_string)
         logger.info('Init: Graph has been loaded')
     except Exception as ex:
         logger.error(f'Init: Service init failed: {ex}')
@@ -214,8 +212,7 @@ def process(dag, raw_data, is_classic=True, with_details=True):
     logger.info('Run: End preprocessing successfully')
 
     logger.info('Run: Begin processing')
-    DAGExecutionEngine.execute(dag, webservice_input, global_parameters)
-    webservice_output, name2schema = dag.get_output_name2data(), dag.get_output_name2schema()
+    webservice_output, name2schema = dag.execute(webservice_input, global_parameters)
     logger.info('Run: End processing successfully')
 
     logger.info('Run: Begin postprocessing')
@@ -275,7 +272,6 @@ def handle_not_supported(request):
 
 
 def handle_empty(request):
-    from azureml.contrib.services.aml_response import AMLResponse
     warning = f'"{request.method}" is not supported, returning empty response'
     logger.warning(warning)
     ret = construct_response('', 200)

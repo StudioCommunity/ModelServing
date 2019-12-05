@@ -1,3 +1,5 @@
+from azureml.studio.common.error import ModuleError
+
 class InputDataError(Exception):
     def __init__(self, schema, data):
         super().__init__(f'Input data are inconsistent with schema.\nSchema: {str(schema)}\nData: {str(data)}')

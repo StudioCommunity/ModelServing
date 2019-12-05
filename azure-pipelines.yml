@@ -35,7 +35,7 @@ steps:
 
 - script: |
     cd scripts
-    python create_score_tests.py
+    python refresh_score_tests.py
   displayName: 'Create score test cases from model test output'
 
 - bash: |

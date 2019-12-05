@@ -9,6 +9,7 @@ from ..logger import get_logger
 
 logger = get_logger(__name__)
 
+
 class BuiltinScoreModule(object):
 
     def __init__(self, model_path, params={}):
@@ -29,7 +30,6 @@ class BuiltinScoreModule(object):
             result_df = self.model.predict(input_directory.iter_images())
             return result_df
         else:
-            # Temp workaround
             df = input_directory.data
             output_label = self.model.predict(df)
             logger.info(f"output_label = {output_label}")

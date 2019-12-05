@@ -40,6 +40,7 @@ class GenericModel(object):
     label_map = None
     serving_config = None
     # Can be set in Score Module, or just use default value
+    # TODO: Decide whether or not expose this as a parameter in Score Module
     _batch_size = 2
     # Can be set in training phase
     _label_column_name = "ground_truth_label"
@@ -279,10 +280,21 @@ class GenericModel(object):
             result_df[ScoreColumnConstants.ScoredLabelsColumnName] = [index_to_label.get(i, i) for i in label_ids]
             return result_df
         else:
-            return pd.DataFrame(predict_ret_list)
+            if not predict_ret_list:
+                return pd.DataFrame()
+            else:
+                # TODO: Follow Module Team's practice to connect to Evaluate Module
+                column_cnt = len(predict_ret_list[0])
+                columns = [f"Score_{i}" for i in range(column_cnt)]
+                return pd.DataFrame(data=predict_ret_list, columns=columns)
 
     @property
     def raw_model(self):
+        """
+        Built-in models should contain a raw_model, which is a ML framework-specified model object
+        e.g. torch.nn.Module
+        :return:
+        """
         if isinstance(self.core_model, BuiltinModel):
             return self.core_model.raw_model
         else:

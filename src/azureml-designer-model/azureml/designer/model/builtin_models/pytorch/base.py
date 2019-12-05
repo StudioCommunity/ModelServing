@@ -18,7 +18,7 @@ logger = get_logger(__name__)
 
 class PytorchBaseModel(BuiltinModel):
 
-    raw_model = None
+    raw_model: torch.nn.Module = None
     _device = "cpu"
     feature_columns_names = None
     extra_conda = {

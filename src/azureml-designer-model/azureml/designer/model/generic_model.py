@@ -257,9 +257,10 @@ class GenericModel(object):
                 class_cnt = len(probs[0])
             else:
                 return pd.DataFrame()
-            columns = [_gen_scored_probability_column_name(self.task.label_map.inverse_transform(range(class_cnt)))]
+            columns = [_gen_scored_probability_column_name(label) for label in 
+                       self.task.label_map.inverse_transform(range(class_cnt))]
             result_df = pd.DataFrame(data=probs, columns=columns)
-            result_df[ScoreColumnConstants.ScoredLabelsColumnName] = self.task.label_map.invers_transform(label_ids)
+            result_df[ScoreColumnConstants.ScoredLabelsColumnName] = self.task.label_map.inverse_transform(label_ids)
             return result_df
         else:
             if not predict_ret_list:

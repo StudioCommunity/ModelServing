@@ -22,7 +22,7 @@ def _run_install_cmds(cmds, command_name):
     stderr = p.stderr.read().decode("utf-8")
     logger.info(f"stdout: {stdout}")
     if stderr:
-        logger.warning(f"sterr: {stderr}")
+        logger.warning(f"stderr: {stderr}")
     logger.info(f"Finished to install {command_name} dependencies")
 
 
@@ -75,7 +75,7 @@ class RemoteDependencyManager(object):
 
     def install(self):
         if not self.conda_dependencies:
-            logger.info("No conda denpendencies to install")
+            logger.info("No conda dependencies to install")
         else:
             conda_cmds = ["conda", "install", "-y"]
             for channel in self.conda_channels:

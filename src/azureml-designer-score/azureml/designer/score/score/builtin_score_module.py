@@ -3,6 +3,7 @@ import os
 import pandas as pd
 from azureml.designer.model.io import load_generic_model
 from azureml.studio.core.io.image_directory import ImageDirectory
+from azureml.studio.core.io.data_frame_directory import DataFrameDirectory
 
 from . import constants
 from ..logger import get_logger
@@ -25,7 +26,9 @@ class BuiltinScoreModule(object):
         logger.info("Generic model loaded")
 
     def run(self, input_directory, global_param=None):
-        # TODO: Directly pass image_directory to model.predict
+        if not isinstance(input_directory, (DataFrameDirectory, ImageDirectory)):
+            raise Exception(f"Unsupported input_directory type: {type(input_directory)}, "
+                            f"expecting DataFrameDirectory or ImageDirectory")
         if isinstance(input_directory, ImageDirectory):
             result_df = self.model.predict(input_directory.iter_images())
             return result_df

@@ -1,9 +1,7 @@
-import os
-
 import pandas as pd
 
 from ..utils import ioutils
-from .. import constants
+
 
 # TODO: Add unittest
 class LabelMap(object):
@@ -54,7 +52,6 @@ class LabelMap(object):
     def index_to_label_dict(self, value):
         self._index_to_label = value
 
-    
     # TODO: implement this
     def transform(self):
         pass

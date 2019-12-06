@@ -26,8 +26,6 @@ class ModelSpecConstants:
     LOCAL_DEPENDENCIES_KEY = "local_dependencies"
     INPUTS_KEY = "inputs"
     OUTPUTS_KEY = "outputs"
-    TASK_TYPE_KEY = "task_type"
-    LABEL_MAP_FILE_KEY = "label_map_file"
     SERVING_CONFIG_KEY = "serving_config"
     DESCRIPTION_KEY = "description"
     TIME_CREATED_KEY = "time_created"
@@ -39,6 +37,12 @@ class ModelSpecConstants:
     MODEL_MODULE_KEY = "module"
     IS_CUDA_KEY = "is_cuda"
     INIT_PARAMS_KEY = "init_params"
+
+    # Task specified keys in model_spec
+    TASK_KEY = "task"
+    TASK_TYPE_KEY = "task_type"
+    LABEL_MAP_FILE_KEY = "label_map_file"
+    GROUND_TRUTH_COLUMN_NAME_KEY = "ground_truth_column_name"
 
     # Others
     DEFAULT_ARTIFACT_SAVE_PATH = "./AzureMLModel"

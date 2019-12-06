@@ -8,6 +8,9 @@ class LabelMap(object):
 
     _index_to_label = {}
 
+    def __init__(self):
+        pass
+
     def save(self, save_to, overwrite_if_exists=True):
         ioutils.validate_overwrite(save_to, overwrite_if_exists)
         index_list = list(self._index_to_label.keys())
@@ -56,5 +59,10 @@ class LabelMap(object):
     def transform(self):
         pass
 
-    def inverse_transform(self):
-        pass
+    # TODO: Support list input
+    def inverse_transform(self, label_ids):
+        """
+        label_id -> label_name
+        :return:
+        """
+        return [self._index_to_label.get(i, i) for i in label_ids]

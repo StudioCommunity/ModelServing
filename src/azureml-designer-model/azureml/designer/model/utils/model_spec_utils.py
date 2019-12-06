@@ -4,7 +4,6 @@ from datetime import datetime
 
 from ..constants import ModelSpecConstants
 from ..model_spec.serving_config import ServingConfig
-from ..model_spec.task_type import TaskType
 from ..logger import get_logger
 from ..utils import yamlutils
 
@@ -18,8 +17,7 @@ def generate_model_spec(
         local_dependencies: list = [],
         inputs: list = None,
         outputs: list = None,
-        task_type: TaskType = None,
-        label_map_path: str = None,
+        task_conf: dict = None,
         serving_config: ServingConfig = None,
         time_created: datetime = datetime.now()
 ):
@@ -35,10 +33,8 @@ def generate_model_spec(
         spec[ModelSpecConstants.INPUTS_KEY] = [model_input.to_dict() for model_input in inputs]
     if outputs is not None:
         spec[ModelSpecConstants.OUTPUTS_KEY] = [model_output.to_dict() for model_output in outputs]
-    if task_type:
-        spec[ModelSpecConstants.TASK_TYPE_KEY] = task_type.name
-    if label_map_path:
-        spec[ModelSpecConstants.LABEL_MAP_FILE_KEY] = label_map_path
+    if task_conf:
+        spec[ModelSpecConstants.TASK_KEY] = task_conf
     if serving_config:
         spec[ModelSpecConstants.SERVING_CONFIG_KEY] = serving_config.to_dict()
     logger.info(f"spec = {spec}")

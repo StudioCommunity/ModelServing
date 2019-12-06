@@ -2,6 +2,7 @@ from . import constants
 from .constants import ModelSpecConstants
 from .generic_model import GenericModel
 from .logger import get_logger
+from .model_spec.task import Task
 from .model_spec.task_type import TaskType
 from .model_spec.label_map import LabelMap
 
@@ -16,6 +17,7 @@ def save_generic_model(
     # TODO provide method to infer input/output schema from sample data
     inputs: list = [],
     outputs: list = [],
+    task: Task = None,
     serving_config: dict = None,
     overwrite_if_exists: bool = True
 ):
@@ -25,6 +27,7 @@ def save_generic_model(
         local_dependencies=local_dependencies,
         inputs=inputs,
         outputs=outputs,
+        task=task,
         serving_config=serving_config
     )
     generic_model.save(
@@ -48,6 +51,9 @@ def save_pytorch_cloudpickle_model(
     local_dependencies: list = [],
     inputs: list = [],
     outputs: list = [],
+    task_type: TaskType = None,
+    label_map=None,
+    ground_truth_column_name=None,
     serving_config: dict = None,
     overwrite_if_exists: bool = True
 ):
@@ -55,12 +61,16 @@ def save_pytorch_cloudpickle_model(
     model = PytorchCloudPickleModel(pytorch_model, {ModelSpecConstants.IS_CUDA_KEY: next(pytorch_model.parameters()).is_cuda})
     logger.info(f"Saving model with is_cuda={next(pytorch_model.parameters()).is_cuda}")
 
+    label_map = LabelMap.create(label_map)
+    task = Task(task_type, label_map, ground_truth_column_name)
+
     generic_model = GenericModel(
         core_model=model,
         conda=conda,
         local_dependencies=local_dependencies,
         inputs=inputs,
         outputs=outputs,
+        task=task,
         serving_config=serving_config
     )
     generic_model.save(
@@ -80,6 +90,7 @@ def save_pytorch_state_dict_model(
     outputs: list = [],
     task_type: TaskType = None,
     label_map=None,
+    ground_truth_column_name=None,
     serving_config: dict = None,
     overwrite_if_exists: bool = True
 ):
@@ -92,6 +103,7 @@ def save_pytorch_state_dict_model(
     logger.info(f"Saving model with flavor: {flavor}")
 
     label_map = LabelMap.create(label_map)
+    task = Task(task_type, label_map, ground_truth_column_name)
     
     generic_model = GenericModel(
         core_model=model,
@@ -99,8 +111,7 @@ def save_pytorch_state_dict_model(
         local_dependencies=local_dependencies,
         inputs=inputs,
         outputs=outputs,
-        task_type=task_type,
-        label_map=label_map,
+        task=task,
         serving_config=serving_config
     )
     generic_model.save(

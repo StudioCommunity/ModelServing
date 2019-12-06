@@ -14,7 +14,7 @@ from .model_spec.local_dependency import LocalDependencyManager
 from .model_spec.model_input import ModelInput
 from .model_spec.model_output import ModelOutput
 from .model_spec.task_type import TaskType
-from .model_spec.label_map import LabelMap
+from .model_spec.task import Task
 from .model_spec.remote_dependency import RemoteDependencyManager
 from .model_spec.serving_config import ServingConfig
 
@@ -36,17 +36,14 @@ class GenericModel(object):
     local_dependencies = None
     inputs = None
     outputs = None
-    task_type = None
-    label_map = None
+    task = None
     serving_config = None
     # Can be set in Score Module, or just use default value
     # TODO: Decide whether or not expose this as a parameter in Score Module
     _batch_size = 2
-    # Can be set in training phase
-    _label_column_name = "ground_truth_label"
 
-    def __init__(self, core_model, conda=None, local_dependencies=None, inputs=None, outputs=None, task_type=None,
-                 label_map=None, serving_config=None):
+    def __init__(self, core_model, conda=None, local_dependencies=None, inputs=None, outputs=None, task=None,
+                 serving_config=None):
         self.core_model = core_model
         if not self.core_model.flavor:
             if not isinstance(core_model, BuiltinModel):
@@ -64,8 +61,7 @@ class GenericModel(object):
         self.local_dependencies = local_dependencies
         self.inputs = inputs
         self.outputs = outputs
-        self.task_type = task_type
-        self.label_map = label_map
+        self.task = task
         self.serving_config = serving_config
 
         if isinstance(core_model, BuiltinModel):
@@ -80,8 +76,8 @@ class GenericModel(object):
                 raise Exception("Can't initialize model without feature_columns_names")
 
             # Init task_type
-            if task_type:
-                self.core_model.task_type = task_type
+            if self.task:
+                self.core_model.task_type = self.task.task_type
 
     def save(
         self,
@@ -108,11 +104,9 @@ class GenericModel(object):
         local_dependency_manager = LocalDependencyManager(self.local_dependencies)
         local_dependency_manager.save(artifact_path)
 
-        label_map_file_name = None
-        if self.label_map:
-            label_map_file_name = ModelSpecConstants.LABEL_MAP_FILE_NAME
-            label_map_path = os.path.join(artifact_path, label_map_file_name)
-            self.label_map.save(label_map_path)
+        task_conf = None
+        if self.task:
+            task_conf = self.task.save(artifact_path, overwrite_if_exists=overwrite_if_exists)
 
         model_spec = model_spec_utils.generate_model_spec(
             flavor=self.core_model.flavor,
@@ -121,8 +115,7 @@ class GenericModel(object):
             local_dependencies=local_dependency_manager.copied_local_dependencies,
             inputs=self.inputs,
             outputs=self.outputs,
-            task_type=self.task_type,
-            label_map_path=label_map_file_name,
+            task_conf=task_conf,
             serving_config=self.serving_config
         )
         model_spec_utils.save_model_spec(artifact_path, model_spec)
@@ -138,28 +131,24 @@ class GenericModel(object):
         conda = None
         inputs = None
         outputs = None
-        task_type = None
-        label_map = None
+        task = None
         serving_config = None
-        
-        # TODO: Use auxiliary method to handle None in loaded yaml file following Module Team
-        if model_spec.get(ModelSpecConstants.CONDA_FILE_KEY, None):
+
+        if ModelSpecConstants.CONDA_FILE_KEY in model_spec:
             conda_yaml_path = os.path.join(artifact_path, model_spec[ModelSpecConstants.CONDA_FILE_KEY])
             conda = yamlutils.load_yaml_file(conda_yaml_path)
             logger.info(f"Successfully loaded {conda_yaml_path}")
 
         local_dependencies = model_spec.get(ModelSpecConstants.LOCAL_DEPENDENCIES_KEY, None)
         logger.info(f"local_dependencies = {local_dependencies}")
-        if model_spec.get(ModelSpecConstants.INPUTS_KEY, None):
-            inputs = [ModelInput.from_dict(model_input) for model_input in model_spec[ModelSpecConstants.INPUTS_KEY]]
-        if model_spec.get(ModelSpecConstants.OUTPUTS_KEY, None):
-            outputs = [ModelOutput.from_dict(model_output) for model_output in model_spec[ModelSpecConstants.OUTPUTS_KEY]]
-        if model_spec.get(ModelSpecConstants.TASK_TYPE_KEY, None):
-            task_type = TaskType[model_spec[ModelSpecConstants.TASK_TYPE_KEY]]
-            logger.info(f"task_tye = {task_type}")
-        if model_spec.get(ModelSpecConstants.LABEL_MAP_FILE_KEY, None):
-            load_from = os.path.join(artifact_path, model_spec[ModelSpecConstants.LABEL_MAP_FILE_KEY])
-            label_map = LabelMap.create_from_csv(load_from)
+        if ModelSpecConstants.INPUTS_KEY in model_spec:
+            inputs = [ModelInput.from_dict(model_input) for model_input in
+                      model_spec[ModelSpecConstants.INPUTS_KEY]]
+        if ModelSpecConstants.OUTPUTS_KEY in model_spec:
+            outputs = [ModelOutput.from_dict(model_output) for model_output in
+                       model_spec[ModelSpecConstants.OUTPUTS_KEY]]
+        if ModelSpecConstants.TASK_KEY in model_spec:
+            task = Task.load(artifact_path, model_spec[ModelSpecConstants.TASK_KEY])
         if model_spec.get(ModelSpecConstants.SERVING_CONFIG_KEY, None):
             serving_config = ServingConfig.from_dict(model_spec[ModelSpecConstants.SERVING_CONFIG_KEY])
 
@@ -188,8 +177,7 @@ class GenericModel(object):
             local_dependencies=local_dependencies,
             inputs=inputs,
             outputs=outputs,
-            task_type=task_type,
-            label_map=label_map,
+            task=task,
             serving_config=serving_config
         )
         
@@ -269,10 +257,9 @@ class GenericModel(object):
                 class_cnt = len(probs[0])
             else:
                 return pd.DataFrame()
-            index_to_label = self.label_map.index_to_label_dict
-            columns = [_gen_scored_probability_column_name(index_to_label.get(i, i)) for i in range(0, class_cnt)]
+            columns = [_gen_scored_probability_column_name(self.task.label_map.inverse_transform(range(class_cnt)))]
             result_df = pd.DataFrame(data=probs, columns=columns)
-            result_df[ScoreColumnConstants.ScoredLabelsColumnName] = [index_to_label.get(i, i) for i in label_ids]
+            result_df[ScoreColumnConstants.ScoredLabelsColumnName] = self.task.label_map.invers_transform(label_ids)
             return result_df
         else:
             if not predict_ret_list:
@@ -305,8 +292,12 @@ class GenericModel(object):
 
     @property
     def label_column_name(self):
-        return self._label_column_name
+        if self.task and self.task.ground_truth_column_name:
+            return self.task.ground_truth_column_name
+        return ModelSpecConstants.GROUND_TRUTH_COLUMN_NAME_KEY
 
-    @label_column_name.setter
-    def label_column_name(self, value: str):
-        self._label_column_name = value
+    @property
+    def task_type(self):
+        if self.task and self.task.task_type:
+            return self.task.task_type
+        return None

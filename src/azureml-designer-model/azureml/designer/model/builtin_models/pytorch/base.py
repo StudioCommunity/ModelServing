@@ -87,7 +87,7 @@ class PytorchBaseModel(BuiltinModel):
             pred_result = list(zip(pred_index, pred_probs))
             logger.info(f"pred_result = {pred_result}")
             return pred_result
-        elif self.task_type == TaskType.Regression:
+        elif not self.task_type or self.task_type == TaskType.Regression:
             return model_output.squeeze(0).tolist()
         else:
             raise Exception(f"Task_type: {self.task_type.name} not implemented yet.")

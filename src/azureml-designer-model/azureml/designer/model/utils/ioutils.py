@@ -22,7 +22,7 @@ def save_conda_env(path, conda_env):
     logger.info(f'CONDA_FILE: {fn}')
 
 
-def _copytree_include(src_dir, dst_dir, include_extensions: tuple = (), exist_ok=False):
+def copytree_include(src_dir, dst_dir, include_extensions: tuple = (), exist_ok=False):
     os.makedirs(dst_dir, exist_ok=exist_ok)
     # Scan and list all included files before copying to avoid recursion
     file_list = []

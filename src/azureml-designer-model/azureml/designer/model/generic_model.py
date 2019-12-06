@@ -105,11 +105,6 @@ class GenericModel(object):
             # TODO: dump local conda env
             pass
 
-        # In the cases where customer manually modified sys.path (e.g. sys.path.append("..")),
-        # they would have to specify the code path manually.
-        if not self.local_dependencies:
-            self.local_dependencies = [os.path.abspath(sys.path[0])]
-            logger.info(f"using sys.path[0] = {sys.path[0]} as local_dependency_path")
         local_dependency_manager = LocalDependencyManager(self.local_dependencies)
         local_dependency_manager.save(artifact_path)
 

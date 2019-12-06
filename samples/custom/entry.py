@@ -9,6 +9,7 @@ from my_custom_model import MyCustomModel
 
 from azureml.designer.model.io import save_generic_model, load_generic_model
 
+
 def get_training_data():
     np.random.seed(0)
     n_samples, n_features = 10, 2
@@ -23,6 +24,7 @@ def get_training_data():
     y = np.dot(X, w) + noise
     return X, y
 
+
 def main():
     X, y = get_training_data()
     clf = BayesianRidge(compute_score=True)
@@ -36,7 +38,7 @@ def main():
         "dependencies": [{"pip": ["scipy", "sklearn"]}]
     }
 
-    save_generic_model(model, path="./AzureMLModel")
+    save_generic_model(model, path="./AzureMLModel", local_dependencies=["."])
     loaded_generic_model = load_generic_model(path="./AzureMLModel", install_dependencies=False)
 
     df = pd.DataFrame(data=X)
@@ -44,6 +46,6 @@ def main():
     print(f"result_df = {result_df}")
     assert (result_df.to_numpy() == y_hat.reshape(-1, 1)).all()
 
+
 if __name__ == "__main__":
     main()
-    

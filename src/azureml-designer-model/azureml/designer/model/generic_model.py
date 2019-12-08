@@ -1,5 +1,5 @@
 import os
-import sys
+import types
 
 from abc import abstractmethod
 import numpy as np
@@ -193,51 +193,58 @@ class GenericModel(object):
         # For BuiltinModel, we assume there's only one positional input parameter in args[0],
         if isinstance(self.core_model, BuiltinModel):
             input_data = args[0]
-            preprocessed_data = self._pre_process(input_data)
-            if isinstance(preprocessed_data, np.ndarray):
-                predict_result = self.core_model.predict(preprocessed_data)
-                postprocessed_data = self._post_process(predict_result)
-                return postprocessed_data
-            else:
-                ground_truth_label_list = []
-                image_id_list = []
-                predict_result = []
-                batch_inputs = []
-                for image, label, image_id in preprocessed_data:
-                    ground_truth_label_list.append(label)
-                    image_id_list.append(image_id)
-                    batch_inputs.append((image,))
-                    if len(batch_inputs) == self.batch_size:
-                        batch_outputs = self.core_model.predict(batch_inputs)
-                        predict_result += batch_outputs
-                        del batch_inputs[:]
-                if batch_inputs:
-                    batch_outputs = self.core_model.predict(batch_inputs)
-                    predict_result += batch_outputs
-                logger.info(f"predict_result = {predict_result}")
+            if not isinstance(input_data, pd.DataFrame):
+                self._feature_columns_names = ["image"]
 
-                # This is a temp solution for the current implementation of ImageDirectory
-                # Because ImageDirectory only provide iterator,
-                # which means I can't get label and image_id in Score Module
-                postprocessed_data = self._post_process(predict_result)
-                origin_data_df = pd.DataFrame({"id": image_id_list, self.label_column_name: ground_truth_label_list})
-                final_result = pd.concat([origin_data_df, postprocessed_data], axis=1)
-                return final_result
+            non_feature_df = pd.DataFrame()
+            predict_result = []
+            for batch_df in self._batching(input_data):
+                batch_non_feature_df = batch_df.loc[:, batch_df.columns.difference(self._feature_columns_names)]
+                non_feature_df = pd.concat([non_feature_df, batch_non_feature_df], ignore_index=True)
+                preprocessed_data = self._pre_process(batch_df)
+                predict_result += self.core_model.predict(preprocessed_data)
+            postprocessed_data = self._post_process(predict_result)
+            if not isinstance(input_data, pd.DataFrame):
+                postprocessed_data = pd.concat([non_feature_df, postprocessed_data], axis=1)
+            return postprocessed_data
         else:
             return self.core_model.predict(*args, **kwargs)
 
-    def _pre_process(self, input_data):
+    def _batching(self, input_data) -> types.GeneratorType:
         """
-        We will deal with two types of data (DataFrame and image generator) until DataFrame++ is implemented
-        For DataFrame, we select feature columns as transform to ndarray
-        For image generator, just pass through, and core_model will deal with it by its own flavor-specified method
-        :param input_data: DataFrame or image generator
-        :return: ndarray if input_data is DataFrame, image generator otherwise
+        Batch input_data into DataFrames. If input_data is DataFrame, return a 1-time generator which returns it;
+        If input_data is ImageDirectory's iterator, return a generator generates a DataFrame of columns:
+        ["image_id", "label", "image"] with batch_size rows.
+        :param input_data: DataFrame or generator which yields (image, label, image_id)
+        :return: generator of DataFrame
         """
         if isinstance(input_data, pd.DataFrame):
-            return input_data[self._feature_columns_names].values
+            yield input_data
         else:
-            return input_data
+            batch_df = pd.DataFrame()
+            for image, label, image_id in input_data:
+                if batch_df.shape[0] == self.batch_size:
+                    batch_df = pd.DataFrame()
+                batch_df = batch_df.append(
+                    {
+                        "id": image_id,
+                        self.label_column_name: label,
+                        "image": image
+                    }, ignore_index=True
+                )
+                if batch_df.shape[0] == self.batch_size:
+                    yield batch_df
+            yield batch_df
+
+    def _pre_process(self, batch_df) -> np.ndarray:
+        """
+        Select feature columns of batch_df and transform to ndarray
+        :param batch_df: DataFrame
+        :return: ndarray if input_data is DataFrame, image generator otherwise
+        """
+        if not isinstance(batch_df, pd.DataFrame):
+            raise Exception(f"_pre_process excepts DataFrame input, got {type(batch_df)}")
+        return batch_df[self._feature_columns_names].values
 
     # Form result DataFrame according to task_type
     def _post_process(self, predict_ret_list) -> pd.DataFrame:

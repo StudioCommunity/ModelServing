@@ -38,7 +38,6 @@ class GenericModel(object):
     outputs = None
     task = None
     serving_config = None
-    # Can be set in Score Module, or just use default value
     # TODO: Decide whether or not expose this as a parameter in Score Module
     _batch_size = 2
 
@@ -251,6 +250,8 @@ class GenericModel(object):
                 return '_'.join(
                     (ScoreColumnConstants.ScoredProbabilitiesMulticlassColumnNamePattern, str(label)))
 
+            # MultiClassification core_model will return a list of tuples in format:
+            # (label_id, [class_0_prob, class_1_prob, ...])
             label_ids = [row[0] for row in predict_ret_list]
             probs = [row[1] for row in predict_ret_list]
             if probs:

@@ -20,6 +20,18 @@ class LabelMap(object):
 
     @classmethod
     def create_from_csv(cls, file_path):
+        """
+        create LabelMap from csv file. The csv file should be of format:
+        ~~~
+        , label
+        label_id0, label0
+        label_id1, label1
+        ...
+        label_idn, labeln
+        ~~~
+        :param file_path: path to csv file
+        :return:
+        """
         df = pd.read_csv(file_path, index_col=0)
         label_map = LabelMap()
         label_map.index_to_label_dict = df.to_dict()["label"]

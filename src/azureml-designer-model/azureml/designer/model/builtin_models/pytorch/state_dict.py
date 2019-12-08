@@ -50,7 +50,7 @@ class PytorchStateDictModel(PytorchBaseModel):
                     model_module = importlib.import_module(model_module)
                     model_class = getattr(model_module, model_class_name)
                 except Exception as e:
-                    logger.error(f"Failed to load {model_class} from {model_module}")
+                    logger.error(f"Failed to load {model_class} from {model_module}.", exc_info=True)
                     raise
 
         init_params = flavor.get(ModelSpecConstants.INIT_PARAMS_KEY, {})

@@ -49,7 +49,7 @@ class PytorchBaseModel(BuiltinModel):
             model_inputs = self._pre_process(inputs)
             logger.info(f"len(model_inputs) = {len(model_inputs)}")
             for i, model_input in enumerate(model_inputs):
-                logger.info(f"model_input[{i}].shape = {model_input.shape}")
+                logger.info(f"model_inputs[{i}].shape = {model_input.shape}")
             model_output = self.raw_model(*model_inputs)
             pred_ret = self._post_process(model_output)
             return pred_ret
@@ -90,7 +90,7 @@ class PytorchBaseModel(BuiltinModel):
         elif not self.task_type or self.task_type == TaskType.Regression:
             return model_output.squeeze(0).tolist()
         else:
-            raise Exception(f"Task_type: {self.task_type.name} not implemented yet.")
+            raise Exception(f"Task_type: {self.task_type.name} has not been implemented yet.")
 
     def _to_tensor(self, entry):
         if isinstance(entry, Image.Image):

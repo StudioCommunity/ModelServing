@@ -1,5 +1,4 @@
 import os
-import yaml
 import pickle
 import sklearn
 import azureml.designer.modelspec.utils as utils

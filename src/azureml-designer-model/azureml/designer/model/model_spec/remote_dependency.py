@@ -1,11 +1,11 @@
 import os
 import sys
 
-import yaml
 from subprocess import Popen, PIPE
 
-from .. import constants
+from ..constants import ModelSpecConstants
 from ..logger import get_logger
+from ..utils import yamlutils
 
 logger = get_logger(__name__)
 
@@ -22,7 +22,7 @@ def _run_install_cmds(cmds, command_name):
     stderr = p.stderr.read().decode("utf-8")
     logger.info(f"stdout: {stdout}")
     if stderr:
-        logger.warning(f"sterr: {stderr}")
+        logger.warning(f"stderr: {stderr}")
     logger.info(f"Finished to install {command_name} dependencies")
 
 
@@ -42,21 +42,19 @@ class RemoteDependencyManager(object):
 
     def save(self, artifact_path, overwrite_if_exists=True):
         conda_env = {
-            "name": constants.CONDA_ENV_NAME,
+            "name": ModelSpecConstants.CONDA_ENV_NAME,
             "channels": self.conda_channels,
             "dependencies": self.conda_dependencies + [{"pip": self.pip_dependencies}]
         }
-        conda_file_path = os.path.join(artifact_path, constants.CONDA_FILE_NAME)
+        conda_file_path = os.path.join(artifact_path, ModelSpecConstants.CONDA_FILE_NAME)
         if os.path.isfile(conda_file_path) and not overwrite_if_exists:
             raise Exception(f"File {conda_file_path} exists. Set overwrite_is_exists=True if you want to overwrite it.")
-        with open(conda_file_path, "w") as f:
-            yaml.safe_dump(conda_env, stream=f, default_flow_style=False) 
+        yamlutils.dump_to_yaml_file(conda_env, conda_file_path)
         logger.info(f"Saved conda to {conda_file_path}")
     
     def load(self, conda_yaml_path):
         logger.info(f"Trying to load conda dependency from {conda_yaml_path}")
-        with open(conda_yaml_path) as fp:
-            config = yaml.safe_load(fp)
+        config = yamlutils.load_yaml_file(conda_yaml_path)
 
         if isinstance(config["channels"], list):
             self.conda_channels = config["channels"]
@@ -77,7 +75,7 @@ class RemoteDependencyManager(object):
 
     def install(self):
         if not self.conda_dependencies:
-            logger.info("No conda denpendencies to install")
+            logger.info("No conda dependencies to install")
         else:
             conda_cmds = ["conda", "install", "-y"]
             for channel in self.conda_channels:

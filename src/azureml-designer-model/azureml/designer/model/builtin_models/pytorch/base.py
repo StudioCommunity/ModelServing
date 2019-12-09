@@ -4,30 +4,23 @@ import inspect
 import pandas as pd
 import torch
 import torchvision
+from PIL import Image
 
-from ...logger import get_logger
 from ..builtin_model import BuiltinModel
+from ...constants import ModelSpecConstants
+from ...logger import get_logger
 from ...utils import conda_merger
+from ...model_spec.task_type import TaskType
+
 
 logger = get_logger(__name__)
 
 
-def get_input_args(pytorch_model):
-    try:
-        forward_func = getattr(pytorch_model, 'forward')
-        args = inspect.getfullargspec(forward_func).args
-        if 'self' in args:
-            args.remove('self')
-        return args
-    except AttributeError:
-        logger.warning("Model without 'forward' function cannot be used to predict", exc_info=True)
-
-
 class PytorchBaseModel(BuiltinModel):
 
-    raw_model = None
+    raw_model: torch.nn.Module = None
     _device = "cpu"
-    input_args = None
+    feature_columns_names = None
     extra_conda = {
         "channels": ["pytorch"],
         "dependencies": [
@@ -37,39 +30,85 @@ class PytorchBaseModel(BuiltinModel):
     }
     default_conda = conda_merger.merge_envs([BuiltinModel.default_conda, extra_conda])
 
-    def __init__(self, raw_model, is_cuda=False):
+    def __init__(self, raw_model, flavor: dict = {}):
         self.raw_model = raw_model
-        self.flavor["is_cuda"] = is_cuda
-
-    def config(self, model_spec: dict):
-        is_cuda = model_spec["flavor"].get("is_cuda", False)
-        self.flavor["is_cuda"] = is_cuda
+        is_cuda = flavor.get(ModelSpecConstants.IS_CUDA_KEY, False)
+        self.flavor[ModelSpecConstants.IS_CUDA_KEY] = is_cuda
         self._device = "cuda" if is_cuda and torch.cuda.is_available() else "cpu"
         self.raw_model.to(self._device)
-        if is_cuda and not torch.cuda.is_available():
-            logger.warning("The model is saved on gpu but loaded on cpu because cuda is not available")
+        self.raw_model.eval()
 
-        if model_spec.get("inputs", None):
-            self.input_args = [model_input["name"] for model_input in model_spec["inputs"]]
-        else:
-            self.input_args = get_input_args(self.raw_model)
-
-    def predict(self, df):
-        outputs = []
+    def predict(self, inputs: list) -> list:
+        """
+        Get prediction
+        :param inputs: list-like of list-like data structure
+        :return: list of list
+        """
+        logger.info(f"len(inputs) = {len(inputs)}")
         with torch.no_grad():
-            logger.info(f"input_df =\n {df}")
-            # TODO: Consolidate several rows together for efficiency
-            for _, row in df.iterrows():
-                input_params = list(map(self.to_tensor, row[self.input_args]))
-                predicted = self.raw_model(*input_params)
-                outputs.append(predicted.tolist())
+            model_inputs = self._pre_process(inputs)
+            logger.info(f"len(model_inputs) = {len(model_inputs)}")
+            for i, model_input in enumerate(model_inputs):
+                logger.info(f"model_inputs[{i}].shape = {model_input.shape}")
+            model_output = self.raw_model(*model_inputs)
+            pred_ret = self._post_process(model_output)
+            return pred_ret
 
-        output_df = pd.DataFrame(outputs)
-        output_df.columns = [f"Score_{i}" for i in range(0, output_df.shape[1])]
-        logger.info(f"output_df =\n{output_df}")
-        return output_df
+    def _pre_process(self, input_tuple_list) -> tuple:
+        """
+        Convert all elements to tensor, and stack tensors in each column into a 1-dim higher tensor
+        e.g. input_tuple_list = [(PIL.Image(3 * 224 * 224), control_tensor0(1 * 5)),
+                                 (PIL.Image(3 * 224 * 224), control_tensor1(1 * 5))]
+             output would be (images_tensor(2 * 3 * 224 * 224), control_tensor(2 * 1 * 5))
+        :param input_tuple_list: A list of tuple with same length, containing PIL.Image or ndarray
+        :return:
+        """
+        input_tensors_list = []
+        for input_tuple in input_tuple_list:
+            input_tensors = [self._to_tensor(x) for x in input_tuple]
+            input_tensors_list.append(input_tensors)
 
-    def to_tensor(self, entry):
+        output_tensors_cnt = len(input_tensors_list[0])
+        output_tensors = [None] * output_tensors_cnt
+        for j in range(output_tensors_cnt):
+            output_tensors[j] = torch.cat([row[j].unsqueeze(0) for row in input_tensors_list])
+        return tuple(output_tensors)
+
+    def _post_process(self, model_output: torch.Tensor) -> list:
+        """
+        Transform raw_model output to task-specified output format
+        :param model_output:
+        :return:
+        """
+        if self.task_type == TaskType.MultiClassification:
+            softmax = torch.nn.Softmax(dim=1)
+            pred_probs = softmax(model_output).cpu().numpy().tolist()
+            pred_index = torch.argmax(model_output, 1).cpu().numpy().tolist()
+            pred_result = list(zip(pred_index, pred_probs))
+            logger.info(f"pred_result = {pred_result}")
+            return pred_result
+        elif not self.task_type or self.task_type == TaskType.Regression:
+            return model_output.squeeze(0).tolist()
+        else:
+            raise Exception(f"Task_type: {self.task_type.name} has not been implemented yet.")
+
+    def _to_tensor(self, entry):
+        if isinstance(entry, Image.Image):
+            transform = torchvision.transforms.ToTensor()
+            return transform(entry).to(self._device)
         if isinstance(entry, str):
             entry = ast.literal_eval(entry)
-        return torch.Tensor(list(entry)).to(self._device)
+        return torch.Tensor(entry).to(self._device)
+    
+    def get_default_feature_columns(self):
+        if not self.raw_model:
+            logger.warning("Can't get default_feature_columns with raw_model uninitialized")
+        try:
+            forward_func = getattr(self.raw_model, 'forward')
+            args = inspect.getfullargspec(forward_func).args
+            if 'self' in args:
+                args.remove('self')
+            return args
+        except AttributeError:
+            logger.warning("Model without 'forward' function cannot be used to predict", exc_info=True)
+            return None

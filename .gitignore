@@ -1,6 +1,7 @@
 # Test generated model folder
 AzureMLModel
 data.dataset.parquet
+dfd
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

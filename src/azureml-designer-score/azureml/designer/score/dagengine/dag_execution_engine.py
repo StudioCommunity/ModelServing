@@ -19,14 +19,15 @@ logger = get_logger(__name__)
 class DagModule(object):
     def __init__(self, mp_module):
         self.mp_module = mp_module
-        self.module_host = None
+        self._module_host = None
         self.params = {}
         self.resources = []
 
     def execute(self, input_data, global_params={}):
         raise NotImplementedError
 
-    def get_module_host(self):
+    @property
+    def module_host(self):
         raise NotImplementedError
 
     def set_params(self, params):
@@ -39,47 +40,49 @@ class OfficialModule(DagModule):
     def execute(self, input_data, global_params={}):
         for key, val in input_data.items():
             input_data[key] = to_dfd(val)
-        module_host = self.get_module_host()
+        module_host = self.module_host
         return module_host.execute(input_data, global_params)
-    
-    def get_module_host(self):
-        if not self.module_host:
+
+    @property
+    def module_host(self):
+        if not self._module_host:
             module_entry = ModuleEntry(
                 self.mp_module.module_name,
                 self.mp_module.class_name,
                 self.mp_module.method_name)
-            self.module_host = DeploymentServiceModuleHost(module_entry)
-        return self.module_host
+            self._module_host = DeploymentServiceModuleHost(module_entry)
+        return self._module_host
 
     def set_params(self, params):
-        module_host = self.get_module_host()
+        module_host = self.module_host
         module_host.parameters_dict.update(params)
 
     def set_resource(self, resource):
-        module_host = self.get_module_host()
+        module_host = self.module_host
         module_host.resources_dict.update(resource)
 
 class CustomModule(DagModule):
     def execute(self, input_data, global_params={}):
-        module_host = self.get_module_host()
+        module_host = self.module_host
         inputs = []
         for data in input_data.values():
             inputs.append(data)
         if global_params:
             inputs.append(global_params)
         return module_host.execute(*inputs)
-    
-    def get_module_host(self):
-        if not self.module_host:
+
+    @property
+    def module_host(self):
+        if not self._module_host:
             self.module_host = CustomModuleHost(
                 self.mp_module.module_name,
                 self.mp_module.class_name,
                 self.mp_module.method_name)
         if self.params:
-            self.module_host.init(*self.resources, self.params)
+            self._module_host.init(*self.resources, self.params)
         else:
-            self.module_host.init(*self.resources)
-        return self.module_host
+            self._module_host.init(*self.resources)
+        return self._module_host
 
     def set_params(self, params):
         self.params = params
@@ -179,7 +182,7 @@ class DagResourceLoader(object):
             elif static_source.datatype_id in cls.typeid2postfix.keys():
                 if os.path.isdir(path):
                     path = os.path.join(path, cls.typeid2postfix[static_source.datatype_id])
-                if not os.path.exists(path):
+                if not os.path.isfile(path):
                     raise ResourceLoadingError(static_source.model_name, static_source.datatype_id)
                 resource = InputHandler.handle_input_from_file_name(path, data_type)
             elif static_source.type == 'TrainedModel' and static_source.datatype_id == "ILearnerDotNet" and os.path.isfile(

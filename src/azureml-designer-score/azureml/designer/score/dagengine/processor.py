@@ -1,5 +1,4 @@
 import os
-import sys
 import json
 import math
 import numpy as np
@@ -11,20 +10,11 @@ from azureml.core.model import Model
 
 from .score_exceptions import InputDataError, ModuleError
 from .dag_execution_engine import DagGraph
-from .common import set_global_setting, ModelZip, PerformanceCounter
+from .utils import set_root_path, ModelZip, PerformanceCounter
 
-import logging
+from .logger import get_logger
 
-
-def eprint(*args, **kwargs): print(*args, file=sys.stderr, **kwargs)
-
-
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-logger.log = print  # temporary fix for app insight telemetry
-logger.info = print
-logger.warning = eprint
-logger.error = eprint
+logger = get_logger(__name__)
 
 
 def pip_install(package):
@@ -93,7 +83,7 @@ def load_graph():
     try:
         path = get_modelpackage_path()
         modelzip = ModelZip(path)
-        set_global_setting('AZUREML_DESIGNER_DS_PATH', modelzip.get_dir())
+        set_root_path(modelzip.get_dir())
         json_string = modelzip.get_graph_json()
         graph = DagGraph(json_string)
         logger.info('Init: Graph has been loaded')

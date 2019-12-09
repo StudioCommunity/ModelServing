@@ -5,17 +5,9 @@ from azureml.studio.common.datatable.data_type_conversion import convert_column_
 from azureml.studio.core.io.data_frame_directory import DataFrameDirectory
 from azureml.studio.core.data_frame_schema import DataFrameSchema
 from azureml.studio.modulehost.handler.data_handler import ZipHandler
+from .logger import get_logger
 
-import logging
-
-def eprint(*args, **kwargs): print(*args, file=sys.stderr, **kwargs)
-
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-logger.log = print
-logger.info = print
-logger.warning = eprint
-logger.error = eprint
+logger = get_logger(__name__)
 
 def create_dfd_from_dict(json_data, schema_data):
     if schema_data:

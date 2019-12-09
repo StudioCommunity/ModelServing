@@ -1,21 +1,11 @@
 import copy
-import sys
 
 from .processor import load_graph, handle_request, handle_empty
 from .processor import pip_install, enable_rawhttp
 
-import logging
+from .logger import get_logger
 
-
-def eprint(*args, **kwargs): print(*args, file=sys.stderr, **kwargs)
-
-
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-logger.log = print
-logger.info = print
-logger.warning = eprint
-logger.error = eprint
+logger = get_logger(__name__)
 
 
 def init():

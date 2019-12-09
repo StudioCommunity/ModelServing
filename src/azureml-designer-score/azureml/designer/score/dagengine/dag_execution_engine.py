@@ -1,5 +1,4 @@
 import os
-import sys
 import json
 import importlib
 import collections
@@ -10,19 +9,12 @@ from azureml.studio.modulehost.module_reflector import ModuleEntry
 from azureml.studio.common.datatypes import DataTypes
 from .modelpackage import ModelPackageDecoder, MPStaticSource
 from .converter import create_dfd_from_dict, to_dfd, to_dict
-from .common import get_global_setting, PerformanceCounter
+from .utils import get_root_path, PerformanceCounter
 from .score_exceptions import InputDataError, ResourceLoadingError
 
-import logging
+from .logger import get_logger
 
-def eprint(*args, **kwargs): print(*args, file=sys.stderr, **kwargs)
-
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-logger.log = print
-logger.info = print
-logger.warning = eprint
-logger.error = eprint
+logger = get_logger(__name__)
 
 class DagModule(object):
     def __init__(self, mp_module):
@@ -121,12 +113,14 @@ class CustomModuleHost(object):
 class DagModuleFactory(object):
     @staticmethod
     def get_module(mp_module):
-        # TODO: temp solution, as some custom module named 'azureml.studio.score.xxx', below code needs change after module team provide a signal to indicate offical module 
-        if mp_module.module_name.startswith('azureml.studio.') and not mp_module.module_name.startswith('azureml.studio.score.'):
+        # TODO: temp solution, as some custom module named 'azureml.studio.score.xxx', below code needs change after module team provide a signal to indicate offical module
+        is_official = (mp_module.module_name.startswith('azureml.studio.') and not mp_module.module_name.startswith('azureml.studio.score.')) \
+                      or (mp_module.module_name.startswith('azureml.designer.') and not mp_module.module_name.startswith('azureml.designer.score.'))
+        if is_official:
             return OfficialModule(mp_module)
         else:
-            method_name = method_name or 'run'
-            return CustomModule(mp_module)    
+            return CustomModule(mp_module)
+
 
 class DagResourceLoader(object):
     typename2datatype = {
@@ -171,7 +165,7 @@ class DagResourceLoader(object):
                 data_type = cls.typename2datatype[static_source.type]
                 logger.warning(f'StaticSource({static_source}) has no type_id')
 
-            root_path = get_global_setting('AZUREML_DESIGNER_DS_PATH')
+            root_path = get_root_path()#get_global_setting('AZUREML_DESIGNER_DS_PATH')
             path = os.path.join(root_path, static_source.model_name)
             logger.info(f'Invoking handle_input_from_file_name({path}, {data_type})')
 

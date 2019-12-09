@@ -8,6 +8,13 @@ def set_global_setting(key, value):
 def get_global_setting(key):
     return os.environ.get(key, '')
 
+def set_root_path(path):
+    global root_path
+    root_path = path
+
+def get_root_path():
+    return root_path
+
 class ModelZip(object):
     def __init__(self, path, target_dir='./studiomodelpackage', graph_file='modelpackage.json'):
         self.path = path

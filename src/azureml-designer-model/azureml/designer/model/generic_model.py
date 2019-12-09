@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 
 from .constants import ScoreColumnConstants, ModelSpecConstants
-from .utils import ioutils, model_spec_utils, yamlutils
+from .utils import ioutils, model_spec_utils, yamlutils, conda_merger
 from .logger import get_logger
 from .model_factory import ModelFactory
 from .builtin_models.builtin_model import BuiltinModel
@@ -55,8 +55,8 @@ class GenericModel(object):
                 raise Exception("BuiltinModel Can't be initialized without flavor")
 
         self.conda = conda
-        if not self.conda and isinstance(self.core_model, BuiltinModel):
-            self.conda = self.core_model.default_conda
+        if isinstance(self.core_model, BuiltinModel):
+            self.conda = conda_merger.merge_envs([self.conda, self.core_model.default_conda])
         self.local_dependencies = local_dependencies
         self.inputs = inputs
         self.outputs = outputs

@@ -95,7 +95,7 @@ class PytorchBaseModel(BuiltinModel):
     def _to_tensor(self, entry):
         if isinstance(entry, Image.Image):
             transform = torchvision.transforms.ToTensor()
-            return transform(entry)
+            return transform(entry).to(self._device)
         if isinstance(entry, str):
             entry = ast.literal_eval(entry)
         return torch.Tensor(entry).to(self._device)

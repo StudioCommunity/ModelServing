@@ -34,7 +34,6 @@ class CoreModel(ABC):
         """
         pass
 
-    # TODO: support non-dataframe data structure
     @abstractmethod
     def predict(self, *args, **kwargs):
         pass

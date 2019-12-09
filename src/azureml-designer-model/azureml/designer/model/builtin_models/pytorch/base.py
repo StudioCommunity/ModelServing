@@ -41,7 +41,7 @@ class PytorchBaseModel(BuiltinModel):
     def predict(self, inputs: list) -> list:
         """
         Get prediction
-        :param inputs: list of tuples
+        :param inputs: list-like of list-like data structure
         :return: list of list
         """
         logger.info(f"len(inputs) = {len(inputs)}")

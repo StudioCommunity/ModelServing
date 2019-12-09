@@ -7,7 +7,7 @@ import pyarrow.parquet
 import torch
 from torch.autograd import Variable
 
-from azureml.designer.model.io import save_pytorch_model, load_generic_model
+from azureml.designer.model.io import save_pytorch_state_dict_model, load_generic_model
 
 from .model import LinearRegression
 
@@ -41,14 +41,23 @@ def train(model, x_train, y_train):
 
 
 def test_save_load():
-    model = LinearRegression(1, 1).to(device)
+    init_params = {
+        "inputSize": 1,
+        "outputSize": 1
+    }
+    model = LinearRegression(**init_params).to(device)
     x_train, y_train = get_training_data()
     train(model, x_train, y_train)
 
     model_save_path = os.path.join(dirname(dirname(abspath(__file__))), "AzureMLModel")
     local_dependencies = [dirname(dirname(abspath(__file__)))]
-
-    save_pytorch_model(model, path=model_save_path, local_dependencies=local_dependencies)
+    
+    save_pytorch_state_dict_model(
+        model,
+        init_params=init_params,
+        path=model_save_path,
+        local_dependencies=local_dependencies
+    )
     loaded_generic_model = load_generic_model(model_save_path)
     df = pd.DataFrame({"x": [[10.0], [11.0], [12.0]]})
     predict_result = loaded_generic_model.predict(df)
@@ -57,5 +66,10 @@ def test_save_load():
     loaded_pytorch_model = loaded_generic_model.raw_model
     assert isinstance(loaded_pytorch_model, torch.nn.Module)
 
-    data_save_path = os.path.join(dirname(dirname(abspath(__file__))), "data.dataset.parquet")
+    dfd_path = os.path.join(dirname(dirname(abspath(__file__))), "dfd")
+    os.makedirs(dfd_path, exist_ok=True)
+    data_save_path = os.path.join(dfd_path, "data.dataset.parquet")
     df.to_parquet(data_save_path, engine="pyarrow")
+    meta_path = os.path.join(dfd_path, "_meta.yaml")
+    with open(meta_path, "w") as fp:
+        fp.write("type: DataFrameDirectory\nextension: {}\nformat: Parquet\ndata: data.dataset.parquet")

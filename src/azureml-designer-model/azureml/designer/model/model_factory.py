@@ -1,8 +1,11 @@
 import importlib
-from abc import ABCMeta
-from .logger import get_logger
 import re
 import inspect
+
+from abc import ABCMeta
+
+from .constants import ModelSpecConstants
+from .logger import get_logger
 
 logger = get_logger(__name__)
 
@@ -28,7 +31,7 @@ def _get_default_flavor_name(cls):
 
 
 def _get_flavor_key(flavor):
-    key = f'{flavor["name"]},{flavor["serialization_method"]}'
+    key = f'{flavor[ModelSpecConstants.FLAVOR_NAME_KEY]},{flavor[ModelSpecConstants.SERIALIZATION_METHOD_KEY]}'
     return key
 
 
@@ -38,12 +41,12 @@ class BuiltinModelMeta(ABCMeta):
         if inspect.isabstract(cls):
             return
         flavor = cls.flavor
-        if not flavor["name"]:
-            flavor["name"] = _get_default_flavor_name(cls)
+        if not flavor[ModelSpecConstants.FLAVOR_NAME_KEY]:
+            flavor[ModelSpecConstants.FLAVOR_NAME_KEY] = _get_default_flavor_name(cls)
         if cls.serialization_method:
-            flavor["serialization_method"] = cls.serialization_method
+            flavor[ModelSpecConstants.SERIALIZATION_METHOD_KEY] = cls.serialization_method
 
-        if flavor["name"] is None:
+        if flavor[ModelSpecConstants.FLAVOR_NAME_KEY] is None:
             raise TypeError(f"Builtin model {cls} should be have a flavor name")
 
         key = _get_flavor_key(flavor)
@@ -78,19 +81,19 @@ class FlavorRegistry(object):
             return FlavorRegistry.flavors.items()
         else:
             return [FlavorRegistry.flavors[key] for key in FlavorRegistry.flavors if
-                    FlavorRegistry.flavors[key].flavor["name"] == flavor_name]
+                    FlavorRegistry.flavors[key].flavor[ModelSpecConstants.FLAVOR_NAME_KEY] == flavor_name]
 
 
 class ModelFactory(object):
 
     @classmethod
     def get_model_class(cls, flavor) -> type:
-        flavor_name = flavor["name"].lower()
-        if flavor_name == "custom":
-            module_path = flavor["module"]
-            class_name = flavor["class"]
+        flavor_name = flavor[ModelSpecConstants.FLAVOR_NAME_KEY].lower()
+        if flavor_name == ModelSpecConstants.CUSTOM_MODEL_FLAVOR_NAME:
+            module_path = flavor[ModelSpecConstants.MODEL_MODULE_KEY]
+            class_name = flavor[ModelSpecConstants.MODEL_CLASS_KEY]
             module = importlib.import_module(module_path)
             return getattr(module, class_name)
 
-        flavor_cls = FlavorRegistry.get_flavor(flavor_name, flavor["serialization_method"])
+        flavor_cls = FlavorRegistry.get_flavor(flavor_name, flavor[ModelSpecConstants.SERIALIZATION_METHOD_KEY])
         return flavor_cls

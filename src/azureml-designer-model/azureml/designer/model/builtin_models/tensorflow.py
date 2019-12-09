@@ -1,8 +1,8 @@
 import os
-import yaml
 import json
 import tensorflow as tf
 from . import constants, utils
+from ..utils import yamlutils
 
 FLAVOR_NAME = "tensorflow"
 
@@ -22,8 +22,7 @@ def _save_model_spec(path, model_file_path, graph_tags, signature_name, serializ
     spec[FLAVOR_NAME]['serialization_format'] = serialization_format
     # add signature_def_key
     spec[FLAVOR_NAME]['signature_def_key'] = signature_name
-    with open(os.path.join(path, constants.MODEL_SPEC_FILE_NAME), 'w') as fp:
-        yaml.dump(spec, fp, default_flow_style=False)
+    yamlutils.dump_to_yaml_file(spec, os.path.join(path, constants.MODEL_SPEC_FILE_NAME))
 
 
 def _save_model(export_path, sess, input_tensor_list, output_tensor_list, graph_tags, signature_name):

@@ -1,17 +1,18 @@
 import os
 from os.path import dirname, abspath
 
-import pytest
 import numpy as np
 import pandas as pd
+import pyarrow.parquet
 import torch
 from torch.autograd import Variable
 
-from azureml.designer.model.io import save_pytorch_model, load_generic_model
+from azureml.designer.model.io import save_pytorch_state_dict_model, load_generic_model
 
 from model import LinearRegression
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
+
 
 def get_training_data():
     x_values = [i for i in range(11)]
@@ -21,6 +22,9 @@ def get_training_data():
     y_values = [2 * i + 1 for i in x_values]
     y_train = np.array(y_values, dtype=np.float32)
     y_train = y_train.reshape(-1, 1)
+
+    return x_train, y_train
+
 
 def train(model, x_train, y_train):
     criterion = torch.nn.MSELoss() 
@@ -35,13 +39,25 @@ def train(model, x_train, y_train):
         loss.backward()
         optimizer.step()
 
+
 def main():
-    model = LinearRegression(1, 1).to(device)
+    init_params = {
+        "inputSize": 1,
+        "outputSize": 1
+    }
+    model = LinearRegression(**init_params).to(device)
     x_train, y_train = get_training_data()
     train(model, x_train, y_train)
 
     model_save_path = "./AzureMLModel"
-    save_pytorch_model(model, path=model_save_path)
+    local_dependencies = ["."]
+    
+    save_pytorch_state_dict_model(
+        model,
+        init_params=init_params,
+        path=model_save_path,
+        local_dependencies=local_dependencies
+    )
     loaded_generic_model = load_generic_model(model_save_path)
     df = pd.DataFrame({"x": [[10.0], [11.0], [12.0]]})
     predict_result = loaded_generic_model.predict(df)

@@ -1,6 +1,7 @@
 import fire
 import torch.nn as nn
 from .basenet import BaseNet
+from azureml.studio.core.logger import logger
 
 
 class DenseNet(BaseNet):

@@ -2,6 +2,7 @@ import os
 from os.path import dirname, abspath
 
 import torch
+import torchvision
 from PIL import Image
 from azureml.designer.model.io import save_pytorch_state_dict_model, load_generic_model
 from azureml.designer.model.model_spec.task_type import TaskType
@@ -28,12 +29,20 @@ def test_save_load():
     model = DenseNet(**init_params)
 
     model_save_path = os.path.join(dirname(dirname(abspath(__file__))), "AzureMLModel")
-    local_dependencies = [dirname(dirname(abspath(__file__)))]
+
     # Also support list and csv_file
     index_to_label = {
         0: "056.dog",
         1: "060.duc",
         2: "080.frog"
+    }
+    conda = {
+        "channels": ["pytorch"],
+        "dependencies": [
+            f"pytorch={torch.__version__}",
+            f"torchvision={torchvision.__version__}",
+            {"pip": ["git+https://github.com/chjinche/CustomModules-1.git@master#subdirectory=azureml-custom-module-examples/image-classification"]}
+        ]
     }
     
     save_pytorch_state_dict_model(
@@ -42,7 +51,7 @@ def test_save_load():
         path=model_save_path,
         task_type=TaskType.MultiClassification,
         label_map=index_to_label,
-        local_dependencies=local_dependencies
+        conda=conda
     )
     loaded_generic_model = load_generic_model(model_save_path)
     image_directory = os.path.join(dirname(dirname(abspath(__file__))), "images")
@@ -56,4 +65,3 @@ def test_save_load():
 
 if __name__ == "__main__":
     test_save_load()
-

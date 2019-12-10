@@ -45,7 +45,7 @@ def get_requirements() -> list:
     Returns:
         list -- list of requirements
     """
-    exclude = ('pytest', 'pylint', 'torch', 'torchvision')
+    exclude = ('pytest', 'pylint', 'torch', 'torchvision', 'azureml.core', 'azureml-designer-internal', 'azureml-designer-classic-modules')
     install_reqs = parse_requirements('requirements.txt', session='hack')
     return [str(ir.req) for ir in install_reqs if ir.name not in exclude]
 

@@ -52,7 +52,9 @@ def construct_response(message, code, json_str):
 
 
 def get_modelpackage_path():
-    with open('configuration.json') as fp:
+    root_path = os.environ.get('DSPATH', '')
+    config_file = os.path.join(root_path, 'configuration.json')
+    with open(config_file) as fp:
         config = json.load(fp)
         model = config['model']
         if ':' in model:

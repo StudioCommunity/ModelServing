@@ -16,9 +16,9 @@ def get_root_path():
     return root_path
 
 class ModelZip(object):
-    def __init__(self, path, target_dir='./studiomodelpackage', graph_file='modelpackage.json'):
+    def __init__(self, path, target_dir='studiomodelpackage', graph_file='modelpackage.json'):
         self.path = path
-        self.target_dir = target_dir
+        self.target_dir = os.path.join(os.environ.get('DSPATH',''), target_dir)
         self.graph_file = graph_file
         self.extractall()
 

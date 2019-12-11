@@ -3,7 +3,7 @@ import sys
 import shutil
 
 from ..constants import ModelSpecConstants
-from ..utils import ioutils
+from ..utils import ioutils, ziputils
 from ..logger import get_logger
 
 logger = get_logger(__name__)
@@ -70,9 +70,22 @@ class LocalDependencyManager(object):
                     self.copied_local_dependencies.append(
                         os.path.join(ModelSpecConstants.LOCAL_DEPENDENCIES_PATH, dst_dir_name))
 
+        if os.path.isdir(dst_root_dir):
+            zip_file_path = os.path.join(artifact_path, ModelSpecConstants.LOCAL_DEPENDENCIES_ZIP_FILE_NAME)
+            ziputils.zip_dir(dst_root_dir, zip_file_path)
+            logger.info(f"Zipped local_dependencies into {zip_file_path}. Removing original directory.")
+            shutil.rmtree(dst_root_dir)
+            logger.info(f"{dst_root_dir} removed.")
+
     def load(self, artifact_path, relative_paths):
         self.local_dependencies = [os.path.abspath(os.path.join(artifact_path, path)) for path in relative_paths]
-        logger.info(f"Loaded {self.local_dependencies}")
+        logger.info(f"local_dependencies = {self.local_dependencies}")
+        if self.local_dependencies:
+            zip_file_path = os.path.join(artifact_path, ModelSpecConstants.LOCAL_DEPENDENCIES_ZIP_FILE_NAME)
+            if not os.path.isfile(zip_file_path):
+                raise Exception(f"Failed to load local_dependencies because {zip_file_path} is missing.")
+            ziputils.unzip_dir(zip_file_path, os.path.join(artifact_path, ModelSpecConstants.LOCAL_DEPENDENCIES_PATH))
+            logger.info(f"Unzipped {zip_file_path} to ")
 
     def install(self):
         for local_dependency_path in self.local_dependencies:

@@ -41,5 +41,5 @@ def copytree_include(src_dir, dst_dir, include_extensions: tuple = (), exist_ok=
 
 
 def validate_overwrite(save_to, overwrite_if_exists):
-    if os.path.isfile(save_to) and not overwrite_if_exists:
-        raise Exception(f"File {save_to} exists. Set overwrite_is_exists=True if you want to overwrite it.")
+    if os.path.exists(save_to) and not overwrite_if_exists:
+        raise Exception(f"Dst path {save_to} exists. Set overwrite_is_exists=True if you want to overwrite it.")

@@ -14,7 +14,6 @@ def zip_dir(src_dir_path, zip_file_path, overwrite_if_exists=True):
             for file_name in file_names:
                 file_path = os.path.join(root, file_name)
                 rel_path = os.path.relpath(file_path, src_dir_path)
-                logger.info(f"file_path= {file_path}, rel_path = {rel_path}")
                 zip_file.write(file_path, rel_path)
 
 

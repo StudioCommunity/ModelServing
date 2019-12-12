@@ -42,7 +42,7 @@ implementation:
             # Workaround for dataset input
             - azureml-defaults
             - azureml-designer-model==0.1.20191209.4
-            - azureml-designer-score==0.1.20191209.4
+            - azureml-designer-score==0.1.20191212.1
             - azureml-designer-core==0.0.25
             - cloudpickle
             - PyYAML

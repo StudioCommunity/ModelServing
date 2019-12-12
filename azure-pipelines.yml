@@ -47,11 +47,11 @@ steps:
     pip install -r requirements.txt --extra-index-url=https://msdata.pkgs.visualstudio.com/_packaging/azureml-modules%40Local/pypi/simple/
   displayName: 'Install azureml-designer-score dependencies'
 
-- bash: |
-    source activate loader_env
-    cd src/azureml-designer-score 
-    python -m pytest -s
-  displayName: 'PyTest azure-designer-score'
+# - bash: |
+#     source activate loader_env
+#     cd src/azureml-designer-score
+#     python -m pytest -s
+#   displayName: 'PyTest azure-designer-score'
 
 # Save build number to file
 - script: |

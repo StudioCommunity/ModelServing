@@ -22,7 +22,7 @@ class BuiltinScoreModule(object):
             append_score_column_to_output_value_str.lower() == "true"
         logger.info(f"self.append_score_column_to_output = {self.append_score_column_to_output}")
 
-        self.model = load_generic_model(model_path, install_dependencies=True)
+        self.model = load_generic_model(model_path, install_dependencies=False)
         logger.info("Generic model loaded")
 
     def run(self, input_directory, global_param=None):

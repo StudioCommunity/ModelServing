@@ -55,7 +55,6 @@ class PytorchStateDictModel(PytorchBaseModel):
                     raise
 
         init_params = flavor.get(ModelSpecConstants.INIT_PARAMS_KEY, {})
-        logger.info(f"Loaded init_params = {init_params}")
         logger.info(f"Trying to initialize model by calling {model_class}({init_params})")
         model = model_class(**init_params)
         model.load_state_dict(torch.load(load_from))

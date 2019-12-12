@@ -164,7 +164,9 @@ class GenericModel(object):
                 local_dependency_manager.install()
 
         core_model_class = ModelFactory.get_model_class(flavor)
+        logger.info(f"core_model_class = {core_model_class}")
         core_model_path = os.path.join(artifact_path, model_spec[ModelSpecConstants.MODEL_FILE_KEY])
+        logger.info(f"Trying to load core_model from {core_model_path}.")
         if issubclass(core_model_class, BuiltinModel):
             core_model = core_model_class.load_with_flavor(core_model_path, model_spec.get(ModelSpecConstants.FLAVOR_KEY, {}))
         else:

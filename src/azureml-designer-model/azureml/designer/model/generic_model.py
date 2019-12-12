@@ -55,8 +55,8 @@ class GenericModel(object):
                 raise Exception("BuiltinModel Can't be initialized without flavor")
 
         self.conda = conda
-        if isinstance(self.core_model, BuiltinModel):
-            self.conda = conda_merger.merge_envs([self.conda, self.core_model.default_conda])
+        if not self.conda and isinstance(self.core_model, BuiltinModel):
+            self.conda = self.core_model.default_conda
         self.local_dependencies = local_dependencies
         self.inputs = inputs
         self.outputs = outputs

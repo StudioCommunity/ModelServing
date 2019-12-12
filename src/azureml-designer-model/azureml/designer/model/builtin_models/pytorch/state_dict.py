@@ -60,6 +60,6 @@ class PytorchStateDictModel(PytorchBaseModel):
         if torch.cuda.is_available():
             model.load_state_dict(torch.load(load_from))
         else:
-            model.load_state_dict(torch.load(load_from), map_location=torch.device('cpu'))
+            model.load_state_dict(torch.load(load_from, map_location=torch.device('cpu')))
 
         return cls(model, flavor)

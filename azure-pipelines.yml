@@ -24,28 +24,28 @@ steps:
     python -m pytest -s
   displayName: 'PyTest azure-designer-model'
 
-- bash: conda create --yes --quiet --name loader_env
-  displayName: Create Anaconda environment for azureml-designer-score test
+# - bash: conda create --yes --quiet --name loader_env
+#   displayName: Create Anaconda environment for azureml-designer-score test
 
-- bash: |
-    source activate loader_env
-    cd src/azureml-designer-model
-    python setup.py install
-  displayName: 'Install azureml-designer-model'
+# - bash: |
+#     source activate loader_env
+#     cd src/azureml-designer-model
+#     python setup.py install
+#   displayName: 'Install azureml-designer-model'
 
-- script: |
-    cd scripts
-    python refresh_score_tests.py
-  displayName: 'Create score test cases from model test output'
+# - script: |
+#     cd scripts
+#     python refresh_score_tests.py
+#   displayName: 'Create score test cases from model test output'
 
-- bash: |
-    source activate loader_env
-    cd src/azureml-designer-score
-    python -m pip install --upgrade pip
-    pip install keyring --pre
-    pip install artifacts-keyring --pre
-    pip install -r requirements.txt --extra-index-url=https://msdata.pkgs.visualstudio.com/_packaging/azureml-modules%40Local/pypi/simple/
-  displayName: 'Install azureml-designer-score dependencies'
+# - bash: |
+#     source activate loader_env
+#     cd src/azureml-designer-score
+#     python -m pip install --upgrade pip
+#     pip install keyring --pre
+#     pip install artifacts-keyring --pre
+#     pip install -r requirements.txt --extra-index-url=https://msdata.pkgs.visualstudio.com/_packaging/azureml-modules%40Local/pypi/simple/
+#   displayName: 'Install azureml-designer-score dependencies'
 
 # - bash: |
 #     source activate loader_env

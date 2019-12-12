@@ -83,7 +83,7 @@ class LocalDependencyManager(object):
         if self.local_dependencies:
             zip_file_path = os.path.join(artifact_path, ModelSpecConstants.LOCAL_DEPENDENCIES_ZIP_FILE_NAME)
             if not os.path.isfile(zip_file_path):
-                raise Exception(f"Failed to load local_dependencies because {zip_file_path} is missing.")
+                raise FileNotFoundError(f"Failed to load local_dependencies because {zip_file_path} is missing.")
             local_dependencies_path = os.path.join(artifact_path, ModelSpecConstants.LOCAL_DEPENDENCIES_PATH)
             ziputils.unzip_dir(zip_file_path, local_dependencies_path)
             logger.info(f"Unzipped {zip_file_path} to {local_dependencies_path}.")

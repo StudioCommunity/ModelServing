@@ -57,6 +57,9 @@ class PytorchStateDictModel(PytorchBaseModel):
         init_params = flavor.get(ModelSpecConstants.INIT_PARAMS_KEY, {})
         logger.info(f"Trying to initialize model by calling {model_class}({init_params})")
         model = model_class(**init_params)
-        model.load_state_dict(torch.load(load_from))
+        if torch.cuda.is_available():
+            model.load_state_dict(torch.load(load_from))
+        else:
+            model.load_state_dict(torch.load(load_from), map_location=torch.device('cpu'))
 
         return cls(model, flavor)

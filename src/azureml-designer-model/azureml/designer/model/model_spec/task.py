@@ -48,5 +48,5 @@ class Task(object):
             task_type = TaskType[task_conf[ModelSpecConstants.TASK_TYPE_KEY]]
         if ModelSpecConstants.LABEL_MAP_FILE_KEY in task_conf:
             label_map = LabelMap.create(os.path.join(artifact_path, task_conf[ModelSpecConstants.LABEL_MAP_FILE_KEY]))
-        ground_truth_column_name = task_conf.get(ModelSpecConstants.LABEL_MAP_FILE_KEY, None)
+        ground_truth_column_name = task_conf.get(ModelSpecConstants.DEFAULT_GROUND_TRUTH_COLUMN_NAME, None)
         return cls(task_type=task_type, label_map=label_map, ground_truth_column_name=ground_truth_column_name)

@@ -303,7 +303,7 @@ class GenericModel(object):
     def label_column_name(self):
         if self.task and self.task.ground_truth_column_name:
             return self.task.ground_truth_column_name
-        return ModelSpecConstants.GROUND_TRUTH_COLUMN_NAME_KEY
+        return ModelSpecConstants.DEFAULT_GROUND_TRUTH_COLUMN_NAME
 
     @property
     def task_type(self):

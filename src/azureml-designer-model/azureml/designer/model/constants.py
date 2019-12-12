@@ -43,6 +43,7 @@ class ModelSpecConstants:
     TASK_TYPE_KEY = "task_type"
     LABEL_MAP_FILE_KEY = "label_map_file"
     GROUND_TRUTH_COLUMN_NAME_KEY = "ground_truth_column_name"
+    DEFAULT_GROUND_TRUTH_COLUMN_NAME = "Ground Truth Label"
 
     # Others
     DEFAULT_ARTIFACT_SAVE_PATH = "./AzureMLModel"

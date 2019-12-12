@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 
 from .constants import ScoreColumnConstants, ModelSpecConstants
-from .utils import ioutils, model_spec_utils, yamlutils, conda_merger
+from .utils import ioutils, model_spec_utils, yamlutils
 from .logger import get_logger
 from .model_factory import ModelFactory
 from .builtin_models.builtin_model import BuiltinModel

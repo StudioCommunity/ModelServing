@@ -1,6 +1,6 @@
 import pandas as pd
 
-from ..utils import ioutils
+from azureml.designer.model.utils import ioutils
 
 
 # TODO: Add unittest

@@ -11,8 +11,8 @@ import importlib
 import cloudpickle
 from urllib.request import urlopen
 
-from . import utils
-from .logger import get_logger
+from azureml.designer.model.builtin_models import utils
+from azureml.designer.model.builtin_models.logger import get_logger
 
 FLAVOR_NAME = "python"
 MODEL_FILE_NAME = "model.pkl"  # we cloud pickle the model to load/save the model by default

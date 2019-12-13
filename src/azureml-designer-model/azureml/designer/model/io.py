@@ -1,10 +1,10 @@
-from . import constants
-from .constants import ModelSpecConstants
-from .generic_model import GenericModel
-from .logger import get_logger
-from .model_spec.task import Task
-from .model_spec.task_type import TaskType
-from .model_spec.label_map import LabelMap
+from azureml.designer.model import constants
+from azureml.designer.model.constants import ModelSpecConstants
+from azureml.designer.model.generic_model import GenericModel
+from azureml.designer.model.logger import get_logger
+from azureml.designer.model.model_spec.task import Task
+from azureml.designer.model.model_spec.task_type import TaskType
+from azureml.designer.model.model_spec.label_map import LabelMap
 
 logger = get_logger(__name__)
 

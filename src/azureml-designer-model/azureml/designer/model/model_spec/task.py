@@ -1,8 +1,8 @@
 import os
 
-from .task_type import TaskType
-from .label_map import LabelMap
-from ..constants import ModelSpecConstants
+from azureml.designer.model.model_spec.task_type import TaskType
+from azureml.designer.model.model_spec.label_map import LabelMap
+from azureml.designer.model.constants import ModelSpecConstants
 
 
 class Task(object):

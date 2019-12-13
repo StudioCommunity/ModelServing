@@ -2,10 +2,10 @@ import os
 
 from datetime import datetime
 
-from ..constants import ModelSpecConstants
-from ..model_spec.serving_config import ServingConfig
-from ..logger import get_logger
-from ..utils import yamlutils
+from azureml.designer.model.constants import ModelSpecConstants
+from azureml.designer.model.model_spec.serving_config import ServingConfig
+from azureml.designer.model.logger import get_logger
+from azureml.designer.model.utils import yamlutils
 
 logger = get_logger(__name__)
 

@@ -2,9 +2,9 @@ import os
 import sys
 import shutil
 
-from ..constants import ModelSpecConstants
-from ..utils import ioutils, ziputils
-from ..logger import get_logger
+from azureml.designer.model.constants import ModelSpecConstants
+from azureml.designer.model.utils import ioutils, ziputils
+from azureml.designer.model.logger import get_logger
 
 logger = get_logger(__name__)
 

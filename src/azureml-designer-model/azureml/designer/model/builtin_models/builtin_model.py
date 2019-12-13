@@ -2,10 +2,10 @@ import sys
 
 from abc import abstractmethod
 
-from ..constants import ModelSpecConstants
-from ..core_model import CoreModel
-from ..model_factory import BuiltinModelMeta
-from ..model_spec.task_type import TaskType
+from azureml.designer.model.constants import ModelSpecConstants
+from azureml.designer.model.core_model import CoreModel
+from azureml.designer.model.model_factory import BuiltinModelMeta
+from azureml.designer.model.model_spec.task_type import TaskType
 
 PYTHON_VERSION = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
 

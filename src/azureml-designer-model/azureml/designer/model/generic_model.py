@@ -5,18 +5,18 @@ from abc import abstractmethod
 import numpy as np
 import pandas as pd
 
-from .constants import ScoreColumnConstants, ModelSpecConstants
-from .utils import ioutils, model_spec_utils, yamlutils
-from .logger import get_logger
-from .model_factory import ModelFactory
-from .builtin_models.builtin_model import BuiltinModel
-from .model_spec.local_dependency import LocalDependencyManager
-from .model_spec.model_input import ModelInput
-from .model_spec.model_output import ModelOutput
-from .model_spec.task_type import TaskType
-from .model_spec.task import Task
-from .model_spec.remote_dependency import RemoteDependencyManager
-from .model_spec.serving_config import ServingConfig
+from azureml.designer.model.constants import ScoreColumnConstants, ModelSpecConstants
+from azureml.designer.model.utils import ioutils, model_spec_utils, yamlutils
+from azureml.designer.model.logger import get_logger
+from azureml.designer.model.model_factory import ModelFactory
+from azureml.designer.model.builtin_models.builtin_model import BuiltinModel
+from azureml.designer.model.model_spec.local_dependency import LocalDependencyManager
+from azureml.designer.model.model_spec.model_input import ModelInput
+from azureml.designer.model.model_spec.model_output import ModelOutput
+from azureml.designer.model.model_spec.task_type import TaskType
+from azureml.designer.model.model_spec.task import Task
+from azureml.designer.model.model_spec.remote_dependency import RemoteDependencyManager
+from azureml.designer.model.model_spec.serving_config import ServingConfig
 
 logger = get_logger(__name__)
 

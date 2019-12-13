@@ -3,10 +3,10 @@ import importlib
 
 import torch
 
-from .base import PytorchBaseModel
-from ...constants import ModelSpecConstants
-from ...logger import get_logger
-from ...utils import conda_merger, ioutils, dictutils
+from azureml.designer.model.builtin_models.pytorch.base import PytorchBaseModel
+from azureml.designer.model.constants import ModelSpecConstants
+from azureml.designer.model.logger import get_logger
+from azureml.designer.model.utils import conda_merger, ioutils, dictutils
 
 logger = get_logger(__name__)
 

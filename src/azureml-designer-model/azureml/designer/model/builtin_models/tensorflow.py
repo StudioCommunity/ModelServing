@@ -1,8 +1,8 @@
 import os
 import json
 import tensorflow as tf
-from . import constants, utils
-from ..utils import yamlutils
+from azureml.designer.model.builtin_models import constants, utils
+from azureml.designer.model.utils import yamlutils
 
 FLAVOR_NAME = "tensorflow"
 

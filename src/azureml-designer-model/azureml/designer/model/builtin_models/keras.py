@@ -1,6 +1,6 @@
 import os
 import keras
-from . import utils
+from azureml.designer.model.builtin_models import utils
 
 FLAVOR_NAME = "keras"
 MODEL_FILE_NAME = "model.h5"

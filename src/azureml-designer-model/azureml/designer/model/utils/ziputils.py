@@ -1,8 +1,8 @@
 import os
 import zipfile
 
-from .ioutils import validate_overwrite
-from ..logger import get_logger
+from azureml.designer.model.utils.ioutils import validate_overwrite
+from azureml.designer.model.logger import get_logger
 
 logger = get_logger(__name__)
 

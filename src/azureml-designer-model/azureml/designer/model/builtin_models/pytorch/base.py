@@ -6,11 +6,11 @@ import torch
 import torchvision
 from PIL import Image
 
-from ..builtin_model import BuiltinModel
-from ...constants import ModelSpecConstants
-from ...logger import get_logger
-from ...utils import conda_merger
-from ...model_spec.task_type import TaskType
+from azureml.designer.model.builtin_models.builtin_model import BuiltinModel
+from azureml.designer.model.constants import ModelSpecConstants
+from azureml.designer.model.logger import get_logger
+from azureml.designer.model.utils import conda_merger
+from azureml.designer.model.model_spec.task_type import TaskType
 
 
 logger = get_logger(__name__)

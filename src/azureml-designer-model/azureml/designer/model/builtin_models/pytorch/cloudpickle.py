@@ -2,8 +2,8 @@ import os
 
 import cloudpickle
 
-from .base import PytorchBaseModel
-from ...utils import conda_merger, ioutils
+from azureml.designer.model.builtin_models.pytorch.base import PytorchBaseModel
+from azureml.designer.model.utils import conda_merger, ioutils
 
 
 class PytorchCloudPickleModel(PytorchBaseModel):

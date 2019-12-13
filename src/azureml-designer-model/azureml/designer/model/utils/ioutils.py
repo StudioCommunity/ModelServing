@@ -1,9 +1,9 @@
 import os
 import shutil
 
-from ..constants import ModelSpecConstants
-from ..logger import get_logger
-from ..utils import yamlutils
+from azureml.designer.model.constants import ModelSpecConstants
+from azureml.designer.model.logger import get_logger
+from azureml.designer.model.utils import yamlutils
 
 logger = get_logger(__name__)
 

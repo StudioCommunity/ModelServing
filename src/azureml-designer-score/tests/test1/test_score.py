@@ -5,7 +5,7 @@ import os.path
 DS_PATH = os.path.dirname(__file__)
 ROOT_PATH = os.path.join(DS_PATH, '../..')
 sys.path.append(ROOT_PATH)
-import azureml.designer.score.dagengine.score_implementation as score_implementation
+import azureml.designer.dagengine.score_implementation as score_implementation
 
 
 class MockRequest(object):

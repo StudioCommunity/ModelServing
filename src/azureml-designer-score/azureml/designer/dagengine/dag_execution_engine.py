@@ -9,7 +9,7 @@ from azureml.studio.modulehost.module_reflector import ModuleEntry
 from azureml.studio.common.datatypes import DataTypes
 from .modelpackage import ModelPackageDecoder, MPStaticSource
 from .converter import create_dfd_from_dict, to_dfd, to_dict
-from .utils import get_root_path, PerformanceCounter
+from .utils import PerformanceCounter
 from .score_exceptions import InputDataError, ResourceLoadingError
 
 from .logger import get_logger
@@ -126,21 +126,22 @@ class DagModuleFactory(object):
 
 
 class DagResourceLoader(object):
-    typename2datatype = {
-        'TrainedModel': DataTypes.LEARNER,
-        'TransformModule': DataTypes.TRANSFORM,
-        'FilterModule': DataTypes.FILTER,
-        'ClusterModule': DataTypes.CLUSTER,
-        'DataSource': None
-    }
-    typeid2postfix = {
-        'IClusterDotNet': 'data.icluster',
-        'ITransformDotNet': 'data.itransform',
-        'TransformationDirectory': 'data.itransform'
-    }
+    def __init__(self, root_path=''):
+        self.root_path = root_path
+        self.typename2datatype = {
+            'TrainedModel': DataTypes.LEARNER,
+            'TransformModule': DataTypes.TRANSFORM,
+            'FilterModule': DataTypes.FILTER,
+            'ClusterModule': DataTypes.CLUSTER,
+            'DataSource': None
+        }
+        self.typeid2postfix = {
+            'IClusterDotNet': 'data.icluster',
+            'ITransformDotNet': 'data.itransform',
+            'TransformationDirectory': 'data.itransform'
+        }
 
-    @staticmethod
-    def from_name(name):
+    def from_name(self, name):
         """Given a name of DataType, find a corresponding item in DataTypes enum.
 
         :param name: The name of DataType.
@@ -153,8 +154,8 @@ class DagResourceLoader(object):
             raise ValueError(f"Failed to load instance of DataTypes from dict")
 
     # 'ModelDirectory' 'TransformDirectory' 'AnyDirectory' 'DataFramDirectory' 'AnyFile'
-    @classmethod
-    def load_static_source(cls, static_source):
+
+    def load_static_source(self, static_source):
         logger.info(f'Loading static source {static_source}')
         try:
             is_not_datasource = static_source.type != 'DataSource'
@@ -163,13 +164,12 @@ class DagResourceLoader(object):
                 if is_path:
                     data_type = None
                 else:
-                    data_type = DagResourceLoader.from_name(static_source.datatype_id)
+                    data_type = self.from_name(static_source.datatype_id)
             else:
-                data_type = cls.typename2datatype[static_source.type]
+                data_type = self.typename2datatype[static_source.type]
                 logger.warning(f'StaticSource({static_source}) has no type_id')
 
-            root_path = get_root_path()#get_global_setting('AZUREML_DESIGNER_DS_PATH')
-            path = os.path.join(root_path, static_source.model_name)
+            path = os.path.join(self.root_path, static_source.model_name)
             logger.info(f'Invoking handle_input_from_file_name({path}, {data_type})')
 
             if static_source.datatype_id in ('ModelDirectory', 'TransformDirectory') and os.path.isdir(
@@ -179,9 +179,9 @@ class DagResourceLoader(object):
             elif static_source.datatype_id == 'DataFrameDirectory' and os.path.isdir(path):
                 resource = InputHandler.handle_input_directory(path)
                 is_not_datasource = False
-            elif static_source.datatype_id in cls.typeid2postfix.keys():
+            elif static_source.datatype_id in self.typeid2postfix.keys():
                 if os.path.isdir(path):
-                    path = os.path.join(path, cls.typeid2postfix[static_source.datatype_id])
+                    path = os.path.join(path, self.typeid2postfix[static_source.datatype_id])
                 if not os.path.isfile(path):
                     raise ResourceLoadingError(static_source.model_name, static_source.datatype_id)
                 resource = InputHandler.handle_input_from_file_name(path, data_type)
@@ -191,7 +191,7 @@ class DagResourceLoader(object):
             elif static_source.type == 'TrainedModel' and os.path.isdir(path):
                 official_ilearner = os.path.join(path, 'data.ilearner')
                 official_metadata = os.path.join(path, 'data.metadata')
-                if (os.path.exists(official_ilearner) and os.path.exists(official_metadata)):
+                if os.path.exists(official_ilearner) and os.path.exists(official_metadata):
                     resource = InputHandler.handle_input_from_file_name(official_ilearner, DataTypes.LEARNER)
                 else:
                     resource = path
@@ -209,7 +209,7 @@ class DagResourceLoader(object):
         return resource, is_not_datasource
 
 class DagNode(object):
-    def __init__(self, mp_node, dag_module):
+    def __init__(self, mp_node, dag_module, root_path=''):
         self.mp_node = mp_node
         self.module = dag_module
         self.input_set = set()
@@ -218,6 +218,7 @@ class DagNode(object):
         self.end_ports = []
         self.outputport_mapping = collections.defaultdict(list)
         self.module.set_params(self.mp_node.parameters)
+        self.resource_loader = DagResourceLoader(root_path)
 
     def is_ready(self):
         return self.input_set == set(self.mp_node.inputport_mappings.keys())
@@ -232,7 +233,7 @@ class DagNode(object):
         self.input_set.add(port_name)
         param_name = port_name.split(':')[-1]
         if isinstance(input_data, MPStaticSource):
-            static_source, is_not_datasource = DagResourceLoader.load_static_source(input_data)
+            static_source, is_not_datasource = self.resource_loader.load_static_source(input_data)
             if is_not_datasource:
                 self.module.set_resource({param_name: static_source})
             else:
@@ -241,7 +242,8 @@ class DagNode(object):
             self.input_param2data[param_name] = input_data
 
 class DagGraph(object):
-    def __init__(self, json_string):
+    def __init__(self, json_string, root_path=''):
+        self.root_path = root_path
         self.nodes = []
         self.entry_nodes = {}
         self.ready_nodes = []
@@ -264,7 +266,7 @@ class DagGraph(object):
         for mp_node in modelpackage.nodes.values():
             for key, value in mp_node.global_parameter_mappings.items():
                 self.module2globalparams[mp_node.module_id][key] = value
-            node = DagNode(mp_node, modules[mp_node.module_id])
+            node = DagNode(mp_node, modules[mp_node.module_id], self.root_path)
             self.nodes.append(node)
             for output_port in mp_node.outputports:
                 output_port2node[output_port] = node
@@ -321,7 +323,6 @@ class DagGraph(object):
             except Exception as ex:
                 self.error_module = node.module.mp_module.module_name
                 raise ex
-            #results = node.get_output_port2data()
             for output_port, targets in node.outputport_mapping.items():
                 result = results[output_port]
                 for target in targets:

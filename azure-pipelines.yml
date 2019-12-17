@@ -31,7 +31,7 @@ steps:
 - script: |
     source activate saver_env
     cd src/azureml-designer-model
-    python -m pytest -s
+    python -m pytest -s --ignore=azureml/designer/model/tests/pytorch/cloudpickle
   displayName: 'PyTest azure-designer-model'
 
 - bash: conda create --yes --quiet --name loader_env

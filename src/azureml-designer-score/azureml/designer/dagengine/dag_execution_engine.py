@@ -2,11 +2,14 @@ import os
 import json
 import importlib
 import collections
+import base64
+import traceback
 
 from azureml.studio.modulehost.handler.port_io_handler import InputHandler
 from azureml.studio.modulehost.deployment_service_module_host import DeploymentServiceModuleHost
 from azureml.studio.modulehost.module_reflector import ModuleEntry
 from azureml.studio.common.datatypes import DataTypes
+from azureml.studio.core.io.image_directory import ImageDirectory
 from .modelpackage import ModelPackageDecoder, MPStaticSource
 from .converter import create_dfd_from_dict, to_dfd, to_dict
 from .utils import PerformanceCounter
@@ -59,7 +62,7 @@ class OfficialModule(DagModule):
 
     def set_resource(self, resource):
         module_host = self.module_host
-        module_host.resources_dict.update(resource)
+        module_host.resources_dict = resource
 
 class CustomModule(DagModule):
     def execute(self, input_data, global_params={}):
@@ -74,7 +77,7 @@ class CustomModule(DagModule):
     @property
     def module_host(self):
         if not self._module_host:
-            self.module_host = CustomModuleHost(
+            self._module_host = CustomModuleHost(
                 self.mp_module.module_name,
                 self.mp_module.class_name,
                 self.mp_module.method_name)
@@ -172,9 +175,12 @@ class DagResourceLoader(object):
             path = os.path.join(self.root_path, static_source.model_name)
             logger.info(f'Invoking handle_input_from_file_name({path}, {data_type})')
 
-            if static_source.datatype_id in ('ModelDirectory', 'TransformDirectory') and os.path.isdir(
-                    path):  # TODO remove this hardcode
-                resource = InputHandler.handle_input_directory(path)
+            if static_source.datatype_id in ('ModelDirectory', 'TransformationDirectory') and os.path.isdir(path):
+                # TODO remove this hardcode
+                try:
+                    resource = InputHandler.handle_input_directory(path)
+                except:
+                    resource = path
                 is_not_datasource = True
             elif static_source.datatype_id == 'DataFrameDirectory' and os.path.isdir(path):
                 resource = InputHandler.handle_input_directory(path)
@@ -289,6 +295,10 @@ class DagGraph(object):
         return modelpackage
 
     def execute(self, input_name2data, global_parameters):
+        def string2bytes(image_string):
+            image_string = image_string.replace('data:image/png;base64,', '')
+            image_string = image_string.replace('data:image/jpg;base64,', '')
+            return base64.b64decode(image_string)
         if set(input_name2data.keys()) != set(self.modelpackage.input_name2port.keys()):
             raise InputDataError(self.modelpackage.inputs, input_name2data)
 
@@ -297,7 +307,13 @@ class DagGraph(object):
             schema = self.modelpackage.input_name2schema[input_name]
             with PerformanceCounter(logger, 'loading input to datatable'):
                 try:
-                    input_data = create_dfd_from_dict(input_raw, schema)
+                    # TODO: refactor this in terms of checking ImageDirectory 
+                    if 'Image' in input_raw and "Label" in input_raw:
+                        image_strings = input_raw['Image']
+                        input_raw['Image'] = [string2bytes(image_string) for image_string in image_strings]
+                        input_data = ImageDirectory.create_from_data(input_raw, schema)
+                    else:
+                        input_data = create_dfd_from_dict(input_raw, schema)
                 except Exception:
                     raise InputDataError(schema, input_raw)
             node, port = self.entry_nodes[input_port]
@@ -321,6 +337,7 @@ class DagGraph(object):
                 with PerformanceCounter(logger,f'executing {node.module.mp_module} with global_params={global_params}'):
                     results = node.execute(global_params)
             except Exception as ex:
+                traceback.print_exc()
                 self.error_module = node.module.mp_module.module_name
                 raise ex
             for output_port, targets in node.outputport_mapping.items():

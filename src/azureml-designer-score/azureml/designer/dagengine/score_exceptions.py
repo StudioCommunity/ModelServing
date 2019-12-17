@@ -1,5 +1,8 @@
 import traceback
-from azureml.studio.common.error import ModuleError
+try:
+    from azureml.studio.internal.error import ModuleError
+except:
+    from azureml.studio.common.error import ModuleError
 
 class InputDataError(Exception):
     def __init__(self, schema, data, with_traceback = False):

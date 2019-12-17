@@ -13,13 +13,23 @@ steps:
 - bash: echo "##vso[task.prependpath]$CONDA/bin"
   displayName: Add conda to PATH
 
+- bash: conda create --yes --quiet --name saver_env
+  displayName: Create Anaconda environment for azureml-designer-model test
+
+- bash: |
+    source activate saver_env
+    conda install -c pytorch pytorch=1.2.0 torchvision=0.4.0 -y
+  displayName: 'Install pytorch'
+
 - script: |
+    source activate saver_env
     cd src/azureml-designer-model
     python -m pip install --upgrade pip
     pip install -r requirements.txt
   displayName: 'Install azureml-designer-model dependencies'
 
 - script: |
+    source activate saver_env
     cd src/azureml-designer-model
     python -m pytest -s
   displayName: 'PyTest azure-designer-model'

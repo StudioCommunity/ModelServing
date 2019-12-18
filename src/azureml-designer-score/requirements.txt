@@ -9,6 +9,7 @@ artifacts-keyring
 azureml-designer-core==0.0.25.post7964938
 
 # for dagengine test
+fire
 pyarrow==0.12.1
 azureml.core
 azureml-designer-internal

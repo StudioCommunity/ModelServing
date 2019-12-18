@@ -45,7 +45,7 @@ def get_requirements() -> list:
     Returns:
         list -- list of requirements
     """
-    exclude = ('pytest', 'pylint', 'torch', 'torchvision', 'pyarrow', 'azureml.core', 'azureml-designer-internal', 'azureml-designer-classic-modules', 'azureml.contrib.services', 'azureml-designer-model', 'azureml-dataprep[pandas,fuse]', 'azureml-designer-core[image]', 'git+https://github.com/chjinche/CustomModules-1.git@master#subdirectory=azureml-custom-module-examples/image-classification')
+    exclude = ('pytest', 'pylint', 'torch', 'torchvision', 'pyarrow', 'azureml.core', 'azureml-designer-internal', 'azureml-designer-classic-modules', 'azureml.contrib.services', 'azureml-designer-model', 'azureml-dataprep[pandas,fuse]', 'azureml-designer-core', 'git+https://github.com/chjinche/CustomModules-1.git@master#subdirectory=azureml-custom-module-examples/image-classification')
     install_reqs = parse_requirements('requirements.txt', session='hack')
     return [str(ir.req) for ir in install_reqs if ir.name not in exclude]
 

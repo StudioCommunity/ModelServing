@@ -15,7 +15,6 @@ azureml.core
 azureml-designer-internal
 azureml-designer-classic-modules==0.0.105
 azureml.contrib.services
-azureml-designer-model==0.1.20191209.4
 azureml-dataprep[pandas,fuse]==1.1.29
 git+https://github.com/chjinche/CustomModules-1.git@master#subdirectory=azureml-custom-module-examples/image-classification
 

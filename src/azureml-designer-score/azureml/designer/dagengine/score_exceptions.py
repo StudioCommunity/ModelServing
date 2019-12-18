@@ -5,7 +5,7 @@ except:
     from azureml.studio.common.error import ModuleError
 
 class InputDataError(Exception):
-    def __init__(self, schema, data, with_traceback = False):
+    def __init__(self, schema, data, with_traceback = True):
         errmsg = f'Input data are inconsistent with schema.\nSchema: {str(schema)[:256]}\nData: {str(data)[:256]}\n'
         if with_traceback:
             errmsg += traceback.format_exc()
@@ -13,7 +13,7 @@ class InputDataError(Exception):
 
 
 class ResourceLoadingError(Exception):
-    def __init__(self, name, type_name, with_traceback = False):
+    def __init__(self, name, type_name, with_traceback = True):
         errmsg = f'Failed to load {type_name} {name} from Model'
         if with_traceback:
             errmsg += traceback.format_exc()

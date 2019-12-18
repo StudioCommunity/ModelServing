@@ -31,8 +31,7 @@ class PytorchStateDictModel(PytorchBaseModel):
 
     def save(self, save_to, overwrite_if_exists=True):
         ioutils.validate_overwrite(save_to, overwrite_if_exists)
-        state_dict = self.raw_model.module.state_dict() if torch.cuda.device_count() > 1 \
-            else self.raw_model.state_dict()
+        state_dict = self.raw_model.state_dict()
         torch.save(state_dict, save_to)
 
     @classmethod
@@ -57,6 +56,9 @@ class PytorchStateDictModel(PytorchBaseModel):
         init_params = flavor.get(ModelSpecConstants.INIT_PARAMS_KEY, {})
         logger.info(f"Trying to initialize model by calling {model_class}({init_params})")
         model = model_class(**init_params)
-        model.load_state_dict(torch.load(load_from))
+        if torch.cuda.is_available():
+            model.load_state_dict(torch.load(load_from))
+        else:
+            model.load_state_dict(torch.load(load_from, map_location=torch.device('cpu')))
 
         return cls(model, flavor)

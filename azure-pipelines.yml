@@ -17,6 +17,8 @@ steps:
     cd src/azureml-designer-model
     python -m pip install --upgrade pip
     pip install -r requirements.txt
+    echo "pip freeze"
+    pip freeze
   displayName: 'Install azureml-designer-model dependencies'
 
 - script: |
@@ -45,6 +47,8 @@ steps:
     pip install keyring --pre
     pip install artifacts-keyring --pre
     pip install -r requirements.txt --extra-index-url=https://msdata.pkgs.visualstudio.com/_packaging/azureml-modules%40Local/pypi/simple/
+    echo "pip freeze"
+    pip freeze
   displayName: 'Install azureml-designer-score dependencies'
 
 - bash: |

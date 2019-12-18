@@ -1,14 +1,14 @@
 # https://pip.pypa.io/en/stable/reference/pip_install/#requirements-file-format
-pandas
-cloudpickle
-Pillow
+pandas==0.24.1
+cloudpickle==1.2.2
+Pillow==6.1.0
 
 # For test cases:
-pytest
-pyint
+pytest==5.2.0
+pylint==2.4.2
 pyarrow==0.12.1
-scipy
-sklearn
+scikit-learn==0.20.3
+scipy==1.2.1
 torch==1.2.0
 torchvision==0.4.0
 

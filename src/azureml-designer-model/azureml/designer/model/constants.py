@@ -43,6 +43,7 @@ class ModelSpecConstants:
     TASK_TYPE_KEY = "task_type"
     LABEL_MAP_FILE_KEY = "label_map_file"
     GROUND_TRUTH_COLUMN_NAME_KEY = "ground_truth_column_name"
+    DEFAULT_GROUND_TRUTH_COLUMN_NAME = "Ground Truth Label"
 
     # Others
     DEFAULT_ARTIFACT_SAVE_PATH = "./AzureMLModel"
@@ -50,6 +51,7 @@ class ModelSpecConstants:
     CONDA_ENV_NAME = "project_environment"
     MODEL_SPEC_FILE_NAME = "model_spec.yaml"
     LOCAL_DEPENDENCIES_PATH = "local_dependencies"
+    LOCAL_DEPENDENCIES_ZIP_FILE_NAME = f"{LOCAL_DEPENDENCIES_PATH}.zip"
     CUSTOM_MODEL_FLAVOR_NAME = "custom"
     CUSTOM_MODEL_DIRECTORY = "model"
     PICKLE_MODEL_FILE_NAME = "model.pkl"

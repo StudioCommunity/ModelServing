@@ -12,7 +12,7 @@ from .densenet import DenseNet
 def mock_image_directory_iterator(directory_path):
     for root, _, files in os.walk(directory_path):
         for filename in files:
-            if filename == "_meta.yaml":
+            if filename in ["_meta.yaml", "images.lst"]:
                 continue
             file_path = os.path.join(root, filename)
             yield Image.open(file_path).convert('RGB'), 0, filename

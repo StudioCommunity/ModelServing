@@ -1,5 +1,6 @@
 from pandas import DataFrame
 import pandas as pd
+import base64
 from azureml.studio.common.datatable.data_table import DataTable
 from azureml.studio.common.datatable.data_type_conversion import convert_column_by_element_type
 from azureml.studio.core.io.data_frame_directory import DataFrameDirectory
@@ -25,6 +26,17 @@ def create_dfd_from_dict(json_data, schema_data):
         ret = DataFrameDirectory.create(data=df, schema=schema_data)
     else:
         ret = DataFrameDirectory.create(data=DataFrame(json_data))
+    return ret
+
+def create_imd_from_dict(json_data, schema_data):
+    from azureml.studio.core.io.image_directory import ImageDirectory
+    def string2bytes(image_string):
+        image_string = image_string.replace('data:image/png;base64,', '')
+        image_string = image_string.replace('data:image/jpg;base64,', '')
+        return base64.b64decode(image_string)
+    image_strings = json_data['Image']
+    json_data['Image'] = [string2bytes(image_string) for image_string in image_strings]
+    ret = ImageDirectory.create_from_data(json_data, schema_data)
     return ret
 
 

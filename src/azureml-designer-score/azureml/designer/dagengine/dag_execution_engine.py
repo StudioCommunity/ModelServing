@@ -9,9 +9,8 @@ from azureml.studio.modulehost.handler.port_io_handler import InputHandler
 from azureml.studio.modulehost.deployment_service_module_host import DeploymentServiceModuleHost
 from azureml.studio.modulehost.module_reflector import ModuleEntry
 from azureml.studio.common.datatypes import DataTypes
-from azureml.studio.core.io.image_directory import ImageDirectory
 from .modelpackage import ModelPackageDecoder, MPStaticSource
-from .converter import create_dfd_from_dict, to_dfd, to_dict
+from .converter import create_imd_from_dict, create_dfd_from_dict, to_dfd, to_dict
 from .utils import PerformanceCounter
 from .score_exceptions import InputDataError, ResourceLoadingError
 
@@ -295,10 +294,6 @@ class DagGraph(object):
         return modelpackage
 
     def execute(self, input_name2data, global_parameters):
-        def string2bytes(image_string):
-            image_string = image_string.replace('data:image/png;base64,', '')
-            image_string = image_string.replace('data:image/jpg;base64,', '')
-            return base64.b64decode(image_string)
         if set(input_name2data.keys()) != set(self.modelpackage.input_name2port.keys()):
             raise InputDataError(self.modelpackage.inputs, input_name2data)
 
@@ -308,10 +303,8 @@ class DagGraph(object):
             with PerformanceCounter(logger, 'loading input to datatable'):
                 try:
                     # TODO: refactor this in terms of checking ImageDirectory 
-                    if 'Image' in input_raw and "Label" in input_raw:
-                        image_strings = input_raw['Image']
-                        input_raw['Image'] = [string2bytes(image_string) for image_string in image_strings]
-                        input_data = ImageDirectory.create_from_data(input_raw, schema)
+                    if 'image_directory' in input_port:
+                        input_data = create_imd_from_dict(input_raw, schema)
                     else:
                         input_data = create_dfd_from_dict(input_raw, schema)
                 except Exception:

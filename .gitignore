@@ -120,3 +120,7 @@ credential.json
 
 # macOS
 .DS_Store
+/src/azureml-designer-score/tests/test1/studiomodelpackage/*
+/src/azureml-designer-score/tests/test2/studiomodelpackage/*
+/src/azureml-designer-score/tests/test1/output/*
+/src/azureml-designer-score/tests/test2/output/*

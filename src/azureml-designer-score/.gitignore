@@ -2,7 +2,6 @@ MNIST_data
 MNIST-data
 *.csv
 outputs
-data
 datas
 notebooks
 app

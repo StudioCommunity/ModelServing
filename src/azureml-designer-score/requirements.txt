@@ -6,7 +6,18 @@ click
 pytest
 keyring
 artifacts-keyring
+
 azureml-designer-core==0.0.25.post7964938
+
+# for dagengine test
+fire
+pyarrow==0.12.1
+azureml.core
+azureml-designer-internal
+azureml-designer-classic-modules==0.0.105
+azureml.contrib.services
+azureml-dataprep[pandas,fuse]==1.1.29
+git+https://github.com/chjinche/CustomModules-1.git@master#subdirectory=azureml-custom-module-examples/image-classification
 
 # WARNING: do NOT upgrade this version because azureml-core 1.0.48 requires it to be <=0.15.89,>=0.15.35
 ruamel.yaml==0.15.89

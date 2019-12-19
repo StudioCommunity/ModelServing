@@ -26,7 +26,7 @@ steps:
     python -m pytest -s
   displayName: 'PyTest azure-designer-model'
 
-- bash: conda create --yes --quiet --name loader_env
+- bash: conda create --yes --quiet --name loader_env python=3.6.8
   displayName: Create Anaconda environment for azureml-designer-score test
 
 - bash: |
@@ -54,7 +54,7 @@ steps:
 - bash: |
     source activate loader_env
     cd src/azureml-designer-score 
-    python -m pytest -s
+    python -m pytest -s --ignore='azureml/designer/score/score/tests/custom'
   displayName: 'PyTest azure-designer-score'
 
 # Save build number to file

@@ -2,7 +2,6 @@ import os
 import json
 import importlib
 import collections
-import base64
 import traceback
 
 from azureml.studio.modulehost.handler.port_io_handler import InputHandler
@@ -302,7 +301,6 @@ class DagGraph(object):
             schema = self.modelpackage.input_name2schema[input_name]
             with PerformanceCounter(logger, 'loading input to datatable'):
                 try:
-                    # TODO: refactor this in terms of checking ImageDirectory 
                     if 'image_directory' in input_port:
                         input_data = create_imd_from_dict(input_raw, schema)
                     else:

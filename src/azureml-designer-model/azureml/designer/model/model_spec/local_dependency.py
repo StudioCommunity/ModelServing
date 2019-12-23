@@ -80,10 +80,14 @@ class LocalDependencyManager(object):
             shutil.rmtree(dst_root_dir)
             logger.info(f"{dst_root_dir} removed.")
             logger.info(f"After rmtree: {os.listdir(os.path.dirname(dst_root_dir))}")
+            logger.info(f"Writing Test File.")
+            test_file_path = os.path.join(os.path.dirname(dst_root_dir), "test.txt")
+            with open(test_file_path, 'w') as fp:
+                fp.write("Hello World\n")
 
-            logger.info(f"Before remove zip: {os.listdir(os.path.dirname(zip_file_path))}")
-            os.remove(zip_file_path)
-            logger.info(f"After remove zip: {os.listdir(os.path.dirname(zip_file_path))}")
+            logger.info(f"Before remove file: {os.listdir(os.path.dirname(zip_file_path))}")
+            os.remove(test_file_path)
+            logger.info(f"After remove file: {os.listdir(os.path.dirname(zip_file_path))}")
 
     def load(self, artifact_path, relative_paths):
         self.local_dependencies = [os.path.abspath(os.path.join(artifact_path, path)) for path in relative_paths]

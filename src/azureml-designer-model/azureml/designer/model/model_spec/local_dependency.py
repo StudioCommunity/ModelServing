@@ -74,8 +74,10 @@ class LocalDependencyManager(object):
             zip_file_path = os.path.join(artifact_path, ModelSpecConstants.LOCAL_DEPENDENCIES_ZIP_FILE_NAME)
             ziputils.zip_dir(dst_root_dir, zip_file_path)
             logger.info(f"Zipped local_dependencies into {zip_file_path}. Removing original directory.")
+            logger.info(f"Before rmtree: {os.listdir('.')}")
             shutil.rmtree(dst_root_dir)
             logger.info(f"{dst_root_dir} removed.")
+            logger.info(f"After rmtree: {os.listdir('.')}")
 
     def load(self, artifact_path, relative_paths):
         self.local_dependencies = [os.path.abspath(os.path.join(artifact_path, path)) for path in relative_paths]

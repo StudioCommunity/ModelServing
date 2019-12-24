@@ -8,6 +8,8 @@ import zipfile
 from azureml.core import Workspace
 from azureml.core.webservice import Webservice
 
+ROOT_DIR = os.path.dirname(__file__)
+
 DOCKFILE_TEMPLATE = '''FROM {base_image}
 ARG conda_env=project_environment
 ARG work_dir=/app
@@ -62,6 +64,7 @@ def create_from_params(subscription, resourcegroup, workspace, deployment=None, 
 # https://mlworkspacecanary.azure.ai/portal/subscriptions/ee85ed72-2b26-48f6-a0e8-cb5bcf98fbd9/resourceGroups/MT/providers/Microsoft.MachineLearningServices/workspaces/zhanxiaAML/deployments/sample1-xin7
 # "https://ml.azure.com/endpoints/lists/realtimeendpoints/amlstudio-5ba5cfd7cf214ccea71438/detail?&wsid=/subscriptions/74eccef0-4b8d-4f83-b5f9-fa100d155b22/resourcegroups/AmlStudioV2DRI/workspaces/StudioV2DRI_EUS"
 def create_from_url(deployment_url):
+    deployment_url = deployment_url.replace('&', '/').replace('?', '/').replace('%2F', '/')
     entries = deployment_url.split('/')
     args = {'subscription': '', 'resourcegroup': '', 'workspace': '', 'deployment': '', 'realtimeendpoint': ''}
     for i, entry in enumerate(entries):
@@ -86,9 +89,10 @@ def copy_scripts(target_dir, overwrite=True):
     candidates = ['main.py', 'rundocker.py']
     for candidate in candidates:
         target_file = os.path.join(target_dir, candidate)
+        source_file = os.path.join(ROOT_DIR, candidate)
         if os.path.exists(target_file) and not overwrite:
             raise FileExistsError(target_file)
-        shutil.copy(candidate, target_file)
+        shutil.copy(source_file, target_file)
 
 
 def download_model(workspace, deployment, target_dir):
@@ -179,7 +183,8 @@ def write_dockerfile(base_image, target_dir):
     with open(os.path.join(target_dir, 'Dockerfile'), 'w') as fp:
         fp.write(dockerfile)
 
-# python -m azureml.designer.score.dagengine.create_debug_env.py create_from_params subscription resourcegroup workspace deployment realtimeendpoint
-# python -m azureml.designer.score.dagengine.debug.create_debug_env create_from_params 74eccef0-4b8d-4f83-b5f9-fa100d155b22 clwantest clwantest "" s7-test2
+# python -m azureml.designer.dagengine.debug.create_debug_env create_from_params subscription resourcegroup workspace deployment realtimeendpoint
+# python -m azureml.designer.dagengine.debug.create_debug_env create_from_params 74eccef0-4b8d-4f83-b5f9-fa100d155b22 clwantest clwantest "" s7-test2
+# python -m azureml.designer.dagengine.debug.create_debug_url create_from_url "https://master.ml.azure.com/endpoints/lists/realtimeendpoints/test-20191217-1509/detail?wsid=/subscriptions/e9b2ec51-5c94-4fa8-809a-dc1e695e4896/resourcegroups/ModuleX-WS2-rg/workspaces/ModuleX-PPE&tid=72f988bf-86f1-41af-91ab-2d7cd011db47"
 if __name__ == '__main__':
     fire.Fire({'create_from_params': create_from_params, 'create_from_url': create_from_url})

@@ -53,6 +53,11 @@ steps:
 
 - bash: |
     source activate loader_env
+    conda evn export
+  displayName: 'Show conda environment'
+
+- bash: |
+    source activate loader_env
     cd src/azureml-designer-score 
     python -m pytest -s --ignore='azureml/designer/score/score/tests/custom'
   displayName: 'PyTest azure-designer-score'

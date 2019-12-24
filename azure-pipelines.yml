@@ -53,7 +53,7 @@ steps:
 
 - bash: |
     source activate loader_env
-    conda evn export
+    conda env export
   displayName: 'Show conda environment'
 
 - bash: |

@@ -27,6 +27,7 @@ class LocalDependencyManager(object):
         src_abs_paths = [os.path.abspath(_) for _ in self.local_dependencies]
 
         with tempfile.TemporaryDirectory() as temp_dir_path:
+            logger.info(f"Created temp dir {temp_dir_path}")
             # Copy pyfiles
             src_py_files = list(filter(lambda x: x.endswith(".py"), src_abs_paths))
             if src_py_files:

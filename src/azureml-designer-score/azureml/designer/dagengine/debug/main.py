@@ -1,6 +1,6 @@
 import os
 import json
-import azureml.designer.score.dagengine.score as Score
+import azureml.designer.dagengine.score_implementation as Score
 
 
 class MockRequest(object):

@@ -73,6 +73,7 @@ class LocalDependencyManager(object):
             if self.copied_local_dependencies:
                 zip_file_path = os.path.join(artifact_path, ModelSpecConstants.LOCAL_DEPENDENCIES_ZIP_FILE_NAME)
                 ziputils.zip_dir(temp_dir_path, zip_file_path)
+                logger.info(f"zipped {temp_dir_path} into {zip_file_path}")
 
     def load(self, artifact_path, relative_paths):
         self.local_dependencies = [os.path.abspath(os.path.join(artifact_path, path)) for path in relative_paths]

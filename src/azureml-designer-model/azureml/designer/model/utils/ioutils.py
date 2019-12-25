@@ -24,7 +24,7 @@ def save_conda_env(path, conda_env):
 
 def copytree_include(src_dir, dst_dir, include_extensions: tuple = (), exist_ok=False):
     os.makedirs(dst_dir, exist_ok=exist_ok)
-    logger.info(f"start copying {src_dir} into = {dst_dir}")
+    logger.info(f"start copying {src_dir} into {dst_dir}")
     # Scan and list all included files before copying to avoid recursion
     file_list = []
     src_dir_len = len(src_dir)
@@ -38,7 +38,7 @@ def copytree_include(src_dir, dst_dir, include_extensions: tuple = (), exist_ok=
         dst_file_path = os.path.join(dst_dir, file_path)
         os.makedirs(os.path.dirname(dst_file_path), exist_ok=True)
         shutil.copy(src_file_path, dst_file_path)
-    logger.info(f"finished copying {src_dir} into = {dst_dir}, {len(file_list)} copied")
+    logger.info(f"finished copying {src_dir} into {dst_dir}, {len(file_list)} files copied")
 
 
 def validate_overwrite(save_to, overwrite_if_exists):

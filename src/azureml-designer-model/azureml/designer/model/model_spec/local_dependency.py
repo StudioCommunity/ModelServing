@@ -22,6 +22,7 @@ class LocalDependencyManager(object):
     def __init__(self, local_dependencies=[]):
         self.local_dependencies = local_dependencies
         self.copied_local_dependencies = []
+        self.temp_local_dependency_path = None
 
     def save(self, artifact_path, exist_ok=True) -> list:
         src_abs_paths = [os.path.abspath(_) for _ in self.local_dependencies]
@@ -81,13 +82,16 @@ class LocalDependencyManager(object):
                     logger.info(f"moved {temp_zip_file_path} to {zip_file_path}")
 
     def load(self, artifact_path, relative_paths):
-        self.local_dependencies = [os.path.abspath(os.path.join(artifact_path, path)) for path in relative_paths]
+        # This is a workaround to avoid loading local dependency from mounted remote disk online, which is intorably slow
+        self.temp_local_dependency_path = tempfile.mkdtemp()
+        logger.info(f"temp_local_dependency_path = {self.temp_local_dependency_path}")
+        self.local_dependencies = [os.path.abspath(os.path.join(self.temp_local_dependency_path, path)) for path in relative_paths]
         logger.info(f"local_dependencies = {self.local_dependencies}")
         if self.local_dependencies:
             zip_file_path = os.path.join(artifact_path, ModelSpecConstants.LOCAL_DEPENDENCIES_ZIP_FILE_NAME)
             if not os.path.isfile(zip_file_path):
                 raise FileNotFoundError(f"Failed to load local_dependencies because {zip_file_path} is missing.")
-            local_dependencies_path = os.path.join(artifact_path, ModelSpecConstants.LOCAL_DEPENDENCIES_PATH)
+            local_dependencies_path = os.path.join(self.temp_local_dependency_path, ModelSpecConstants.LOCAL_DEPENDENCIES_PATH)
             ziputils.unzip_dir(zip_file_path, local_dependencies_path)
             logger.info(f"Unzipped {zip_file_path} to {local_dependencies_path}.")
 

@@ -15,7 +15,7 @@ PYTHON_VERSION = "{major}.{minor}.{micro}".format(major=sys.version_info.major,
 
 def _run_install_cmds(cmds, command_name):
     logger.info(" ".join(cmds))
-    result = subprocess.run(cmds, stdout=PIPE, stderr=PIPE, universal_newlines=True)
+    result = subprocess.run(cmds, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
     log_message = f"Finished to install {command_name} dependencies with return_code {result.returncode}"
     if result.returncode == 0:
         logger.info(log_message)

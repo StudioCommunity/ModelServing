@@ -16,6 +16,7 @@ steps:
 - script: |
     cd src/azureml-designer-model
     python -m pip install --upgrade pip
+    pip install keyring artifacts-keyring
     pip install -r requirements.txt --extra-index-url=https://msdata.pkgs.visualstudio.com/_packaging/azureml-modules%40Local/pypi/simple/
     echo "pip freeze"
     pip freeze
@@ -44,8 +45,7 @@ steps:
     source activate loader_env
     cd src/azureml-designer-score
     python -m pip install --upgrade pip
-    pip install keyring --pre
-    pip install artifacts-keyring --pre
+    pip install keyring artifacts-keyring
     pip install -r requirements.txt --extra-index-url=https://msdata.pkgs.visualstudio.com/_packaging/azureml-modules%40Local/pypi/simple/
     echo "pip freeze"
     pip freeze

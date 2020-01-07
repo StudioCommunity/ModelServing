@@ -1,7 +1,6 @@
 import os
 import sys
-
-from subprocess import Popen, PIPE
+import subprocess
 
 from ..constants import ModelSpecConstants
 from ..logger import get_logger
@@ -16,14 +15,15 @@ PYTHON_VERSION = "{major}.{minor}.{micro}".format(major=sys.version_info.major,
 
 def _run_install_cmds(cmds, command_name):
     logger.info(" ".join(cmds))
-    p = Popen(cmds, stdout=PIPE, stderr=PIPE)
-    p.wait()
-    stdout = p.stdout.read().decode("utf-8")
-    stderr = p.stderr.read().decode("utf-8")
-    logger.info(f"stdout: {stdout}")
-    if stderr:
-        logger.warning(f"stderr: {stderr}")
-    logger.info(f"Finished to install {command_name} dependencies")
+    result = subprocess.run(cmds, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+    log_message = f"Finished to install {command_name} dependencies with return_code {result.returncode}"
+    if result.returncode == 0:
+        logger.info(log_message)
+    else:
+        logger.warning(log_message)
+    logger.info(f"stdout: {result.stdout}")
+    if result.stderr:
+        logger.warning(f"stderr: {result.stderr}")
 
 
 # Temporary workaround to reconstruct the python environment in training phase.

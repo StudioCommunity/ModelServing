@@ -1,5 +1,6 @@
 import os
 import types
+import shutil
 
 from abc import abstractmethod
 import numpy as np
@@ -41,8 +42,8 @@ class GenericModel(object):
     # TODO: Decide whether or not expose this as a parameter in Score Module
     _batch_size = 2
 
-    def __init__(self, core_model, conda=None, local_dependencies=None, inputs=None, outputs=None, task=None,
-                 serving_config=None):
+    def __init__(self, core_model, conda=None, local_dependencies=None, temp_local_dependency_path=None, inputs=None, outputs=None,
+                 task=None, serving_config=None):
         self.core_model = core_model
         if not self.core_model.flavor:
             if not isinstance(core_model, BuiltinModel):
@@ -58,6 +59,7 @@ class GenericModel(object):
         if not self.conda and isinstance(self.core_model, BuiltinModel):
             self.conda = self.core_model.default_conda
         self.local_dependencies = local_dependencies
+        self.temp_local_dependency_path = temp_local_dependency_path
         self.inputs = inputs
         self.outputs = outputs
         self.task = task
@@ -77,6 +79,12 @@ class GenericModel(object):
             # Init task_type
             if self.task:
                 self.core_model.task_type = self.task.task_type
+    
+    def __del__(self):
+        if self.temp_local_dependency_path:
+            logger.info(f"Deleting temp directory {self.temp_local_dependency_path}")
+            shutil.rmtree(self.temp_local_dependency_path)
+            logger.info(f"Deleted temp directory {self.temp_local_dependency_path}")
 
     def save(
         self,
@@ -132,6 +140,7 @@ class GenericModel(object):
         outputs = None
         task = None
         serving_config = None
+        temp_local_dependency_path = None
 
         if ModelSpecConstants.CONDA_FILE_KEY in model_spec:
             conda_yaml_path = os.path.join(artifact_path, model_spec[ModelSpecConstants.CONDA_FILE_KEY])
@@ -162,6 +171,7 @@ class GenericModel(object):
                 local_dependency_manager = LocalDependencyManager()
                 local_dependency_manager.load(artifact_path, local_dependencies)
                 local_dependency_manager.install()
+                temp_local_dependency_path = local_dependency_manager.temp_local_dependency_path
 
         core_model_class = ModelFactory.get_model_class(flavor)
         logger.info(f"core_model_class = {core_model_class}")
@@ -176,6 +186,7 @@ class GenericModel(object):
             core_model=core_model,
             conda=conda,
             local_dependencies=local_dependencies,
+            temp_local_dependency_path=temp_local_dependency_path,
             inputs=inputs,
             outputs=outputs,
             task=task,

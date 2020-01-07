@@ -19,6 +19,8 @@ from .model_spec.task import Task
 from .model_spec.remote_dependency import RemoteDependencyManager
 from .model_spec.serving_config import ServingConfig
 
+from azureml.studio.core.io.image_directory import ImageDirectory
+
 logger = get_logger(__name__)
 
 
@@ -219,6 +221,8 @@ class GenericModel(object):
             postprocessed_data = self._post_process(predict_result)
             if not isinstance(input_data, pd.DataFrame):
                 postprocessed_data = pd.concat([non_feature_df, postprocessed_data], axis=1)
+                postprocessed_data[self.label_column_name] = self.task.label_map.inverse_transform(
+                    postprocessed_data["category_id"].tolist())
             return postprocessed_data
         else:
             return self.core_model.predict(*args, **kwargs)
@@ -233,21 +237,17 @@ class GenericModel(object):
         """
         if isinstance(input_data, pd.DataFrame):
             yield input_data
-        else:
+        elif isinstance(input_data, ImageDirectory):
             batch_df = pd.DataFrame()
-            for image, label, image_id in input_data:
+            for row_dict in input_data.iter_images():
                 if batch_df.shape[0] == self.batch_size:
                     batch_df = pd.DataFrame()
-                batch_df = batch_df.append(
-                    {
-                        "id": image_id,
-                        self.label_column_name: label,
-                        "image": image
-                    }, ignore_index=True
-                )
+                batch_df = batch_df.append(row_dict, ignore_index=True)
                 if batch_df.shape[0] == self.batch_size:
                     yield batch_df
             yield batch_df
+        else:
+            raise NotImplementedError(f"input_data of type {type(input_data)} is not supported yet.")
 
     def _pre_process(self, batch_df) -> np.ndarray:
         """

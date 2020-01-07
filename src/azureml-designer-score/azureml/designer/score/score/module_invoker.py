@@ -46,7 +46,6 @@ def entrance(trained_model: str, dataset: str, scored_dataset: str, append_score
     # TODO: Support other task types
     if score_module.model.task_type == TaskType.MultiClassification:
         predict_df = output_df
-        _LABEL_NAME = 'label'
         score_columns = schema_utils.generate_score_column_meta(predict_df=predict_df)
         if score_module.model.label_column_name in predict_df.columns:
             label_column_name = score_module.model.label_column_name

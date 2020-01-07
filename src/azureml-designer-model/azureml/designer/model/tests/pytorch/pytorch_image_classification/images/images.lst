@@ -1,5 +1,5 @@
-{"source-ref": "056.dog/056_0001.jpg", "class": "056.dog"}
-{"source-ref": "056.dog/056_0002.jpg", "class": "056.dog"}
-{"source-ref": "056.dog/056_0003.jpg", "class": "056.dog"}
-{"source-ref": "056.dog/056_0004.jpg", "class": "056.dog"}
-{"source-ref": "056.dog/056_0005.jpg", "class": "056.dog"}
+{"image_info": {"file_name": "image/056_0001.jpg"}, "category_id": 0, "id": 0}
+{"image_info": {"file_name": "image/056_0002.jpg"}, "category_id": 0, "id": 1}
+{"image_info": {"file_name": "image/056_0003.jpg"}, "category_id": 0, "id": 2}
+{"image_info": {"file_name": "image/056_0004.jpg"}, "category_id": 0, "id": 3}
+{"image_info": {"file_name": "image/056_0005.jpg"}, "category_id": 0, "id": 4}

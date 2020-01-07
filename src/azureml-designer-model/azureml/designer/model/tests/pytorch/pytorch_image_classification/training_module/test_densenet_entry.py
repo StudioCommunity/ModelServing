@@ -2,20 +2,11 @@ import os
 from os.path import dirname, abspath
 
 import torch
-from PIL import Image
+from azureml.studio.core.io.image_directory import ImageDirectory
 from azureml.designer.model.io import save_pytorch_state_dict_model, load_generic_model
 from azureml.designer.model.model_spec.task_type import TaskType
 
 from .densenet import DenseNet
-
-
-def mock_image_directory_iterator(directory_path):
-    for root, _, files in os.walk(directory_path):
-        for filename in files:
-            if filename in ["_meta.yaml", "images.lst"]:
-                continue
-            file_path = os.path.join(root, filename)
-            yield Image.open(file_path).convert('RGB'), 0, filename
 
 
 def test_save_load():
@@ -35,7 +26,6 @@ def test_save_load():
         1: "060.duc",
         2: "080.frog"
     }
-    
     save_pytorch_state_dict_model(
         model,
         init_params=init_params,
@@ -45,9 +35,10 @@ def test_save_load():
         local_dependencies=local_dependencies
     )
     loaded_generic_model = load_generic_model(model_save_path)
-    image_directory = os.path.join(dirname(dirname(abspath(__file__))), "images")
-    image_iterator = mock_image_directory_iterator(image_directory)
-    predict_result = loaded_generic_model.predict(image_iterator)
+    image_directory_path = os.path.join(dirname(dirname(abspath(__file__))), "images")
+    image_directory = ImageDirectory.load(image_directory_path)
+
+    predict_result = loaded_generic_model.predict(image_directory)
     print(f"predict_result =\n{predict_result}")
 
     loaded_pytorch_model = loaded_generic_model.raw_model

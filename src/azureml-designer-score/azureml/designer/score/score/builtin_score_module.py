@@ -1,5 +1,3 @@
-import os
-
 import pandas as pd
 from azureml.designer.model.io import load_generic_model
 from azureml.studio.core.io.image_directory import ImageDirectory
@@ -30,7 +28,7 @@ class BuiltinScoreModule(object):
             raise Exception(f"Unsupported input_directory type: {type(input_directory)}, "
                             f"expecting DataFrameDirectory or ImageDirectory")
         if isinstance(input_directory, ImageDirectory):
-            result_df = self.model.predict(input_directory.iter_images())
+            result_df = self.model.predict(input_directory)
             return result_df
         else:
             df = input_directory.data

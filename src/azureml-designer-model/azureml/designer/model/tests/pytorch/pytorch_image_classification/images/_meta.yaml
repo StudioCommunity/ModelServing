@@ -1,4 +1,5 @@
 type: ImageDirectory
+loader_method: azureml.studio.core.io.image_directory.FolderBasedImageDirectory.load
 extension: {}
 image_lst: images.lst
 samples: _samples.json

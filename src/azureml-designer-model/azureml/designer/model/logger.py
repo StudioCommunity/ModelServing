@@ -1,13 +1,9 @@
-import sys
 import logging
 
 
 # TODO: Enrich this
 def get_logger(name):
+    logging.basicConfig(format="%(asctime)s %(name)-20s %(levelname)-10s %(message)s")
     logger = logging.getLogger(name)
-    logger.setLevel(logging.INFO)
-    formatter = logging.Formatter("%(asctime)s %(name)-20s %(levelname)-10s %(message)s")
-    handler = logging.StreamHandler(sys.stdout)
-    handler.setFormatter(formatter)
-    logger.handlers = [handler]
+    logger.setLevel(logging.DEBUG)
     return logger

@@ -38,7 +38,7 @@ def entrance(trained_model: str, dataset: str, append_score_columns_to_output: s
         dataset=input_dir,
         append_score_columns_to_output=append_score_columns_to_output_bool
     )
-    output_dfd = score_module.run(trained_model, input_dir, append_score_columns_to_output)
+    output_dfd,  = score_module.run(trained_model, input_dir, append_score_columns_to_output)
     logger.info(f"dumping to DFD {scored_dataset}")
     clear_folder(scored_dataset)
     output_dfd.dump(scored_dataset)

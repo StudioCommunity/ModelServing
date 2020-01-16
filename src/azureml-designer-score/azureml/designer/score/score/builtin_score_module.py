@@ -79,4 +79,4 @@ class BuiltinScoreModule(object):
             dfd = DataFrameDirectory.create(data=result_df, schema=meta_data.to_dict())
         else:
             dfd = DataFrameDirectory.create(data=result_df)
-        return dfd
+        return dfd,

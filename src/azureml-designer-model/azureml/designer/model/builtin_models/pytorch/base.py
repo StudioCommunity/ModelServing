@@ -102,6 +102,7 @@ class PytorchBaseModel(BuiltinModel):
                     torchvision.transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
                 ]
             )
+            logger.info("Applied normalization as workaround.")
             return transform(entry).to(self._device)
         if isinstance(entry, str):
             entry = ast.literal_eval(entry)

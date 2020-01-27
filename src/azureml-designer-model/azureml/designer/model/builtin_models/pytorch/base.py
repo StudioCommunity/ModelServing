@@ -37,10 +37,7 @@ class PytorchBaseModel(BuiltinModel):
         self.flavor[ModelSpecConstants.IS_CUDA_KEY] = is_cuda
         self.flavor[ModelSpecConstants.IS_MULTI_GPU_KEY] = is_multi_gpu
         self._device = "cuda" if is_cuda and torch.cuda.is_available() else "cpu"
-        if is_multi_gpu and torch.cuda.device_count() > 1:
-            self.raw_model = torch.nn.DataParallel(self.raw_model).cuda()
-        else:
-            self.raw_model.to(self._device)
+        self.raw_model.to(self._device)
         self.raw_model.eval()
 
     def predict(self, inputs: list) -> list:
@@ -117,7 +114,10 @@ class PytorchBaseModel(BuiltinModel):
         if not self.raw_model:
             logger.warning("Can't get default_feature_columns with raw_model uninitialized")
         try:
-            forward_func = getattr(self.raw_model, 'forward')
+            if isinstance(self.raw_model, torch.nn.DataParallel):
+                forward_func = getattr(self.raw_model.module, 'forward')
+            else:
+                forward_func = getattr(self.raw_model, 'forward')
             args = inspect.getfullargspec(forward_func).args
             if 'self' in args:
                 args.remove('self')

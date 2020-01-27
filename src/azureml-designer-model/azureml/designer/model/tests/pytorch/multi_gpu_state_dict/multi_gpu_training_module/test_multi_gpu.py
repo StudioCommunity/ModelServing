@@ -46,8 +46,7 @@ def test_save_load():
         "output_size": 1
     }
     model = LinearRegression(**init_params).to(device)
-    if torch.cuda.device_count() > 1:
-        model = torch.nn.DataParallel(model)
+    model = torch.nn.DataParallel(model)
     x_train, y_train = get_training_data()
     train(model, x_train, y_train)
 

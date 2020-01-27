@@ -33,9 +33,14 @@ class PytorchBaseModel(BuiltinModel):
     def __init__(self, raw_model, flavor: dict = {}):
         self.raw_model = raw_model
         is_cuda = flavor.get(ModelSpecConstants.IS_CUDA_KEY, False)
+        is_multi_gpu = flavor.get(ModelSpecConstants.IS_MULTI_GPU_KEY, False)
         self.flavor[ModelSpecConstants.IS_CUDA_KEY] = is_cuda
+        self.flavor[ModelSpecConstants.IS_MULTI_GPU_KEY] = is_multi_gpu
         self._device = "cuda" if is_cuda and torch.cuda.is_available() else "cpu"
-        self.raw_model.to(self._device)
+        if is_multi_gpu and torch.cuda.device_count() > 1:
+            self.raw_model = torch.nn.DataParallel(self.raw_model).cuda()
+        else:
+            self.raw_model.to(self._device)
         self.raw_model.eval()
 
     def predict(self, inputs: list) -> list:
@@ -107,7 +112,7 @@ class PytorchBaseModel(BuiltinModel):
         if isinstance(entry, str):
             entry = ast.literal_eval(entry)
         return torch.Tensor(entry).to(self._device)
-    
+
     def get_default_feature_columns(self):
         if not self.raw_model:
             logger.warning("Can't get default_feature_columns with raw_model uninitialized")

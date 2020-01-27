@@ -37,6 +37,7 @@ class ModelSpecConstants:
     MODEL_MODULE_KEY = "module"
     IS_CUDA_KEY = "is_cuda"
     INIT_PARAMS_KEY = "init_params"
+    IS_MULTI_GPU_KEY = "is_multi_gpu"
 
     # Task specified keys in model_spec
     TASK_KEY = "task"

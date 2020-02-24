@@ -13,6 +13,12 @@ steps:
 - bash: echo "##vso[task.prependpath]$CONDA/bin"
   displayName: Add conda to PATH
 
+- task: PipAuthenticate@1
+  inputs:
+    artifactFeeds: 'CustomModules,azureml-modules'
+    onlyAddExtraIndex: true
+  displayName: 'Pip authenticate'
+
 - script: |
     cd src/azureml-designer-model
     python -m pip install --upgrade pip
@@ -58,7 +64,7 @@ steps:
 
 - bash: |
     source activate loader_env
-    cd src/azureml-designer-score 
+    cd src/azureml-designer-score
     python -m pytest -s --ignore='azureml/designer/score/score/tests/custom'
   displayName: 'PyTest azure-designer-score'
 

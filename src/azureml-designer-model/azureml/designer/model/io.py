@@ -59,12 +59,12 @@ def save_pytorch_cloudpickle_model(
 ):
     import torch
     from .builtin_models.pytorch.cloudpickle import PytorchCloudPickleModel
-    is_multi_gpu = isinstance(pytorch_model, torch.nn.DataParallel)
+    is_parallel = isinstance(pytorch_model, torch.nn.DataParallel)
     flavor = {
         ModelSpecConstants.IS_CUDA_KEY: next(pytorch_model.parameters()).is_cuda,
-        ModelSpecConstants.IS_MULTI_GPU_KEY: is_multi_gpu
+        ModelSpecConstants.IS_PARALLEL_KEY: is_parallel
     }
-    model = PytorchCloudPickleModel(pytorch_model.module if is_multi_gpu else pytorch_model, flavor)
+    model = PytorchCloudPickleModel(pytorch_model.module if is_parallel else pytorch_model, flavor)
     logger.info(f"Saving model with is_cuda={next(pytorch_model.parameters()).is_cuda}")
 
     label_map = LabelMap.create(label_map)
@@ -102,13 +102,13 @@ def save_pytorch_state_dict_model(
 ):
     import torch
     from .builtin_models.pytorch.state_dict import PytorchStateDictModel
-    is_multi_gpu = isinstance(pytorch_model, torch.nn.DataParallel)
+    is_parallel = isinstance(pytorch_model, torch.nn.DataParallel)
     flavor = {
         ModelSpecConstants.IS_CUDA_KEY: next(pytorch_model.parameters()).is_cuda,
-        ModelSpecConstants.IS_MULTI_GPU_KEY: is_multi_gpu,
+        ModelSpecConstants.IS_PARALLEL_KEY: is_parallel,
         ModelSpecConstants.INIT_PARAMS_KEY: init_params
     }
-    model = PytorchStateDictModel(pytorch_model.module if is_multi_gpu else pytorch_model, flavor)
+    model = PytorchStateDictModel(pytorch_model.module if is_parallel else pytorch_model, flavor)
     logger.info(f"Saving model with flavor: {flavor}")
 
     label_map = LabelMap.create(label_map)

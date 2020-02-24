@@ -56,11 +56,6 @@ class PytorchStateDictModel(PytorchBaseModel):
         init_params = flavor.get(ModelSpecConstants.INIT_PARAMS_KEY, {})
         logger.info(f"Trying to initialize model by calling {model_class}({init_params})")
         model = model_class(**init_params)
-        is_multi_gpu = flavor.get(ModelSpecConstants.IS_MULTI_GPU_KEY, False)
-        if is_multi_gpu:
-            model = torch.nn.DataParallel(model)
-            model.module.load_state_dict(torch.load(load_from, map_location=torch.device('cpu')))
-        else:
-            model.load_state_dict(torch.load(load_from, map_location=torch.device('cpu')))
+        model.load_state_dict(torch.load(str(load_from), map_location=torch.device('cpu')))
 
         return cls(model, flavor)

@@ -33,12 +33,16 @@ class PytorchBaseModel(BuiltinModel):
     def __init__(self, raw_model, flavor: dict = {}):
         self.raw_model = raw_model
         is_cuda = flavor.get(ModelSpecConstants.IS_CUDA_KEY, False)
-        is_multi_gpu = flavor.get(ModelSpecConstants.IS_MULTI_GPU_KEY, False)
+        is_parallel = flavor.get(ModelSpecConstants.IS_PARALLEL_KEY, False)
         self.flavor[ModelSpecConstants.IS_CUDA_KEY] = is_cuda
-        self.flavor[ModelSpecConstants.IS_MULTI_GPU_KEY] = is_multi_gpu
+        self.flavor[ModelSpecConstants.IS_PARALLEL_KEY] = is_parallel
         self._device = "cuda" if is_cuda and torch.cuda.is_available() else "cpu"
         self.raw_model.to(self._device)
         self.raw_model.eval()
+        if is_parallel and torch.cuda.device_count() > 1:
+            self._parallel_model = torch.nn.DataParallel(raw_model)
+        else:
+            self._parallel_model = None
 
     def predict(self, inputs: list) -> list:
         """
@@ -52,7 +56,10 @@ class PytorchBaseModel(BuiltinModel):
             logger.info(f"len(model_inputs) = {len(model_inputs)}")
             for i, model_input in enumerate(model_inputs):
                 logger.info(f"model_inputs[{i}].shape = {model_input.shape}")
-            model_output = self.raw_model(*model_inputs)
+            if self._parallel_model:
+                model_output = self._parallel_model(*model_inputs)
+            else:
+                model_output = self.raw_model(*model_inputs)
             pred_ret = self._post_process(model_output)
             return pred_ret
 

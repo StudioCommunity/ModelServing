@@ -2,7 +2,7 @@
 pandas==0.24.1
 cloudpickle==1.2.2
 Pillow==6.1.0
-azureml-designer-core==0.0.26.post8823615
+azureml-designer-core[image]==0.0.28.post10715613
 
 # For test cases:
 pytest==5.2.0

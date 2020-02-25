@@ -81,7 +81,7 @@ class GenericModel(object):
             # Init task_type
             if self.task:
                 self.core_model.task_type = self.task.task_type
-    
+
     def __del__(self):
         if self.temp_local_dependency_path:
             logger.info(f"Deleting temp directory {self.temp_local_dependency_path}")
@@ -135,7 +135,7 @@ class GenericModel(object):
         logger.info(f"MODEL_FOLDER: {os.listdir(artifact_path)}")
         model_spec = yamlutils.load_yaml_file(model_spec_path)
         logger.info(f"Successfully loaded {model_spec_path}")
-        
+
         flavor = model_spec[ModelSpecConstants.FLAVOR_KEY]
         conda = None
         inputs = None
@@ -194,7 +194,7 @@ class GenericModel(object):
             task=task,
             serving_config=serving_config
         )
-        
+
     @abstractmethod
     def predict(self, *args, **kwargs):
         """
@@ -208,8 +208,11 @@ class GenericModel(object):
         # For BuiltinModel, we assume there's only one positional input parameter in args[0],
         if isinstance(self.core_model, BuiltinModel):
             input_data = args[0]
+            # Assume it's ImageDirectory if it's not DataFrame
             if not isinstance(input_data, pd.DataFrame):
+                # TODO: Add attribute to specify feature and ground truth instead of hard code
                 self._feature_columns_names = ["image"]
+                self.task.ground_truth_column_name = "category"
 
             non_feature_df = pd.DataFrame()
             predict_result = []
@@ -221,8 +224,6 @@ class GenericModel(object):
             postprocessed_data = self._post_process(predict_result)
             if not isinstance(input_data, pd.DataFrame):
                 postprocessed_data = pd.concat([non_feature_df, postprocessed_data], axis=1)
-                postprocessed_data[self.label_column_name] = self.task.label_map.inverse_transform(
-                    postprocessed_data["category_id"].tolist())
             return postprocessed_data
         else:
             return self.core_model.predict(*args, **kwargs)
@@ -278,7 +279,7 @@ class GenericModel(object):
                 class_cnt = len(probs[0])
             else:
                 return pd.DataFrame()
-            columns = [_gen_scored_probability_column_name(label) for label in 
+            columns = [_gen_scored_probability_column_name(label) for label in
                        self.task.label_map.inverse_transform(range(class_cnt))]
             result_df = pd.DataFrame(data=probs, columns=columns)
             result_df[ScoreColumnConstants.ScoredLabelsColumnName] = self.task.label_map.inverse_transform(label_ids)

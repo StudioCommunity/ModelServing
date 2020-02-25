@@ -9,7 +9,7 @@
         "isNullable": false
       },
       "properties": {
-        "mime_type": "image/jpg",
+        "mime_type": "image/png",
         "image_ref": "image_info"
       }
     },
@@ -23,11 +23,11 @@
       }
     },
     {
-      "name": "category_id",
-      "type": "Numeric",
+      "name": "category",
+      "type": "String",
       "isFeature": false,
       "elementType": {
-        "typeName": "int64",
+        "typeName": "str",
         "isNullable": false
       },
       "properties": {
@@ -35,15 +35,15 @@
         "categories": [
           {
             "id": 0,
-            "name": "056.dog"
+            "name": "cat"
           },
           {
             "id": 1,
-            "name": "060.duck"
+            "name": "dog"
           },
           {
             "id": 2,
-            "name": "080.frog"
+            "name": "frog"
           }
         ]
       }

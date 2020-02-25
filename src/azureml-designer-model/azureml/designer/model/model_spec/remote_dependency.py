@@ -29,7 +29,7 @@ def _run_install_cmds(cmds, command_name):
 # Temporary workaround to reconstruct the python environment in training phase.
 # Should deprecate when Module team support reading the conda.yaml in Model Folder and build image according to that
 class RemoteDependencyManager(object):
-    
+
     def __init__(
         self,
         additional_conda_channels=[],
@@ -51,7 +51,7 @@ class RemoteDependencyManager(object):
             raise Exception(f"File {conda_file_path} exists. Set overwrite_is_exists=True if you want to overwrite it.")
         yamlutils.dump_to_yaml_file(conda_env, conda_file_path)
         logger.info(f"Saved conda to {conda_file_path}")
-    
+
     def load(self, conda_yaml_path):
         logger.info(f"Trying to load conda dependency from {conda_yaml_path}")
         config = yamlutils.load_yaml_file(conda_yaml_path)
@@ -88,4 +88,8 @@ class RemoteDependencyManager(object):
         else:
             pip_cmds = ["pip", "install"] + self.pip_dependencies
             _run_install_cmds(pip_cmds, "pip")
+
+        result = subprocess.run(["pip", "freeze"], stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                universal_newlines=True)
+        logger.debug(f"pip freeze result:\n{result.stdout}")
 

@@ -93,10 +93,13 @@ class RemoteDependencyManager(object):
                 if pip_dependency.startswith("azureml-designer-core"):
                     try:
                         import azureml.studio.core
+                        logger.warning(f"Skipped azureml-designer-core because current sdk depend on it.")
                     except ImportError:
                         filtered_pip_dependencies.append(pip_dependency)
                 elif pip_dependency.startswith("azureml-designer-model"):
                     try:
+                        logger.warning(f"Skipped {pip_dependency} because it's forbidden to alter on the fly, "
+                                       f"please update manually if needed.")
                         import azureml.designer.model
                     except ImportError:
                         filtered_pip_dependencies.append(pip_dependency)

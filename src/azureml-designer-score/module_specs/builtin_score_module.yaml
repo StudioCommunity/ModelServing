@@ -1,6 +1,6 @@
-name: Score Model With Spec Unified Class Definition
+name: Score Modern Model
 id: 412abbd1-794f-4888-a72f-a16220b9a521
-version: 0.0.0.2
+version: 0.0.0.5
 category: Machine Learning\Score
 description: Buildin Score Module for a set of limited flavors.
 inputs:
@@ -36,13 +36,13 @@ implementation:
       - pip:
         # Workaround for dataset input
         - azureml-defaults
-        - azureml-designer-model==0.1.20200110.1
-        - azureml-designer-score==0.1.20200110.1
-        - azureml-designer-core==0.0.26
-        - cloudpickle
-        - PyYAML
-        - click
-        - pandas
+        - azureml-designer-model==0.1.20200224.4
+        - azureml-designer-score==0.1.20200224.4
+        - azureml-designer-core==0.0.28
+        - cloudpickle==1.2.2
+        - PyYAML==5.1.2
+        - click==7.0
+        - pandas==0.24.1
         - pyarrow==0.12.1
     command:
     - python

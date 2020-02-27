@@ -86,7 +86,23 @@ class RemoteDependencyManager(object):
         if not self.pip_dependencies:
             logger.info("No pip dependencies to install")
         else:
-            pip_cmds = ["pip", "install"] + self.pip_dependencies
+            # Temp workaround to avoid installing dependency break Dagengine
+            # TODO: Add parameter like "escape_core" to control this behavior
+            filtered_pip_dependencies = []
+            for pip_dependency in self.pip_dependencies:
+                if pip_dependency.startswith("azureml-designer-core"):
+                    try:
+                        import azureml.studio.core
+                    except ImportError:
+                        filtered_pip_dependencies.append(pip_dependency)
+                elif pip_dependency.startswith("azureml-designer-model"):
+                    try:
+                        import azureml.designer.model
+                    except ImportError:
+                        filtered_pip_dependencies.append(pip_dependency)
+                else:
+                    filtered_pip_dependencies.append(pip_dependency)
+            pip_cmds = ["pip", "install"] + filtered_pip_dependencies
             _run_install_cmds(pip_cmds, "pip")
 
         result = subprocess.run(["pip", "freeze"], stdout=subprocess.PIPE, stderr=subprocess.PIPE,

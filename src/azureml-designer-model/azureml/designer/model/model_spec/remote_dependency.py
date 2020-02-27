@@ -86,24 +86,25 @@ class RemoteDependencyManager(object):
         if not self.pip_dependencies:
             logger.info("No pip dependencies to install")
         else:
-            # Temp workaround to avoid installing dependency break Dagengine
+            # Temp workaround to avoid installing dependency break Dagengine, should freeze azureml-designer-core and
+            # azureml-designer-model
             # TODO: Add parameter like "escape_core" to control this behavior
             filtered_pip_dependencies = []
+            result = subprocess.run(["pip", "list"], stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                    universal_newlines=True)
+            installed_pip_list = [line.split() for line in result.stdout.strip().split('\n')]
+            installed_pip_version_dict = {x[0]: x[1] for x in installed_pip_list if len(x) == 2}
+            # TODO: Think of how to deal with modules which depend on fixed core or model version, e.g. pytorch-modules
+            fixed_version_packages = ["azureml-designer-core", "azureml-designer-model",
+                                      "azureml-designer-pytorch-modules"]
             for pip_dependency in self.pip_dependencies:
-                if pip_dependency.startswith("azureml-designer-core"):
-                    try:
-                        import azureml.studio.core
-                        logger.warning(f"Skipped azureml-designer-core because current sdk depend on it.")
-                    except ImportError:
-                        filtered_pip_dependencies.append(pip_dependency)
-                elif pip_dependency.startswith("azureml-designer-model"):
-                    try:
-                        logger.warning(f"Skipped {pip_dependency} because it's forbidden to alter on the fly, "
-                                       f"please update manually if needed.")
-                        import azureml.designer.model
-                    except ImportError:
-                        filtered_pip_dependencies.append(pip_dependency)
-                else:
+                skip = False
+                for reserved_package in fixed_version_packages:
+                    if pip_dependency.startswith(reserved_package) and reserved_package in installed_pip_version_dict:
+                        logger.warning(f"Skipped {reserved_package} because current sdk depend on it.")
+                        skip = True
+                        break
+                if not skip:
                     filtered_pip_dependencies.append(pip_dependency)
             pip_cmds = ["pip", "install"] + filtered_pip_dependencies
             _run_install_cmds(pip_cmds, "pip")
